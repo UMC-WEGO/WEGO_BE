@@ -1,6 +1,6 @@
 ---
 name: "❌ Bug Template"
-about: 버그가 발생한 상황과 수정 사항을 적습니다.
+about: 버그가 발생한 상황과 수정 사항을 적어주세요.
 title: "[ BUG ]"
 labels: ''
 assignees: ''
