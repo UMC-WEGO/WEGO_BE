@@ -1,0 +1,411 @@
+openapi: 3.0.0
+info:
+  title: USER 관련 API
+  version: 1.0.0
+paths:
+  /users/info:
+    get:
+      tags:
+        - USER
+      summary: 마이페이지 정보 조회
+      responses:
+        "200":
+          description: 마이페이지 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 마이페이지 정보 조회 성공
+                  result:
+                    type: object
+                    properties:
+                      user_id:
+                        type: integer
+                        example: 1
+                      nickname:
+                        type: string
+                        example: tndbsrkd
+                      email:
+                        type: string
+                        example: test@example.com
+                      point:
+                        type: integer
+                        example: 1400
+                      travel:
+                        type: integer
+                        example: 1
+                      completedMissions:
+                        type: integer
+                        example: 8
+                      temperature:
+                        type: integer
+                        example: 30
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /users/profile:
+    patch:
+      tags:
+        - USER
+      summary: 프로필 수정
+      responses:
+        "200":
+          description: 프로필 수정 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 프로필이 성공적으로 업데이트되었습니다.
+        "409":
+          description: 이미 존재하는 닉네임
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 409
+                  message:
+                    type: string
+                    example: 이미 존재하는 닉네임입니다.
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /users/past-trips:
+    get:
+      tags:
+        - USER
+      summary: 지난 여행 조회
+      responses:
+        "200":
+          description: 지난 여행 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 지난 여행 목록 조회 성공
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tripId:
+                          type: integer
+                          example: 1
+                        destination:
+                          type: string
+                          example: 충주
+                        startDate:
+                          type: string
+                          format: date-time
+                          example: "2024-11-26T12:00:00Z"
+                        endDate:
+                          type: string
+                          format: date-time
+                          example: "2024-11-27T12:00:00Z"
+                        participants:
+                          type: integer
+                          example: 7
+                        completedMissions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              missionId:
+                                type: integer
+                                example: 1
+                              photoUrl:
+                                type: string
+                                example: "https://example.com/images/mission1.jpg"
+                              missionTitle:
+                                type: string
+                                example: 골목길 미션
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /users/past-trips/{tripId}/missions/{missionId}:
+    get:
+      tags:
+        - USER
+      summary: 미션 상세 조회
+      parameters:
+        - name: tripId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: missionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: 미션 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 미션 상세 조회 성공
+                  data:
+                    type: object
+                    properties:
+                      tripId:
+                        type: integer
+                        example: 1
+                      missionId:
+                        type: integer
+                        example: 1
+                      photoUrl:
+                        type: string
+                        example: "https://example.com/images/mission1.jpg"
+                      missionTitle:
+                        type: string
+                        example: 골목길 미션
+                      description:
+                        type: string
+                        example: 충주 관아골 골목 다녀왔는데 벽화가 너무 예뻤다.
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /users/my-posts:
+    get:
+      tags:
+        - USER
+      summary: 내가 쓴 글 조회
+      responses:
+        "200":
+          description: 내가 쓴 글 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 내가 쓴 글 목록 조회 성공
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        postId:
+                          type: integer
+                          example: 1
+                        photoUrl:
+                          type: string
+                          example: "https://example.com/images/mission1.jpg"
+                        topic:
+                          type: string
+                          example: 미션 제안
+                        title:
+                          type: string
+                          example: 이런건 어떤가요 ㅋㅋ
+                        content:
+                          type: string
+                          example: 순천 안온해변에서 갑자기 갯벌 밟아보기 어
+                        region:
+                          type: string
+                          example: 순천시
+                        createdAt:
+                          type: string
+                          format: date-time
+                          example: "2024-11-26T12:00:00Z"
+                        likes:
+                          type: integer
+                          example: 5
+                        comments:
+                          type: integer
+                          example: 3
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /users/my-missions:
+    get:
+      tags:
+        - USER
+      summary: 저장한 미션 조회
+      responses:
+        "200":
+          description: 저장한 미션 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 저장한 미션 조회 성공
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tripId:
+                          type: integer
+                          example: 1
+                        destination:
+                          type: string
+                          example: 충주
+                        startDate:
+                          type: string
+                          format: date-time
+                          example: "2024-11-26T12:00:00Z"
+                        endDate:
+                          type: string
+                          format: date-time
+                          example: "2024-11-27T12:00:00Z"
+                        participants:
+                          type: integer
+                          example: 7
+                        completedMissions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              missionId:
+                                type: integer
+                                example: 1
+                              missionTitle:
+                                type: string
+                                example: 골목길 미션
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
