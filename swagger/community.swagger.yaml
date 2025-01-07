@@ -1,0 +1,744 @@
+openapi: 3.0.0
+info:
+  title: COMMUNITY 관련 API
+  version: 1.0.0
+
+paths:
+  /community/posts:
+    post:
+      summary: "즉흥여행 글쓰기"
+      tags:
+        - COMMUNITY
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                topic:
+                  type: string
+                  description: 게시글 주제
+                  example: 미션 제안
+                local:
+                  type: string
+                  description: 지역명
+                  example: 순천
+                title:
+                  type: string
+                  description: 게시물 제목
+                  example: 이런건 어떤가요 ㅋㅋ
+                content:
+                  type: string
+                  description: 게시물 본문
+                  example: 순천 안온해변에서 어쩌고
+                images:
+                  type: array
+                  description: 이미지(최대 5개)
+                  example: "https://example.com/uploads/image1.jpg"
+                  items:
+                    type: string
+                    format: uri
+      responses:
+        '200':
+          description: "게시글 작성 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 게시글 작성 성공
+                  result:
+                    type: object
+                    properties:
+                      userId:
+                        type: integer
+                        example: 1
+                      postId:
+                        type: integer
+                        example: 1
+                      topic:
+                        type: string
+                        example: 미션 제안
+                      local:
+                        type: string
+                        example: 순천
+                      title:
+                        type: string
+                        example: 이런건 어떤가요 ㅋㅋ
+                      content:
+                        type: string
+                        example: 순천 안온해변에서 어쩌고
+                      images:
+                        type: array
+                        items:
+                          type: string
+                          format: uri
+                        example: 
+                          - https://example.com/uploads/image1.jpg
+                          - https://example.com/uploads/image2.jpg
+                      createdAt:
+                        type: string
+                        example: 2025-01-06T12:00:00Z
+                        format: date-time
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /community/posts/local:
+    get:
+      summary: "게시글 지역 선택 시 최근 출발 지역 조회"
+      tags:
+        - COMMUNITY
+      responses:
+        '200':
+          description: "최근 출발 지역 조회 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 최근 출발 지역 조회 성공
+                  result:
+                    type: object
+                    properties:
+                      userId:
+                        type: integer
+                      local:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                          - 서울 강북
+                          - 부산
+                          
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /community/impromptu-posts:
+    get:
+      summary: "즉흥 게시판 글 조회"
+      tags:
+        - COMMUNITY
+      parameters:
+        - name: topic
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "즉흥 게시판 글 조회 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 즉흥 게시판 글 조회 성공
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        userId:
+                          type: integer
+                          example: 1
+                        postId:
+                          type: integer
+                          example: 1
+                        topic:
+                          type: string
+                          example: 미션 제안
+                        local:
+                          type: string
+                          example: 순천
+                        title:
+                          type: string
+                          example: 이런건 어떤가요 ㅋㅋ
+                        content:
+                          type: string
+                          example: 순천 안온해변에서 어쩌고
+                        images:
+                          type: array
+                          items:
+                            type: string
+                            format: uri
+                          example: 
+                            - https://example.com/uploads/image1.jpg
+                            - https://example.com/uploads/image2.jpg
+                        createdAt:
+                          type: string
+                          example: 2025-01-06T12:00:00Z
+                          format: date-time
+                        likes:
+                          type: integer
+                          example: 5
+                        comments:
+                          type: integer
+                          example: 3
+                        scraps:
+                          type: integer
+                          example: 5
+                        isLiked:
+                          type: boolean
+                          example: true
+                        isScraped:
+                          type: boolean
+                          example: false
+        '400':
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /community/popular-posts:
+    get:
+      summary: "인기 게시판 글 조회"
+      tags:
+        - COMMUNITY
+      responses:
+        '200':
+          description: "인기 게시판 글 조회 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 즉흥 게시판 글 조회 성공
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        userId:
+                          type: integer
+                          example: 1
+                        postId:
+                          type: integer
+                          example: 1
+                        topic:
+                          type: string
+                          example: 미션 제안
+                        local:
+                          type: string
+                          example: 순천
+                        title:
+                          type: string
+                          example: 이런건 어떤가요 ㅋㅋ
+                        content:
+                          type: string
+                          example: 순천 안온해변에서 어쩌고
+                        images:
+                          type: array
+                          items:
+                            type: string
+                            format: uri
+                          example: 
+                            - https://example.com/uploads/image1.jpg
+                            - https://example.com/uploads/image2.jpg
+                        createdAt:
+                          type: string
+                          example: 2025-01-06T12:00:00Z
+                          format: date-time
+                        likes:
+                          type: integer
+                          example: 5
+                        comments:
+                          type: integer
+                          example: 3
+                        scraps:
+                          type: integer
+                          example: 5
+                        isLiked:
+                          type: boolean
+                          example: true
+                        isScraped:
+                          type: boolean
+                          example: false
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /community/posts/{postId}:
+    get:
+      summary: "특정 게시물 조회"
+      tags:
+        - COMMUNITY
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "특정 게시물 조회 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 특정 게시물 조회 성공
+                  result:
+                    type: object
+                    properties:
+                      postId:
+                        type: integer
+                        example: 123
+                      author:
+                        type: object
+                        properties:
+                          nickname:
+                            type: string
+                            example: "홍길동"
+                          profileImage:
+                            type: string
+                            format: uri
+                            example: "https://example.com/profile.jpg"
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2025-01-06T12:00:00Z"
+                      title:
+                        type: string
+                        example: "예시 게시물 제목"
+                      content:
+                        type: string
+                        example: "이것은 예시 게시물의 내용입니다."
+                      images:
+                        type: array
+                        items:
+                          type: string
+                          format: uri
+                        example: 
+                          - "https://example.com/uploads/image1.jpg"
+                          - "https://example.com/uploads/image2.jpg"
+                      totalLikes:
+                        type: integer
+                        example: 25
+                      totalComments:
+                        type: integer
+                        example: 10
+                      totalScraps:
+                        type: integer
+                        example: 3
+                      isLiked:
+                        type: boolean
+                        example: true
+                      isScraped:
+                        type: boolean
+                        example: false
+                      comments:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            nickname:
+                              type: string
+                              example: "WEGO"
+                            createdAt:
+                              type: string
+                              format: date-time
+                              example: "2025-01-06T13:00:00Z"
+                            content:
+                              type: string
+                              example: "이 게시물 정말 좋네요!"
+
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /community/posts/{postId}/likes:
+    patch:
+      summary: "게시물 공감"
+      tags:
+        - COMMUNITY
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "게시물 공감 추가 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 게시물 공감 추가 성공
+                  result:
+                    type: object
+                    properties:
+                      userId:
+                        type: integer
+                        example: 1
+                      postId:
+                        type: integer
+                        example: 1
+                      totalLikes:
+                        type: integer
+                        example: 26
+                      isLiked:
+                        type: boolean
+                        example: true
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /community/posts/{postId}/comments:
+    post:
+      summary: "게시물 댓글 작성"
+      tags:
+        - COMMUNITY
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  example: "이 게시물 정말 재미있어요!"
+      responses:
+        '200':
+          description: "댓글 작성 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "댓글 작성 성공"
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        commentId:
+                          type: integer
+                          example: 1
+                        postId:
+                          type: integer
+                          example: 123
+                        userId:
+                          type: integer
+                          example: 45
+                        nickname:
+                          type: string
+                          example: "WEGO"
+                        text:
+                          type: string
+                          example: "이 게시물 정말 재미있어요!"
+                        createdAt:
+                          type: string
+                          format: date-time
+                          example: "2025-01-06T12:00:00Z"
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "잘못된 요청입니다."
+
+
+  /community/posts/{postId}/scraps:
+    patch:
+      summary: "게시물 스크랩"
+      tags:
+        - COMMUNITY
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "게시물 스크랩 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "게시물 스크랩 성공"
+                  result:
+                    type: object
+                    properties:
+                      userId:
+                        type: integer
+                        example: 1
+                      postId:
+                        type: integer
+                        example: 101
+                      totalScraps:
+                        type: integer
+                        example: 10
+                      isScraped:
+                        type: boolean
+                        example: true
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "잘못된 요청입니다."
+
+/community/my-scraps:
+    get:
+      summary: "스크랩한 글 조회"
+      tags:
+        - COMMUNITY
+      parameters:
+        - name: topic
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "스크랩 글 조회 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "스크랩 글 조회 성공"
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        userId:
+                          type: integer
+                          example: 1
+                        postId:
+                          type: integer
+                          example: 1
+                        topic:
+                          type: string
+                          example: "미션 제안"
+                        local:
+                          type: string
+                          example: "서울 강북"
+                        title:
+                          type: string
+                          example: "이런 건 어떠세요?"
+                        content:
+                          type: string
+                          example: "~~~~~~"
+                        image:
+                          type: string
+                          format: uri
+                          example: "https://example.com/image1.jpg"
+                        createdAt:
+                          type: string
+                          format: date-time
+                          example: "2025-01-06T12:00:00Z"
+                        totalLikes:
+                          type: integer
+                          example: 20
+                        totalComments:
+                          type: integer
+                          example: 3
+                        totalScraps:
+                          type: integer
+                          example: 5
+                        isLiked:
+                          type: boolean
+                          example: true
+                        isScraped:
+                          type: boolean
+                          example: true
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "잘못된 요청입니다."
