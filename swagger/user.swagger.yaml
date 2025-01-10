@@ -34,6 +34,9 @@ paths:
                       nickname:
                         type: string
                         example: tndbsrkd
+                      profile_image:
+                        type: string
+                        example: "https://example.com/images/profile.jpg"
                       email:
                         type: string
                         example: test@example.com
@@ -65,12 +68,31 @@ paths:
                   message:
                     type: string
                     example: 잘못된 요청입니다.
-
   /users/profile:
     patch:
       tags:
         - USER
       summary: 프로필 수정
+      requestBody:
+        description: "수정할 프로필 데이터(이미지, 이메일, 닉네임 중 하나 이상)"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nickname:
+                  type: string
+                  description: "변경할 닉네임"
+                  example: "newNickname"
+                email:
+                  type: string
+                  description: "변경할 이메일"
+                  example: "newEmail@example.com"
+                profileImage:
+                  format: uri
+                  description: "프로필 이미지"
+                  example: "https://example.com/images/profile.jpg"
       responses:
         "200":
           description: 프로필 수정 성공
@@ -87,9 +109,9 @@ paths:
                     example: 200
                   message:
                     type: string
-                    example: 프로필이 성공적으로 업데이트되었습니다.
+                    example: "프로필이 성공적으로 업데이트되었습니다."
         "409":
-          description: 이미 존재하는 닉네임
+          description: 이미 존재하는 닉네임 혹은 이메일
           content:
             application/json:
               schema:
@@ -97,13 +119,13 @@ paths:
                 properties:
                   isSuccess:
                     type: boolean
-                    example: true
+                    example: false
                   code:
                     type: integer
                     example: 409
                   message:
                     type: string
-                    example: 이미 존재하는 닉네임입니다.
+                    example: "이미 존재하는 닉네임입니다."
         "400":
           description: 잘못된 요청
           content:
@@ -119,8 +141,7 @@ paths:
                     example: 400
                   message:
                     type: string
-                    example: 잘못된 요청입니다.
-
+                    example: "잘못된 요청입니다."
   /users/past-trips:
     get:
       tags:
@@ -165,6 +186,9 @@ paths:
                         participants:
                           type: integer
                           example: 7
+                        allMissionsCompleted:
+                          type: boolean
+                          example: true
                         completedMissions:
                           type: array
                           items:
@@ -241,7 +265,7 @@ paths:
                         type: integer
                         example: 1
                       photoUrl:
-                        type: string
+                        format: uri
                         example: "https://example.com/images/mission1.jpg"
                       missionTitle:
                         type: string
@@ -321,78 +345,15 @@ paths:
                         comments:
                           type: integer
                           example: 3
-        "400":
-          description: 잘못된 요청
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  isSuccess:
-                    type: boolean
-                    example: false
-                  code:
-                    type: integer
-                    example: 400
-                  message:
-                    type: string
-                    example: 잘못된 요청입니다.
-
-  /users/my-missions:
-    get:
-      tags:
-        - USER
-      summary: 저장한 미션 조회
-      responses:
-        "200":
-          description: 저장한 미션 조회 성공
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  isSuccess:
-                    type: boolean
-                    example: true
-                  code:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: 저장한 미션 조회 성공
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        tripId:
-                          type: integer
-                          example: 1
-                        destination:
-                          type: string
-                          example: 충주
-                        startDate:
-                          type: string
-                          format: date-time
-                          example: "2024-11-26T12:00:00Z"
-                        endDate:
-                          type: string
-                          format: date-time
-                          example: "2024-11-27T12:00:00Z"
-                        participants:
-                          type: integer
-                          example: 7
-                        completedMissions:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              missionId:
-                                type: integer
-                                example: 1
-                              missionTitle:
-                                type: string
-                                example: 골목길 미션
+                        isScrapped:
+                          type: boolean
+                          example: true
+                        isLiked:
+                          type: boolean
+                          example: false
+                        hasCommented:
+                          type: boolean
+                          example: true
         "400":
           description: 잘못된 요청
           content:
