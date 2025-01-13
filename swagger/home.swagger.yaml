@@ -120,4 +120,265 @@ paths:
                   message:
                     type: string
                     example: "잘못된 요청입니다."
+  
+  /home/register-trip:
+    post:
+      summary: "여행 일정 등록"
+      tags:
+        - HOME
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                travelRegion:
+                  type: string
+                  description: "여행 지역"
+                  example: "부산"
+                startDate:
+                  type: string
+                  format: date-time
+                  description: "여행 시작 날짜"
+                  example: "2025-01-06T12:00:00Z"
+                endDate:
+                  type: string
+                  format: date-time
+                  description: "여행 종료 날짜"
+                  example: "2025-01-08T12:00:00Z"
+                participants:
+                  type: integer
+                  description: "여행 인원"
+                  example: 5
+                transportType:
+                  type: string
+                  description: "이동 수단"
+                  example: "자가용"
+      responses:
+        '200':
+          description: "여행 일정 등록 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "여행 일정이 성공적으로 등록되었습니다."
+        '400':
+          description: "잘못된 요청"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "잘못된 요청입니다."
 
+  /home/popular-missions:
+    post:
+      summary: "인기 미션 조회"
+      tags:
+        - HOME
+      responses:
+        '200':
+          description: "인기 미션 조회 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "인기 미션 조회 성공"
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        missionId:
+                          type: int
+                          description: "미션 id"
+                          example: 1
+                        region:
+                          type: string
+                          description: "지역명"
+                          example: "순천"
+                        missionTitle:
+                          type: string
+                          description: "미션 제목"
+                          example: "길 고양이 사진 찍기"
+                    example:
+                      - missionId : 2
+                        region: "순천"
+                        missionTitle: "길 고양이 사진 찍기"
+                      - missionId : 3
+                        region: "순천"
+                        missionTitle: "길 고양이 사진 찍기"
+        '400':
+          description: "잘못된 요청"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "잘못된 요청입니다."
+
+  /home/upcoming-trips:
+    get:
+      summary: "다가오는 여행 조회"
+      tags:
+        - HOME
+      responses:
+        '200':
+          description: "다가오는 여행 조회 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "다가오는 여행 조회 성공"
+                  result:
+                    type: object
+                    properties:
+                      tripId:
+                        type: int
+                        description: "여행 id"
+                        example: 1
+                      travelRegion:
+                        type: string
+                        description: "여행 지역"
+                        example: "부산"
+                      startDate:
+                        type: string
+                        format: date-time
+                        description: "여행 시작 날짜"
+                        example: "2025-01-06T12:00:00Z"
+                      endDate:
+                        type: string
+                        format: date-time
+                        description: "여행 종료 날짜"
+                        example: "2025-01-08T12:00:00Z"
+                      participants:
+                        type: integer
+                        description: "여행 인원"
+                        example: 5
+                      transportType:
+                        type: string
+                        description: "이동 수단"
+                        example: "자가용"
+        '400':
+          description: "잘못된 요청"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "잘못된 요청입니다."
+
+  /home/upcoming-trips/{tripId}:
+    delete:
+      summary: "다가오는 여행 삭제"
+      tags:
+        - HOME
+      parameters:
+        - name: tripId
+          in: path
+          required: true
+          description: "삭제할 여행의 ID"
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: "여행 삭제 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "여행이 성공적으로 삭제되었습니다."
+        '400':
+          description: "잘못된 요청"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "잘못된 요청입니다."
+        '404':
+          description: "해당 여행을 찾을 수 없음"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: "해당 여행을 찾을 수 없습니다."

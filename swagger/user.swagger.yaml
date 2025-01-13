@@ -370,3 +370,58 @@ paths:
                   message:
                     type: string
                     example: 잘못된 요청입니다.
+  /users/my-missions:
+      get:
+        tags:
+          - USER
+        summary: 저장한 미션 조회
+        responses:
+          "200":
+            description: 저장한 미션 조회 성공
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    isSuccess:
+                      type: boolean
+                      example: true
+                    code:
+                      type: integer
+                      example: 200
+                    message:
+                      type: string
+                      example: 저장한 미션 조회 성공
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          tripId:
+                            type: integer
+                            example: 1
+                          destination:
+                            type: string
+                            example: 충주
+                          startDate:
+                            type: string
+                            format: date-time
+                            example: "2024-11-26T12:00:00Z"
+                          endDate:
+                            type: string
+                            format: date-time
+                            example: "2024-11-27T12:00:00Z"
+                          participants:
+                            type: integer
+                            example: 7
+                          completedMissions:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                missionId:
+                                  type: integer
+                                  example: 1
+                                missionTitle:
+                                  type: string
+                                  example: 골목길 미션

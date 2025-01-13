@@ -434,3 +434,92 @@ paths:
                   message:
                     type: string
                     example: 잘못된 요청입니다.
+
+  /auth/delete:
+    patch:
+      tags:
+        - AUTH
+      summary: 회원 탈퇴
+      # parameters:
+      #   - name: authorization
+      #     in: header
+      #     description: 저장된 refresh token과 db에 저장된 유저 관련 데이터들을 삭제
+      #     required: true
+      responses:
+        "200":
+          description: 회원탈퇴 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 회원탈퇴 성공
+
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /auth/logout:
+    patch:
+      tags:
+        - AUTH
+      summary: 로그아웃
+      # parameters:
+      #   - name: authorization
+      #     in: header
+      #     description: 저장된 refreshToken을 삭제
+      #     required: true
+      responses:
+        "200":
+          description: 로그아웃 성공 시 로그인 페이지로 리디렉션
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 로그아웃 성공
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
