@@ -135,6 +135,161 @@ paths:
                   message:
                     type: string
                     example: 잘못된 요청입니다.
+
+  /auth/email-auth/send:
+    post:
+      tags:
+        - AUTH
+      summary: 이메일 인증 요청
+      requestBody:
+        description: 인증 코드를 받을 이메일 주소를 포함한 요청 본문
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 인증 코드를 받을 이메일 주소
+                  example: test@example.com
+      responses:
+        "200":
+          description: 이메일 인증 요청 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 인증 코드가 전송되었습니다.
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 이메일 형식입니다.
+        "500":
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 서버에서 이메일을 전송하지 못했습니다.
+                  
+  /auth/email-auth/verify:
+    post:
+      tags:
+        - AUTH
+      summary: 인증 코드 검증
+      requestBody:
+        description: 이메일과 인증 코드를 포함한 요청 본문
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 인증을 요청했던 이메일 주소
+                  example: test@example.com
+                code:
+                  type: string
+                  description: 사용자에게 전송된 인증 코드
+                  example: 123456
+      responses:
+        "200":
+          description: 인증 코드 검증 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 인증 코드가 유효합니다.
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+        "401":
+          description: 인증 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 401
+                  message:
+                    type: string
+                    example: 인증 코드가 일치하지 않습니다.
+        "500":
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 인증 검증 중 서버 오류가 발생했습니다.
+
                     
   /auth/login:
     post:
@@ -263,6 +418,95 @@ paths:
                       refreshToken:
                         type: string
                         example: "RefreshToken"
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /auth/delete:
+    patch:
+      tags:
+        - AUTH
+      summary: 회원 탈퇴
+      # parameters:
+      #   - name: authorization
+      #     in: header
+      #     description: 저장된 refresh token과 db에 저장된 유저 관련 데이터들을 삭제
+      #     required: true
+      responses:
+        "200":
+          description: 회원탈퇴 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 회원탈퇴 성공
+
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+
+  /auth/logout:
+    patch:
+      tags:
+        - AUTH
+      summary: 로그아웃
+      # parameters:
+      #   - name: authorization
+      #     in: header
+      #     description: 저장된 refreshToken을 삭제
+      #     required: true
+      responses:
+        "200":
+          description: 로그아웃 성공 시 로그인 페이지로 리디렉션
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 로그아웃 성공
         "400":
           description: 잘못된 요청
           content:
