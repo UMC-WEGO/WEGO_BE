@@ -69,7 +69,6 @@ paths:
                   message:
                     type: string
                     example: 잘못된 요청입니다.
-
   /auth/email-auth/send:
     post:
       tags:
@@ -134,8 +133,7 @@ paths:
                     example: 500
                   message:
                     type: string
-                    example: 서버에서 이메일을 전송하지 못했습니다.
-                  
+                    example: 서버에서 이메일을 전송하지 못했습니다.        
   /auth/email-auth/verify:
     post:
       tags:
@@ -221,8 +219,7 @@ paths:
                     example: 500
                   message:
                     type: string
-                    example: 인증 검증 중 서버 오류가 발생했습니다.
-                                 
+                    example: 인증 검증 중 서버 오류가 발생했습니다.                          
   /auth/login:
     post:
       tags:
@@ -449,3 +446,134 @@ paths:
                   message:
                     type: string
                     example: 잘못된 요청입니다.
+
+  /auth/nickname-check:
+    post:
+        tags:
+          - AUTH
+        summary: 닉네임 중복 검사
+        requestBody:
+          description: 중복 검사하려는 닉네임
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nickname:
+                    type: string
+                    description: "이메일"
+        responses:
+          "200":
+            description: 사용 가능한 닉네임
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    isSuccess:
+                      type: boolean
+                      example: true
+                    code:
+                      type: integer
+                      example: 200
+                    message:
+                      type: string
+                      example: 사용가능한 닉네임입니다.
+          "409":
+            description: 닉네임 중복
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    isSuccess:
+                      type: boolean
+                      example: false
+                    code:
+                      type: integer
+                      example: 409
+                    message:
+                      type: string
+                      example: 이미 사용 중인 닉네임입니다.
+          "400":
+            description: 잘못된 요청
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    isSuccess:
+                      type: boolean
+                      example: false
+                    code:
+                      type: integer
+                      example: 400
+                    message:
+                      type: string
+                      example: 잘못된 요청입니다.
+  /auth/email-check:
+      post:
+        tags:
+          - AUTH
+        summary: 이메일 중복 검사
+        requestBody:
+          description: 중복 검사하려는 이메일
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    description: "이메일"
+        responses:
+          "200":
+            description: 사용 가능한 닉네임
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    isSuccess:
+                      type: boolean
+                      example: true
+                    code:
+                      type: integer
+                      example: 200
+                    message:
+                      type: string
+                      example: 사용가능한 닉네임입니다.
+          "409":
+            description: 닉네임 중복
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    isSuccess:
+                      type: boolean
+                      example: false
+                    code:
+                      type: integer
+                      example: 409
+                    message:
+                      type: string
+                      example: 이미 사용 중인 닉네임입니다.
+          "400":
+            description: 잘못된 요청
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    isSuccess:
+                      type: boolean
+                      example: false
+                    code:
+                      type: integer
+                      example: 400
+                    message:
+                      type: string
+                      example: 잘못된 요청입니다.
