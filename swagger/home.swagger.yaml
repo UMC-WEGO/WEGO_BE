@@ -190,7 +190,7 @@ paths:
                     example: "잘못된 요청입니다."
 
   /home/popular-missions:
-    post:
+    get:
       summary: "인기 미션 조회"
       tags:
         - HOME
