@@ -16,14 +16,18 @@ paths:
             schema:
               type: object
               properties:
-                topic:
-                  type: string
-                  description: 게시글 주제
+                category_id:
+                  type: integer
+                  description: 게시글 카테고리 ID
                   example: 미션 제안
-                local:
-                  type: string
-                  description: 지역명
-                  example: 순천
+                user_id:
+                  type: integer
+                  description: 사용자 ID
+                  example: 2
+                local_id:
+                  type: integer
+                  description: 지역명 ID
+                  example: 3
                 title:
                   type: string
                   description: 게시물 제목
@@ -32,7 +36,7 @@ paths:
                   type: string
                   description: 게시물 본문
                   example: 순천 안온해변에서 어쩌고
-                images:
+                picture_url:
                   type: array
                   description: 이미지(최대 5개)
                   example: 
@@ -42,55 +46,47 @@ paths:
                     type: string
                     format: uri
       responses:
-        '200':
+        '201':
           description: "게시글 작성 성공"
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  isSuccess:
-                    type: boolean
-                    example: true
-                  code:
+                  post_id: 
                     type: integer
-                    example: 200
-                  message:
+                    description: 게시물 ID
+                    example: 22
+                  category_name:
                     type: string
-                    example: 게시글 작성 성공
-                  result:
-                    type: object
-                    properties:
-                      userId:
-                        type: integer
-                        example: 1
-                      postId:
-                        type: integer
-                        example: 1
-                      topic:
-                        type: string
-                        example: 미션 제안
-                      local:
-                        type: string
-                        example: 순천
-                      title:
-                        type: string
-                        example: 이런건 어떤가요 ㅋㅋ
-                      content:
-                        type: string
-                        example: 순천 안온해변에서 어쩌고
-                      images:
-                        type: array
-                        items:
-                          type: string
-                          format: uri
-                        example: 
-                          - https://example.com/uploads/image1.jpg
-                          - https://example.com/uploads/image2.jpg
-                      createdAt:
-                        type: string
-                        example: 2025-01-06T12:00:00Z
-                        format: date-time
+                    description: 카테고리 이름
+                    example: 현지 정보
+                  local_name:
+                    type: string
+                    description: 지역 이름
+                    example: 제주
+                  title:
+                    type: string
+                    description: 게시물 제목
+                    example: 이런건 어떤가요 ㅋㅋㅋ
+                  content:
+                    type: string
+                    description: 게시물 본문
+                    example: 순천 안온해변에서 어쩌고
+                  picture_url:
+                    type: array
+                    description: 이미지(최대 5개)
+                    example:
+                      - "https://example.com/uploads/image1.jpg"
+                      - "https://example.com/uploads/image2.jpg"
+                    items:
+                      type: string
+                      format: uri
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: 생성 일시
+                    example: "2025-01-18T17:29:30.000Z"
         "400":
           description: 잘못된 요청
           content:
@@ -108,7 +104,7 @@ paths:
                     type: string
                     example: 잘못된 요청입니다.
 
-  /community/posts/modify/{postId}:
+  /community/posts/modify/{post_id}:
     patch:
       summary: "게시물 수정"
       tags:
@@ -232,13 +228,13 @@ paths:
                     type: string
                     example: 게시글을 찾을 수 없습니다.
 
-  /community/posts/delete/{postId}:
+  /community/posts/delete/{post_id}:
     delete:
       summary: "게시물 삭제"
       tags:
         - COMMUNITY
       parameters:
-        - name: postId
+        - name: post_id
           in: path
           required: true
           description: 게시물 ID
@@ -545,13 +541,13 @@ paths:
                     type: string
                     example: 잘못된 요청입니다.
 
-  /community/posts/{postId}:
+  /community/posts/{post_id}:
     get:
       summary: "특정 게시물 조회"
       tags:
         - COMMUNITY
       parameters:
-        - name: postId
+        - name: post_id
           in: path
           required: true
           schema:

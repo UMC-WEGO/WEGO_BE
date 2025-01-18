@@ -57,25 +57,35 @@ export const delete_post_repository = async(post_id) => {
 
 
 // 전체 게시글 조회
-export const get_all_posts_repository = async() => {
+export const get_all_posts_repository = async(page,limit) => {
+    const offset = (page - 1) * limit;
+
     const query = `
         SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.name AS local_name, p.created_at
         FROM post p
         JOIN category c ON c.id = p.category_id
         JOIN local l ON l.id = p.local_id
-        ORDER BY created_at DESC;
+        ORDER BY created_at DESC
+        LIMIT ${limit} 
+        OFFSET ${offset};
     `;
     const[rows] = await pool.execute(query);
+
     return rows;
 }
 
 
 // 카테고리별 조회
-export const get_posts_by_category_repository = async(category_id) => {
+export const get_posts_by_category_repository = async(category_id,page,limit) => {
+    const offset = (page- 1) * limit;
+
     const query = `
         SELECT * FROM post
         WHERE category_id = ?
-        ORDER BY created_at DESC;
+        ORDER BY created_at DESC
+        LIMIT ${limit}
+        OFFSET ${offset}
+        ;
     `;
     const [rows] = await pool.execute(query, [category_id]);
     return rows;

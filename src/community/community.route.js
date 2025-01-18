@@ -31,7 +31,7 @@ communityRouter.get("/impromptu-posts", get_all_posts_controller);
 // 카테고리별 게시글 조회 
 communityRouter.get("/impromptu-posts/:category_id", get_posts_by_category_controller);
 
-// 상위 2개 게시물 조회
+// 상위 2개 게시물 조회 - 지역 선택시
 communityRouter.get("/impromptu-posts/top/:local_id", get_top_post_controller);
 
 // 인기 게시판 조회

@@ -56,16 +56,16 @@ export const delete_post_service = async (post_id) => {
 
 
 // 전체 글 조회
-export const get_all_posts_service = async() => {
-    const all_posts = await get_all_posts_repository();
+export const get_all_posts_service = async(page, limit) => {
+    const all_posts = await get_all_posts_repository(page,limit);
 
     return all_posts;
 }
 
 
 // 카테고리별 글 조회
-export const get_posts_by_category_service = async (category_id) => {
-    const posts = await get_posts_by_category_repository(category_id);
+export const get_posts_by_category_service = async (category_id,page,limit) => {
+    const posts = await get_posts_by_category_repository(category_id,page,limit);
 
     return posts;
 }

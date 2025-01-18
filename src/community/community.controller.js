@@ -77,8 +77,11 @@ export const delete_post_controller = async(req,res,next) => {
 
 // 전체 글 조회 
 export const get_all_posts_controller = async(req,res,next) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+
     try {
-        const posts = await get_all_posts_service();
+        const posts = await get_all_posts_service(page, limit);
         res.status(StatusCodes.OK).json(posts);
     } catch(error){
         console.error(error);
@@ -89,9 +92,12 @@ export const get_all_posts_controller = async(req,res,next) => {
 
 // 카테고리별 글 조회
 export const get_posts_by_category_controller = async(req,res,next)=> {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+
     try{
         const category_id = parseInt(req.params.category_id);
-        const posts = await get_posts_by_category_service(category_id);
+        const posts = await get_posts_by_category_service(category_id,page,limit);
 
         res.status(StatusCodes.OK).json(posts);
     } catch (error){
