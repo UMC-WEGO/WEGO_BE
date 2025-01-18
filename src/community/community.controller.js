@@ -10,6 +10,9 @@ import {
     get_top_posts_response_dto,
     get_post_by_id_response_dto,
     get_comment_response_dto,
+
+    create_comment_dto,
+
 } from "./community.dto.js"
 
 import {
@@ -20,6 +23,9 @@ import {
     get_posts_by_category_service,
     get_top_post_service,
     get_post_by_id_service,
+
+    create_comment_service,
+    
 } from "./community.service.js"
 
 
@@ -139,3 +145,20 @@ export const get_post_by_id_controller = async(req,res,next) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "특정 게시물 조회 중에 에러가 발생했습니다."});
     }
 };
+
+
+// 댓글 작성
+export const create_comment_controller = async(req,res) => {
+    try{
+        const post_id = parseInt(req.params.post_id);
+        const post_data = create_comment_dto(req.body);
+
+        const comment = await create_comment_service(post_id, post_data);
+
+        res.status(StatusCodes.CREATED).json(comment);
+    } catch(error) {
+        console.error(error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "댓글 작성 중에 에러가 발생했습니다."});
+    }
+
+}

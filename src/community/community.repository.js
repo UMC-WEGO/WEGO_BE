@@ -124,3 +124,29 @@ export const get_post_by_id_repository = async (post_id) => {
     return rows;
 };
 
+
+
+// 댓글 작성 
+export const create_comment_repository = async(post_id, data) => {
+    const {user_id, content} = data;
+
+    const query = `
+        INSERT INTO comment (user_id, post_id, content, created_at)
+        VALUES (?,?,?,NOW());
+    `;
+
+    const [result] = await pool.execute(query, [user_id, post_id, content]);
+
+    const comment_id = result.insertId;
+
+    const new_query = `
+        SELECT u.nickname AS user_nickname, u.profile_image AS user_profile_image, c.content, c.created_at
+        FROM comment c
+        JOIN user u ON u.id = c.user_id
+        WHERE c.id = ?;
+    `;
+
+    const[new_post] = await pool.execute(new_query,[comment_id]);
+
+    return new_post[0];
+}

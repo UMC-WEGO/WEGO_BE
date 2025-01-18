@@ -1,4 +1,7 @@
-import {create_post_response_dto} from "./community.dto.js"
+import {
+    create_post_response_dto, 
+    create_comment_response_dto,
+} from "./community.dto.js"
 
 import {
     create_post_repository,
@@ -8,13 +11,14 @@ import {
     get_top_post_repository,
     get_posts_by_category_repository,
     get_post_by_id_repository,
+
+    create_comment_repository,
 } from "./community.repository.js"
 
 // 게시글 작성
 export const create_post_service = async (data) => {
     try{
         const post_key = await create_post_repository(data);
-        console.log("생성된 post_key: ", post_key);
 
         if(!post_key) {
             throw new Error("postKey가 존재하지 않습니다.");
@@ -89,3 +93,23 @@ export const get_post_by_id_service = async(post_id) => {
 
     return post;
 }
+
+
+// 댓글 작성 
+export const create_comment_service = async(post_id, data) => {
+    try {
+        const post_key = await create_comment_repository(post_id, data);
+
+        if(!post_key) {
+            throw new Error("댓글이 작성되지 않았습니다.");
+        }
+        
+        const response_dto = create_comment_response_dto(post_key);
+
+        return response_dto;
+    } catch(error){
+        console.error("댓글 작성 서비스 에러: ", error);
+        throw error;
+
+    }
+};

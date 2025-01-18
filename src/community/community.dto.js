@@ -134,3 +134,18 @@ export const get_post_by_id_response_dto = (response, post_id) => ({
     //comments: response.comments.map(comment => get_comment_response_dto(comment, user[comment.user_id])),
 });
 
+
+
+// 댓글 작성 DTO
+export const create_comment_dto = (data) => ({
+    content: data.content,
+    user_id: data.user_id,
+});
+
+// 댓글 작성 응답 DTO
+export const create_comment_response_dto = (response) => ({
+    user_nickname: response.user_nickname,
+    user_profile_image : response.user_profile_image,
+    content: response.content,
+    created_at: response.created_at ? new Date(response.created_at).toISOString() : null,
+});

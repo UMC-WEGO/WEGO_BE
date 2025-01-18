@@ -8,6 +8,8 @@ import {
     get_posts_by_category_controller,
     get_top_post_controller,
     get_post_by_id_controller,
+
+    create_comment_controller,
 } from './community.controller.js'
 
 const communityRouter = express.Router();
@@ -40,5 +42,8 @@ communityRouter.get("/impromptu-posts/top/:local_id", get_top_post_controller);
 //특정 게시물 조회
 communityRouter.get("/posts/:post_id", get_post_by_id_controller);
 
+
+// 댓글 작성 
+communityRouter.post("/posts/:post_id/comments", create_comment_controller);
 
 export default communityRouter;
