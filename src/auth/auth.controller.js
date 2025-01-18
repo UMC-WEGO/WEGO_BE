@@ -1,8 +1,14 @@
 // src/auth/auth.controller.js
 
 import { response } from '../../config/response.js';
-import { signUp, login } from './auth.service.js';
-import { SignUpDto, LoginDto, RefreshDto, NicknameCheckDTO, EmailCheckDTO } from './auth.dto.js';
+import { 
+  signUp,
+  login,
+  checkNickname,
+  checkEmail,
+  refreshTokens 
+} from './auth.service.js';
+import { SignUpDto, LoginDto } from './auth.dto.js';
 
 export const signUpController = async (req, res) => {
   try {
@@ -29,7 +35,6 @@ export const signUpController = async (req, res) => {
   }
 };
 
-// src/auth/auth.controller.js
 
 export const loginController = async (req, res) => {
   try {
@@ -56,5 +61,66 @@ export const loginController = async (req, res) => {
     );
 
     return res.status(401).json(result);
+  }
+};
+
+export const nicknameCheckController = async (req, res) => {
+  try {
+    const { nickname } = req.body;
+    const result = await checkNickname(nickname);
+    const responseResult = response(
+      { isSuccess: true, code: 200, message: result.message }
+    );
+    return res.status(200).json(responseResult);
+  } catch (error) {
+    const responseResult = response(
+      { isSuccess: false, code: 409, message: error.message }
+    );
+    return res.status(409).json(responseResult);
+  }
+};
+
+export const emailCheckController = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const result = await checkEmail(email);
+    const responseResult = response(
+      { isSuccess: true, code: 200, message: result.message }
+    );
+    return res.status(200).json(responseResult);
+  } catch (error) {
+    const responseResult = response(
+      { isSuccess: false, code: 409, message: error.message }
+    );
+    return res.status(409).json(responseResult);
+  }
+};
+
+export const refreshController = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      throw new Error('리프레시 토큰이 제공되지 않았습니다.');
+    }
+
+    const tokens = await refreshTokens(refreshToken);
+
+    const result = response(
+      { isSuccess: true, code: 200, message: '토큰 재발급 성공' },
+      {
+        refreshToken: tokens.refreshToken,
+      }
+    );
+
+    res.header('Authorization', `Bearer ${tokens.accessToken}`);
+    return res.status(200).json(result);
+  } catch (error) {
+    const result = response(
+      { isSuccess: false, code: 400, message: error.message || '잘못된 요청입니다.' },
+      null
+    );
+
+    return res.status(400).json(result);
   }
 };

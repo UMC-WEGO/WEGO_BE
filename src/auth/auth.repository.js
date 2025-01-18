@@ -30,7 +30,7 @@ export const findUserByEmail = async (email) => {
   } catch (error) {
     console.error('Error fetching user by email:', error.message);
     console.error(error.stack);
-    throw new Error('데이터베이스 오류가 발생했습니다.');
+    throw new Error('이메일 검사 중 오류가 발생했습니다.');
   }
 };
 
@@ -48,5 +48,32 @@ export const updateUserRefreshToken = async (user_id, refreshToken) => {
     console.error('Error updating refresh token:', error.message);
     console.error(error.stack);
     throw new Error('리프레시 토큰 저장 중 오류가 발생했습니다.');
+  }
+};
+
+
+export const findUserByNickname = async (nickname) => {
+  const query = `SELECT * FROM User WHERE nickname = ?`;
+  const values = [nickname];
+
+  try {
+    const [rows] = await pool.query(query, values);
+    return rows[0]; // Return the user if found
+  } catch (error) {
+    console.error('Error fetching user by nickname:', error.message);
+    throw new Error('닉네임 중복 검사 중 오류가 발생했습니다.');
+  }
+};
+
+export const findUserByRefreshToken = async (refreshToken) => {
+  const query = `SELECT * FROM User WHERE refreshToken = ?`;
+  const values = [refreshToken];
+
+  try {
+    const [rows] = await pool.query(query, values);
+    return rows[0];
+  } catch (error) {
+    console.error('Error fetching user by refresh token:', error.message);
+    throw new Error('리프레시 토큰 조회 중 오류가 발생했습니다.');
   }
 };
