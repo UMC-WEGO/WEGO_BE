@@ -1,51 +1,55 @@
 import { StatusCodes } from 'http-status-codes'; 
 import {
-    CreatePostDto,
-    CreatePostResponseDto,
-    GetPostByIdResponseDto,
-    UpdatePostRequestDto,
-    DeletePostResponseDto,
-    GetAllPostsResponseDto,
-    GetPostsByCategoryResponseDto,
-    GetTopPostsResponseDto,
-    UpdatePostResponseDto,
+    create_post_dto,
+    create_post_response_dto,
+    update_post_request_dto,
+    update_post_response_dto,
+    delete_post_response_dto,
+    get_all_posts_response_dto,
+    get_posts_by_category_response_dto,
+    get_top_posts_response_dto,
+    get_post_by_id_response_dto,
+    get_comment_response_dto,
 } from "./community.dto.js"
 
 import {
-    createPostService,
-    updatePostService,
-    deletePostService,
-    getAllPostsService,
-    getPostsByCategoryService,
-    getTopPostService,
-    getPostByIdService,
+    create_post_service,
+    update_post_service,
+    delete_post_service,
+    get_all_posts_service,
+    get_posts_by_category_service,
+    get_top_post_service,
+    get_post_by_id_service,
 } from "./community.service.js"
 
 
-// 게시물 작성
-export const createPostController = async(req,res,next) => {
+// 게시글 작성
+export const create_post_controller = async(req,res,next) => {
     try {
-        const postData = CreatePostDto(req.body);
-        const newPost = await createPostService(postData);
-        res.status(StatusCodes.CREATED).json(CreatePostResponseDto({ result: newPost }));
+        const post_data = create_post_dto(req.body);
+        const new_post = await create_post_service(post_data);
+
+        res.status(StatusCodes.CREATED).json(new_post);
+
     } catch (error) {
+        //next(error);
         console.error(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "게시글 작성 중에 에러가 발생했습니다." });
     }
 };
 
 
-// 게시물 수정 
-export const updatePostController = async(req,res,next) => {
+// 게시글 수정 
+export const update_post_controller = async(req,res,next) => {
     try {
-        const postId = parseInt(req.params.postId);
-        const postData = UpdatePostRequestDto(req.body, postId);
-        const updatedPost = await updatePostService(postId, postData);
+        const post_id = parseInt(req.params.post_id);
+        const post_data = update_post_request_dto(req.body, post_id);
+        const updated_post = await update_post_service(post_id, post_data);
 
-        if(!updatedPost){
+        if(!updated_post){
             return res.status(StatusCodes.NOT_FOUND).json({message : "게시물을 찾을 수 없습니다."});
         }
-        res.status(StatusCodes.OK).json(UpdatePostResponseDto({result: updatedPost}));
+        res.status(StatusCodes.OK).json(updated_post);
     } catch(error) {
         console.error(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "게시물 수정 중에 에러가 발생했습니다."});
@@ -53,14 +57,14 @@ export const updatePostController = async(req,res,next) => {
 };
 
 
-// 게시물 삭제
-export const deletePostController = async(req,res,next) => {
+// 게시글 삭제
+export const delete_post_controller = async(req,res,next) => {
     try {
-        const postId = parseInt(req.params.postId);
-        const result = await deletePostService(postId);
+        const post_id = parseInt(req.params.post_id);
+        const result = await delete_post_service(post_id);
 
         if(result){
-            res.status(StatusCodes.OK).json(DeletePostResponseDto(postId));
+            res.status(StatusCodes.OK).json(delete_post_response_dto(post_id));
         } else {
             res.status(StatusCodes.NOT_FOUND).json({message: "게시물을 찾을 수 없습니다."});
         }
@@ -72,10 +76,10 @@ export const deletePostController = async(req,res,next) => {
 
 
 // 전체 글 조회 
-export const getAllPostsController = async(req,res,next) => {
+export const get_all_posts_controller = async(req,res,next) => {
     try {
-        const posts = await getAllPostsService();
-        res.status(StatusCodes.OK).json(GetAllPostsResponseDto(posts));
+        const posts = await get_all_posts_service();
+        res.status(StatusCodes.OK).json(posts);
     } catch(error){
         console.error(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "전체 글 조회 중에 에러가 발생했습니다. "});
@@ -84,12 +88,12 @@ export const getAllPostsController = async(req,res,next) => {
 
 
 // 카테고리별 글 조회
-export const getPostsByCategoryController = async(req,res,next)=> {
+export const get_posts_by_category_controller = async(req,res,next)=> {
     try{
-        const categoryId = parseInt(req.params.categoryId);
-        const posts = await getPostsByCategoryService(categoryId);
+        const category_id = parseInt(req.params.category_id);
+        const posts = await get_posts_by_category_service(category_id);
 
-        res.status(StatusCodes.OK).json(GetPostsByCategoryResponseDto(posts,categoryId));
+        res.status(StatusCodes.OK).json(posts);
     } catch (error){
         console.error(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "게시판 조회중에 에러가 발생했습니다."});
@@ -98,30 +102,32 @@ export const getPostsByCategoryController = async(req,res,next)=> {
 
 
 // 즉흥 게시판 상위 2개만 조회
-export const getTopPostController = async(req,res,next) => {
+export const get_top_post_controller = async(req,res,next) => {
     try {
-        const categoryId = parseInt(req.params.categoryId);
-        const posts = await getTopPostService(categoryId);
-        const topPosts = GetTopPostsResponseDto(posts,categoryId);
+        const local_id = parseInt(req.params.local_id);
+        const top_posts = await get_top_post_service(local_id);
 
-        res.status(StatusCodes.OK).json({sucess: true, result : topPosts});
+        res.status(StatusCodes.OK).json(top_posts);
     } catch(error){
         console.error(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "게시판 상위 2개 조회 중에 에러가 발생했습니다."});
     }
 };
 
-// 특정 게시물 조회
-export const getPostByIdController = async(req,res,next) => {
+
+
+
+// 특정 게시글 조회
+export const get_post_by_id_controller = async(req,res,next) => {
     try{
-        const postId = parseInt(req.params.postId);
-        const post = await getPostByIdService(postId);
+        const post_id = parseInt(req.params.post_id);
+        const post = await get_post_by_id_service(post_id);
 
         if(!post){
             return res.status(StatusCodes.NOT_FOUND).json({message: "게시글을 찾을 수 없습니다."});
         }
 
-        res.status(StatusCodes.OK).json(GetPostByIdResponseDto(post, postId, {}));
+        res.status(StatusCodes.OK).json(post);
     } catch (error){
         console.error(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "특정 게시물 조회 중에 에러가 발생했습니다."});
