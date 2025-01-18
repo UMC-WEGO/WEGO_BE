@@ -19,3 +19,34 @@ export const createUser = async (signUpDto) => {
     throw new Error('회원가입 중 오류가 발생했습니다.');
   }
 };
+
+export const findUserByEmail = async (email) => {
+  const query = `SELECT * FROM User WHERE email = ?`;
+  const values = [email];
+
+  try {
+    const [rows] = await pool.query(query, values);
+    return rows[0];
+  } catch (error) {
+    console.error('Error fetching user by email:', error.message);
+    console.error(error.stack);
+    throw new Error('데이터베이스 오류가 발생했습니다.');
+  }
+};
+
+export const updateUserRefreshToken = async (user_id, refreshToken) => {
+  const query = `
+    UPDATE User
+    SET refreshToken = ?
+    WHERE id = ?;
+  `;
+  const values = [refreshToken, user_id];
+
+  try {
+    await pool.query(query, values);
+  } catch (error) {
+    console.error('Error updating refresh token:', error.message);
+    console.error(error.stack);
+    throw new Error('리프레시 토큰 저장 중 오류가 발생했습니다.');
+  }
+};

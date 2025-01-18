@@ -1,7 +1,7 @@
 // src/auth/auth.route.js
 
 import express from 'express';
-import { signUpController } from './auth.controller.js';
+import { signUpController, loginController } from './auth.controller.js';
 
 export const authRouter = express.Router();
 
@@ -9,7 +9,7 @@ export const authRouter = express.Router();
 authRouter.post('/signUp', signUpController);
 authRouter.post('/email-auth/send', );  
 authRouter.post('/email-auth/verify', );  
-authRouter.post('/login', );
+authRouter.post('/login', loginController);
 authRouter.post('/refresh', );  
 authRouter.post('/delete', );   
 authRouter.post('/logout', );

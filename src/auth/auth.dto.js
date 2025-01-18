@@ -9,3 +9,29 @@ export class SignUpDto {
       this.info_consent = info_consent;
     }
   }
+
+export class LoginDto {
+    constructor(email, password) {
+      this.email = email;
+      this.password = password;
+    }
+}
+
+export class RefreshDto {
+  constructor(refreshToken) {
+    this.refreshToken = refreshToken;
+  }
+}
+
+export class NicknameCheckDTO {
+  constructor(nickname) {
+    this.nickname = nickname;
+  }
+}
+
+export class EmailCheckDTO {
+  constructor(email) {
+    this.email = email;
+  }
+}
+
