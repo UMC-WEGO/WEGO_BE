@@ -8,7 +8,8 @@ import {
     nicknameCheckController,
     emailCheckController,
     refreshController,
-    deleteUserController 
+    deleteUserController,
+    logoutController
     } from './auth.controller.js';
 
 
@@ -21,6 +22,6 @@ authRouter.post('/email-auth/verify', );
 authRouter.post('/login', loginController);
 authRouter.post('/refresh', refreshController);  
 authRouter.patch('/delete', authenticateToken, deleteUserController );   
-authRouter.patch('/logout', authenticateToken );
+authRouter.patch('/logout', authenticateToken, logoutController );
 authRouter.post('/nickname-check', nicknameCheckController);
 authRouter.post('/email-check', emailCheckController);

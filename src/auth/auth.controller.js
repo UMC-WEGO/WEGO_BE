@@ -7,7 +7,8 @@ import {
   checkNickname,
   checkEmail,
   refreshTokens,
-  deleteUser
+  deleteUser,
+  logout 
 } from './auth.service.js';
 import { SignUpDto, LoginDto } from './auth.dto.js';
 
@@ -147,3 +148,25 @@ export const deleteUserController = async (req, res) => {
     return res.status(400).json(responseResult);
   }
 };
+
+export const logoutController = async (req, res) => {
+  try {
+    const { user_id } = req;  
+    
+    const result = await logout(user_id);
+
+    const responseResult = response(
+      { isSuccess: true, code: 200, message: result.message },
+      null
+    );
+    
+    return res.status(200).json(responseResult);
+  } catch (error) {
+    const responseResult = response(
+      { isSuccess: false, code: 400, message: error.message || '로그아웃 처리 중 오류가 발생했습니다.' },
+      null
+    );
+    return res.status(400).json(responseResult);
+  }
+};
+
