@@ -5,7 +5,8 @@ import {
     findUserByEmail,
     updateUserRefreshToken,
     findUserByNickname,
-    findUserByRefreshToken 
+    findUserByRefreshToken,
+    deactivateUserById 
     } from './auth.repository.js';
 import { generateTokens, verifyToken} from '../utils/jwt.utils.js';
 import bcrypt from 'bcrypt';
@@ -106,5 +107,14 @@ export const refreshTokens = async (refreshToken) => {
   } catch (error) {
     console.error('토큰 재발급 에러:', error.message);
     throw new Error('리프레시 토큰 검증 중 오류가 발생했습니다.');
+  }
+};
+
+export const deleteUser = async (userId) => {
+  try {
+    await deactivateUserById(userId);
+    return { message: '회원탈퇴 성공' };
+  } catch (error) {
+    throw new Error(error.message || '회원탈퇴 처리 중 오류가 발생했습니다.');
   }
 };

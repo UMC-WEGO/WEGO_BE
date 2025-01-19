@@ -77,3 +77,33 @@ export const findUserByRefreshToken = async (refreshToken) => {
     throw new Error('리프레시 토큰 조회 중 오류가 발생했습니다.');
   }
 };
+
+export const findUserById = async (userId) => {
+  const query = `SELECT * FROM User WHERE id = ?`;
+  const values = [userId];
+
+  try {
+    const [rows] = await pool.query(query, values);
+    return rows[0]; 
+  } catch (error) {
+    console.error('Error fetching user by id:', error.message);
+    throw new Error('사용자 조회 중 오류가 발생했습니다.');
+  }
+};
+
+
+export const deactivateUserById = async (userId) => {
+  const query = `
+    UPDATE User 
+    SET status = 'INACTIVE', nickname = '탈퇴한 사용자', refreshToken = NULL 
+    WHERE id = ?;
+  `;
+  const values = [userId];
+
+  try {
+    await pool.query(query, values);
+  } catch (error) {
+    console.error('Error deactivating user:', error.message);
+    throw new Error('회원 탈퇴 중 오류가 발생했습니다.');
+  }
+};

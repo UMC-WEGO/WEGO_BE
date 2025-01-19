@@ -15,23 +15,4 @@ export class LoginDto {
       this.email = email;
       this.password = password;
     }
-}
-
-export class RefreshDto {
-  constructor(refreshToken) {
-    this.refreshToken = refreshToken;
   }
-}
-
-export class NicknameCheckDTO {
-  constructor(nickname) {
-    this.nickname = nickname;
-  }
-}
-
-export class EmailCheckDTO {
-  constructor(email) {
-    this.email = email;
-  }
-}
-

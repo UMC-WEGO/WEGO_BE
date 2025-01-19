@@ -6,7 +6,8 @@ import {
   login,
   checkNickname,
   checkEmail,
-  refreshTokens 
+  refreshTokens,
+  deleteUser
 } from './auth.service.js';
 import { SignUpDto, LoginDto } from './auth.dto.js';
 
@@ -122,5 +123,27 @@ export const refreshController = async (req, res) => {
     );
 
     return res.status(400).json(result);
+  }
+};
+
+
+
+export const deleteUserController = async (req, res) => {
+  try {
+    const { user_id } = req;
+
+    const result = await deleteUser(user_id);
+
+    const responseResult = response(
+      { isSuccess: true, code: 200, message: result.message },
+      null
+    );
+    return res.status(200).json(responseResult);
+  } catch (error) {
+    const responseResult = response(
+      { isSuccess: false, code: 400, message: error.message || '잘못된 요청입니다.' },
+      null
+    );
+    return res.status(400).json(responseResult);
   }
 };

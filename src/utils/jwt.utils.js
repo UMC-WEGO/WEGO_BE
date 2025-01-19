@@ -6,17 +6,17 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // 환경 변수 체크
-const { JWT_PRIVATE_KEY, JWT_PUBLIC_KEY, JWT_REFRESH_SECRET } = process.env;
+const { JWT_PRIVATE_KEY, JWT_PUBLIC_KEY } = process.env;
 
-if (!JWT_PRIVATE_KEY || !JWT_PUBLIC_KEY || !JWT_REFRESH_SECRET) {
-    throw new Error("환경 변수 JWT_PRIVATE_KEY, JWT_PUBLIC_KEY 또는 JWT_REFRESH_SECRET이 누락되었습니다.");
+if (!JWT_PRIVATE_KEY || !JWT_PUBLIC_KEY ) {
+    throw new Error("환경 변수 JWT_PRIVATE_KEY 또는 JWT_PUBLIC_KEY 누락되었습니다.");
 }
 
 // 에러 메시지 상수
 const ERROR_MESSAGES = {
     MISSING_OR_INVALID_AUTH_HEADER: "Authorization 헤더가 없거나 형식이 잘못되었습니다.",
     INVALID_USER_ID: "유효하지 않은 user_id 입니다.",
-    MISSING_SECRET_KEY: "비밀 키가 누락되었습니다. JWT_PRIVATE_KEY 또는 JWT_REFRESH_SECRET을 확인하십시오.",
+    MISSING_SECRET_KEY: "비밀 키가 누락되었습니다. JWT_PRIVATE_KEY을 확인하십시오.",
     INVALID_TOKEN: "유효하지 않은 토큰입니다."
 };
 
