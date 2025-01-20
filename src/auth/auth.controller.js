@@ -1,6 +1,7 @@
 // src/auth/auth.controller.js
 
 import { response } from '../../config/response.js';
+import { status } from "../../config/response.status.js";
 import { 
   signUp,
   login,
@@ -10,9 +11,13 @@ import {
   deleteUser,
   logout,
   sendEmailVerificationCode,
-  verifyEmailAuthCode
+  verifyEmailAuthCode,
+  sendPasswordVerificationCode,
+  verifyPasswordAuthCode,
+  changePasswordService
 } from './auth.service.js';
-import { SignUpDto, LoginDto } from './auth.dto.js';
+import { SignUpDto, LoginDto, signUpResponseDTO, checkResponseDTO, sendAuthCodeResponseDTO, verifyAuthCodeResponseDTO, changePasswordResponseDTO } from './auth.dto.js';
+import { findUserByEmail } from './auth.repository.js';
 
 export const signUpController = async (req, res) => {
   try {
@@ -23,19 +28,9 @@ export const signUpController = async (req, res) => {
 
     const newUser = await signUp(signUpDto);
 
-    const result = response(
-      { isSuccess: true, code: 200, message: '회원가입 성공' },
-      newUser
-    );
-
-    return res.status(200).json(result);
+    return res.send(response(status.SUCCESS, signUpResponseDTO("회원가입 성공")));
   } catch (error) {
-    const result = response(
-      { isSuccess: false, code: 400, message: error.message || '잘못된 요청입니다.' },
-      null
-    );
-
-    return res.status(400).json(result);
+    return res.send(response(status.BAD_REQUEST));
   }
 };
 
@@ -48,23 +43,11 @@ export const loginController = async (req, res) => {
 
     const tokens = await login(loginDto);
 
-    const result = response(
-      { isSuccess: true, code: 200, message: '로그인 성공' },
-      {
-        refreshToken: tokens.refreshToken,
-      }
-    );
-
     res.header('Authorization', `Bearer ${tokens.accessToken}`);
 
-    return res.status(200).json(result);
+    return res.send(response(status.SUCCESS, loginResponseDTO(tokens.refreshToken)));
   } catch (error) {
-    const result = response(
-      { isSuccess: false, code: 401, message: error.message || '잘못된 요청입니다.' },
-      null
-    );
-
-    return res.status(401).json(result);
+    return res.send(response(status.BAD_REQUEST));
   }
 };
 
@@ -72,10 +55,9 @@ export const nicknameCheckController = async (req, res) => {
   try {
     const { nickname } = req.body;
     const result = await checkNickname(nickname);
-    const responseResult = response(
-      { isSuccess: true, code: 200, message: result.message }
-    );
-    return res.status(200).json(responseResult);
+
+    return res.send(response(status.SUCCESS, checkResponseDTO("사용가능한 닉네임입니다.")));
+    
   } catch (error) {
     const responseResult = response(
       { isSuccess: false, code: 409, message: error.message }
@@ -110,25 +92,13 @@ export const refreshController = async (req, res) => {
 
     const tokens = await refreshTokens(refreshToken);
 
-    const result = response(
-      { isSuccess: true, code: 200, message: '토큰 재발급 성공' },
-      {
-        refreshToken: tokens.refreshToken,
-      }
-    );
-
     res.header('Authorization', `Bearer ${tokens.accessToken}`);
-    return res.status(200).json(result);
-  } catch (error) {
-    const result = response(
-      { isSuccess: false, code: 400, message: error.message || '잘못된 요청입니다.' }
-    );
 
-    return res.status(400).json(result);
+    return res.send(response(status.SUCCESS, refreshTokenResponseDTO(tokens.refreshToken)));
+  } catch (error) {
+    return res.send(response(status.BAD_REQUEST))
   }
 };
-
-
 
 export const deleteUserController = async (req, res) => {
   try {
@@ -178,17 +148,10 @@ export const sendEmailAuthController = async (req, res) => {
 
     await sendEmailVerificationCode(email);
 
-    const responseResult = response(
-      { isSuccess: true, code: 200, message: '인증 코드가 전송되었습니다.' }
-    );
+    return res.send(response(status.SUCCESS, sendAuthCodeResponseDTO("인증 코드가 전송되었습니다.")));
 
-    return res.status(200).json(responseResult);
   } catch (error) {
-    const responseResult = response(
-      { isSuccess: false, code: error.message === '이미 사용 중인 이메일입니다.' ? 409 : 400, message: error.message || '잘못된 요청입니다.' }
-    );
-
-    return res.status(responseResult.code).json(responseResult);
+    return res.send(response(status.BAD_REQUEST))
   }
 };
 
@@ -198,19 +161,13 @@ export const verifyEmailAuthController = async (req, res) => {
     const { email, code } = req.body;
 
     if (!email || !code) {
-      const responseResult = response(
-        { isSuccess: false, code: 400, message: '이메일과 인증 코드가 필요합니다.' }
-      );
-      return res.status(400).json(responseResult);
+      return res.send(response(status.BAD_REQUEST))
     }
 
     const isVerified = await verifyEmailAuthCode(email, code);
 
     if (isVerified) {
-      const responseResult = response(
-        { isSuccess: true, code: 200, message: '이메일 인증 성공' }
-      );
-      return res.status(200).json(responseResult);
+      return res.send(response(status.SUCCESS, verifyAuthCodeResponseDTO("인증 코드가 유효합니다.")));
     } else {
   
       const responseResult = response(
@@ -234,3 +191,85 @@ export const verifyEmailAuthController = async (req, res) => {
   }
 };
 
+export const sendPasswordAuthController = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      throw new Error('이메일이 제공되지 않았습니다.');
+    }
+
+    const user = await findUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+    }
+
+    await sendPasswordVerificationCode(email);
+
+    return res.send(response(status.SUCCESS, sendAuthCodeResponseDTO("인증 코드가 전송되었습니다.")));
+
+  } catch (error) {
+    return res.send(response(status.BAD_REQUEST));
+  }
+};
+
+
+export const verifyPasswordAuthController = async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    const user = await findUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+    }
+
+    if (!email || !code) {
+      return res.send(response(status.BAD_REQUEST))
+    }
+
+    const isVerified = await verifyPasswordAuthCode(email, code);
+
+    if (isVerified) {
+      return res.send(response(status.SUCCESS, verifyAuthCodeResponseDTO("인증 코드가 유효합니다.")));
+    } else {
+  
+      const responseResult = response(
+        { isSuccess: false, code: 401, message: '잘못된 인증 코드입니다.' }
+      );
+      return res.status(401).json(responseResult);
+    }
+  } catch (error) {
+
+    if (error.message === '인증 코드가 만료되었습니다.') {
+      const responseResult = response(
+        { isSuccess: false, code: 408, message: '인증 코드가 만료되었습니다.' }
+      );
+      return res.status(408).json(responseResult);
+    }
+
+    const responseResult = response(
+      { isSuccess: false, code: 500, message: error.message || '서버 오류가 발생했습니다.' }
+    );
+    return res.status(500).json(responseResult);
+  }
+};
+
+
+export const passwordChangeController = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.send(response(status.BAD_REQUEST))
+    }
+
+    await changePasswordService(email, password);
+
+    return res.send(response(status.SUCCESS, changePasswordResponseDTO("패스워드 변경 성공")));
+
+
+  } catch (error) {
+    console.error('비밀번호 변경 오류:', error.message);
+    return res.status(500).json({ message: error.message || '비밀번호 변경 중 오류가 발생했습니다.' });
+  }
+};

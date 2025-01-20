@@ -9,7 +9,8 @@ import {
     deactivateUserById,
     createAuthCode,
     findAuthCodeByEmail,
-    deactivateAuthCode
+    deactivateAuthCode,
+    updateUserPassword
     } from './auth.repository.js';
 import { generateTokens, verifyToken } from '../utils/jwt.utils.js';
 import { generateVerificationCode } from '../utils/generateVerificationCode.js';
@@ -208,4 +209,94 @@ export const verifyEmailAuthCode = async (email, code) => {
   await deactivateAuthCode(authCode.id);
 
   return true;
+};
+
+export const sendPasswordVerificationCode = async (email) => {
+
+  const verificationCode = generateVerificationCode();
+
+  const expiresAt = new Date();
+  expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail', 
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER, 
+      pass: process.env.EMAIL_PASSWORD, 
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: '[위고] 비밀번호 찾기',
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <div style="background-color: #f8f8f8; padding: 20px; text-align: center; border-radius: 8px;">
+          <h2 style="color: #2196F3;">비밀번호를 찾기 위해 아래 인증번호를 입력해 주세요.</h2>
+          <div style="font-size: 24px; font-weight: bold; color: #333; margin: 20px 0; padding: 10px; background-color: #f1f1f1; display: inline-block; border-radius: 5px;">
+            인증번호: <span style="color: #1976D2;">${verificationCode}</span>
+          </div>
+          <p style="margin-top: 20px; color: #777;">감사합니다 😊</p>
+          <p style="color: #888; font-size: 14px;">[위고] 팀 드림</p>
+        </div>
+      </div>
+    `,
+  };
+  
+  try {
+
+    await transporter.sendMail(mailOptions);
+    console.log(`Verification code sent to ${email}`);
+
+    await createAuthCode({
+      email,
+      code: verificationCode,
+      purpose: 'PASSWORD_RESET',
+      expires_at: expiresAt,
+    });
+
+  } catch (error) {
+    console.error('Error sending email:', error.message);
+    throw new Error('이메일 전송 중 오류가 발생했습니다.');
+  }
+};
+
+export const verifyPasswordAuthCode = async (email, code) => {
+
+  const authCode = await findAuthCodeByEmail(email, code);
+
+  if (!authCode) {
+    throw new Error('인증 코드가 일치하지 않습니다.');
+  }
+
+  const currentDate = new Date();
+  const codeExpirationDate = new Date(authCode.expires_at);
+
+  if (currentDate > codeExpirationDate) {
+    await deactivateAuthCode(authCode.id);
+    throw new Error('인증 코드가 만료되었습니다.');
+  }
+
+  await deactivateAuthCode(authCode.id);
+
+  return true;
+};
+
+export const changePasswordService = async (email, newPassword) => {
+
+  const user = await findUserByEmail(email);
+  if (!user) {
+    throw new Error('사용자를 찾을 수 없습니다.');
+  }
+
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  await updateUserPassword(user.id, hashedPassword);
+
+  return { message: '비밀번호가 성공적으로 변경되었습니다.' };
 };

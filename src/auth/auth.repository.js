@@ -150,3 +150,15 @@ export const deactivateAuthCode = async (authCode_id) => {
     throw new Error('인증 코드 비활성화 중 오류가 발생했습니다.');
   }
 };
+
+export const updateUserPassword = async (user_id, newPassword) => {
+  const query = `UPDATE User SET password = ? WHERE id = ?`;
+  const values = [newPassword, user_id];
+
+  try {
+    await pool.query(query, values);
+  } catch (error) {
+    console.error('Error updating user password:', error.message);
+    throw new Error('비밀번호 업데이트 중 오류가 발생했습니다.');
+  }
+};

@@ -577,3 +577,228 @@ paths:
                     message:
                       type: string
                       example: 잘못된 요청입니다.
+
+
+  /auth/password-auth/send:
+    post:
+      tags:
+        - AUTH
+      summary: 비밀번호 찾기 인증 코드 요청
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 인증 코드를 받을 이메일 주소
+                  example: test@example.com
+      responses:
+        "200":
+          description: 이메일 인증 요청 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 인증 코드가 전송되었습니다.
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+        
+
+  /auth/password-auth/verify:
+    post:
+      tags:
+        - AUTH
+      summary: 패스워드 변경 시 인증 코드 검증
+      requestBody:
+        description: 이메일과 인증 코드를 포함한 요청 본문
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 인증을 요청했던 이메일 주소
+                  example: test@example.com
+                code:
+                  type: string
+                  description: 사용자에게 전송된 인증 코드
+                  example: 123456
+      responses:
+        "200":
+          description: 인증 코드 검증 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 인증 코드가 유효합니다.
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+        "401":
+          description: 인증 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 401
+                  message:
+                    type: string
+                    example: 잘못된 인증 코드입니다.
+        "408":
+          description: 인증 코드 만료
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 인증 코드가 만료되었습니다.
+  /auth/password:
+    patch:
+      tags:
+        - AUTH
+      summary: 패스워드 변경
+      requestBody:
+        description: 이메일과 변경할 비밀번호를 포함한 요청 본문
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 인증을 요청했던 이메일 주소
+                  example: test@example.com
+                password:
+                  type: string
+                  description: 변경할 패스워드
+                  example: 1234567
+      responses:
+        "200":
+          description: 패스워드 변경 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 비밀번호가 성공적으로 변경되었습니다.
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 잘못된 요청입니다.
+        "401":
+          description: 인증 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 401
+                  message:
+                    type: string
+                    example: 잘못된 인증 코드입니다.
+        "408":
+          description: 인증 코드 만료
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 인증 코드가 만료되었습니다.
