@@ -10,6 +10,7 @@ paths:
       tags:
         - HOME
       requestBody:
+        description: "duration 값: 1, 1-2, 2-3, 3+ 중 하나"
         required: true
         content:
           application/json:
@@ -18,30 +19,36 @@ paths:
               properties:
                 departure:
                   type: string
-                  description: "출발지"
-                  example: 부산
+                  description: "출발지 (예: 부산)"
+                  example: "부산"
                 transportType:
                   type: string
-                  description: "이동 수단"
-                  example: 자가용
+                  description: "이동 수단 (예: 자가용)"
+                  example: "자가용"
                 startDate:
                   type: string
                   format: date-time
-                  description: "여행 시작 날짜"
+                  description: "여행 시작 날짜 (예: 2025-01-06T12:00:00Z)"
                   example: "2025-01-06T12:00:00Z"
                 endDate:
                   type: string
                   format: date-time
-                  description: "여행 종료 날짜"
+                  description: "여행 종료 날짜 (예: 2025-01-08T12:00:00Z)"
                   example: "2025-01-08T12:00:00Z"
                 participants:
                   type: integer
-                  description: "여행 인원"
+                  description: "여행 인원 (예: 5)"
                   example: 5
-                timeZone:
+                duration:
                   type: string
-                  description: "이동 시간대"
-                  example: 2
+                  description: |
+                    여행 시간 (가능한 값: '1', '1-2', '2-3', '3+')
+                  enum:
+                    - "1"
+                    - "1-2"
+                    - "2-3"
+                    - "3+"
+                  example: "2-3"
       responses:
         '200':
           description: "랜덤 여행지 추천 성공"
@@ -64,46 +71,21 @@ paths:
                     items:
                       type: object
                       properties:
-                        parentRegion:
-                          type: string
-                          description: "부모 지역"
-                          example: "경상북도"
-                        childRegion:
+                        location:
                           type: string
                           description: "자식 지역"
                           example: "대구"
-                        travelTime:
+                        region:
                           type: string
-                          description: "여행 시간"
-                          example: "1시간 44분"
+                          description: "부모 지역"
+                          example: "경상북도"
                     example:
-                      - parentRegion: "경상북도"
-                        childRegion: "대구"
-                        travelTime: "1시간 44분"
-                      - parentRegion: "충청남도"
-                        childRegion: "천안"
-                        travelTime: "1시간 11분"
-                      - parentRegion: "충청북도"
-                        childRegion: "충주"
-                        travelTime: "1시간 30분"
-                  departure:
-                    type: string
-                    description: "출발지"
-                    example: "부산"
-                  transportType:
-                    type: string
-                    description: "이동 수단"
-                    example: "자가용"
-                  startDate:
-                    type: string
-                    format: date-time
-                    description: "여행 시작 날짜"
-                    example: "2025-01-06T12:00:00Z"
-                  endDate:
-                    type: string
-                    format: date-time
-                    description: "여행 종료 날짜"
-                    example: "2025-01-08T12:00:00Z"
+                      - region: "경상북도"
+                        location: "대구"
+                      - region: "충청남도"
+                        location: "천안"
+                      - region: "충청북도"
+                        location: "충주"
         '400':
           description: "잘못된 요청"
           content:
@@ -116,7 +98,7 @@ paths:
                     example: false
                   code:
                     type: integer
-                    example: 400
+                    example: 500
                   message:
                     type: string
                     example: "잘못된 요청입니다."
