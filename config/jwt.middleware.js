@@ -34,7 +34,7 @@ const authenticateToken = (req, res, next) => {
     try {
         const decoded = verifyToken(token, JWT_PUBLIC_KEY);  // 공개 키로 검증
         req.user_id = decoded.id; 
-        console.log("Authenticated userId:", req.user_id);  // 디코딩된 userId 확인
+        console.log("Authenticated user_id:", req.user_id);  // 디코딩된 userId 확인
         next(); 
     } catch (err) {
         return res.status(401).json(createErrorResponse(err.message));

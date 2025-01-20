@@ -9,16 +9,16 @@ import {
     emailCheckController,
     refreshController,
     deleteUserController,
-    logoutController
+    logoutController,
+    sendEmailAuthController,
+    verifyEmailAuthController
     } from './auth.controller.js';
-
 
 export const authRouter = express.Router();
 
-// 회원가입 API
 authRouter.post('/signUp', signUpController);
-authRouter.post('/email-auth/send', );  
-authRouter.post('/email-auth/verify', );  
+authRouter.post('/email-auth/send', sendEmailAuthController);  
+authRouter.post('/email-auth/verify', verifyEmailAuthController);  
 authRouter.post('/login', loginController);
 authRouter.post('/refresh', refreshController);  
 authRouter.patch('/delete', authenticateToken, deleteUserController );   

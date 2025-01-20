@@ -78,9 +78,9 @@ export const findUserByRefreshToken = async (refreshToken) => {
   }
 };
 
-export const findUserById = async (userId) => {
+export const findUserById = async (user_id) => {
   const query = `SELECT * FROM User WHERE id = ?`;
-  const values = [userId];
+  const values = [user_id];
 
   try {
     const [rows] = await pool.query(query, values);
@@ -92,18 +92,61 @@ export const findUserById = async (userId) => {
 };
 
 
-export const deactivateUserById = async (userId) => {
+export const deactivateUserById = async (user_id) => {
   const query = `
     UPDATE User 
     SET status = 'INACTIVE', nickname = '탈퇴한 사용자', refreshToken = NULL 
     WHERE id = ?;
   `;
-  const values = [userId];
+  const values = [user_id];
 
   try {
     await pool.query(query, values);
   } catch (error) {
     console.error('Error deactivating user:', error.message);
     throw new Error('회원 탈퇴 중 오류가 발생했습니다.');
+  }
+};
+
+export const createAuthCode = async ({ email, code, purpose, expires_at }) => {
+  const query = `
+    INSERT INTO Auth_codes (email, code, purpose, expires_at)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  try {
+    await pool.query(query, [email, code, purpose, expires_at]);
+  } catch (error) {
+    console.error('Error saving auth code:', error.message);
+    throw new Error('인증 코드 저장 중 오류가 발생했습니다.');
+  }
+};
+
+export const findAuthCodeByEmail = async (email, code) => {
+  const query = `
+    SELECT * FROM Auth_codes 
+    WHERE email = ? AND code = ? 
+    ORDER BY expires_at DESC LIMIT 1;
+  `;
+  const values = [email, code];
+
+  try {
+    const [rows] = await pool.query(query, values);
+    return rows[0]; 
+  } catch (error) {
+    console.error('Error finding auth code:', error.message);
+    throw new Error('인증 코드 조회 중 오류가 발생했습니다.');
+  }
+};
+
+export const deactivateAuthCode = async (authCode_id) => {
+  const query = `UPDATE Auth_codes SET is_used = true WHERE id = ?`;
+  const values = [authCode_id];
+
+  try {
+    await pool.query(query, values);
+  } catch (error) {
+    console.error('Error deactivating auth code:', error.message);
+    throw new Error('인증 코드 비활성화 중 오류가 발생했습니다.');
   }
 };

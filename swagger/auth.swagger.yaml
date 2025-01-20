@@ -73,7 +73,7 @@ paths:
     post:
       tags:
         - AUTH
-      summary: 이메일 인증 요청
+      summary: 이메일 인증 코드 요청
       requestBody:
         required: true
         content:
@@ -117,9 +117,9 @@ paths:
                     example: 400
                   message:
                     type: string
-                    example: 잘못된 이메일 형식입니다.
-        "500":
-          description: 서버 오류
+                    example: 잘못된 요청입니다.
+        "409":
+          description: 이메일 중복
           content:
             application/json:
               schema:
@@ -130,15 +130,15 @@ paths:
                     example: false
                   code:
                     type: integer
-                    example: 500
+                    example: 409
                   message:
                     type: string
-                    example: 서버에서 이메일을 전송하지 못했습니다.        
+                    example: 이미 사용 중인 이메일입니다.      
   /auth/email-auth/verify:
     post:
       tags:
         - AUTH
-      summary: 인증 코드 검증
+      summary: 이메일 인증 코드 검증
       requestBody:
         description: 이메일과 인증 코드를 포함한 요청 본문
         required: true
@@ -203,9 +203,9 @@ paths:
                     example: 401
                   message:
                     type: string
-                    example: 인증 코드가 일치하지 않습니다.
-        "500":
-          description: 서버 오류
+                    example: 잘못된 인증 코드입니다.
+        "408":
+          description: 인증 코드 만료
           content:
             application/json:
               schema:
@@ -219,7 +219,7 @@ paths:
                     example: 500
                   message:
                     type: string
-                    example: 인증 검증 중 서버 오류가 발생했습니다.                          
+                    example: 인증 코드가 만료되었습니다.                         
   /auth/login:
     post:
       tags:
