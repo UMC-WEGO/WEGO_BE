@@ -21,24 +21,14 @@ paths:
                   type: string
                   description: "출발지 (예: 부산)"
                   example: "부산"
-                transportType:
-                  type: string
-                  description: "이동 수단 (예: 자가용)"
-                  example: "자가용"
-                startDate:
-                  type: string
-                  format: date-time
-                  description: "여행 시작 날짜 (예: 2025-01-06T12:00:00Z)"
-                  example: "2025-01-06T12:00:00Z"
-                endDate:
-                  type: string
-                  format: date-time
-                  description: "여행 종료 날짜 (예: 2025-01-08T12:00:00Z)"
-                  example: "2025-01-08T12:00:00Z"
                 participants:
                   type: integer
                   description: "여행 인원 (예: 5)"
                   example: 5
+                vehicle:
+                  type: string
+                  description: "이동 수단 (예: 자가용)"
+                  example: "자가용"
                 duration:
                   type: string
                   description: |
@@ -49,6 +39,16 @@ paths:
                     - "2-3"
                     - "3+"
                   example: "2-3"
+                startDate:
+                  type: string
+                  format: date-time
+                  description: "여행 시작 날짜 (예: 2025-01-06T12:00:00Z)"
+                  example: "2025-01-06T12:00:00Z"
+                endDate:
+                  type: string
+                  format: date-time
+                  description: "여행 종료 날짜 (예: 2025-01-08T12:00:00Z)"
+                  example: "2025-01-08T12:00:00Z"
       responses:
         '200':
           description: "랜덤 여행지 추천 성공"
@@ -240,11 +240,19 @@ paths:
                     type: string
                     example: "잘못된 요청입니다."
 
-  /home/upcoming-trips:
+  /home/upcoming-trips/{userId}:
     get:
       summary: "다가오는 여행 조회"
       tags:
         - HOME
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: "사용자의 ID"
+          schema:
+            type: integer
+            example: 1
       responses:
         '200':
           description: "다가오는 여행 조회 성공"
@@ -269,10 +277,23 @@ paths:
                         type: int
                         description: "여행 id"
                         example: 1
-                      travelRegion:
+                      location:
                         type: string
                         description: "여행 지역"
                         example: "부산"
+                      participants:
+                        type: integer
+                        description: "여행 인원"
+                        example: 5
+                      vehicle:
+                        type: string
+                        description: "이동 수단"
+                        example: "자가용"
+                      duration:
+                        type: string
+                        description: |
+                          여행 시간 (가능한 값: '1', '1-2', '2-3', '3+')
+                        example: "2-3"
                       startDate:
                         type: string
                         format: date-time
@@ -283,14 +304,6 @@ paths:
                         format: date-time
                         description: "여행 종료 날짜"
                         example: "2025-01-08T12:00:00Z"
-                      participants:
-                        type: integer
-                        description: "여행 인원"
-                        example: 5
-                      transportType:
-                        type: string
-                        description: "이동 수단"
-                        example: "자가용"
         '400':
           description: "잘못된 요청"
           content:
