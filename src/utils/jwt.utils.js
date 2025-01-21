@@ -41,8 +41,8 @@ const generateTokens = (user_id) => {
 
     const payload = { id: user_id };
     return {
-        accessToken: createToken(payload, JWT_PRIVATE_KEY, '7d'),  // Access Token
-        refreshToken: createToken(payload, JWT_PRIVATE_KEY, '30d')  // Refresh Token
+        accessToken: createToken(payload, JWT_PRIVATE_KEY, '7d'),  
+        refreshToken: createToken(payload, JWT_PRIVATE_KEY, '30d')  
     };
 };
 

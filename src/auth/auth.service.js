@@ -139,7 +139,9 @@ export const logout = async (user_id) => {
 export const sendEmailVerificationCode = async (email) => {
 
   const existingUser = await findUserByEmail(email);
+  console.log(existingUser)
   if (existingUser) {
+    
     throw new Error('이미 사용 중인 이메일입니다.');
   }
 
@@ -176,7 +178,6 @@ export const sendEmailVerificationCode = async (email) => {
       </div>
     `,
   };
-  
 
   try {
 
@@ -195,6 +196,7 @@ export const sendEmailVerificationCode = async (email) => {
     throw new Error('이메일 전송 중 오류가 발생했습니다.');
   }
 };
+
 
 export const verifyEmailAuthCode = async (email, code) => {
 
