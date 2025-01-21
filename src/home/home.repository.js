@@ -69,3 +69,21 @@ const getRandomDestinations = (destinations) => {
   const shuffled = destinations.sort(() => Math.random() - 0.5);
   return shuffled.slice(0, 3);
 };
+
+// 여행지 저장
+export const saveTrip = async (location, participants, vehicle, duration, startDate, endDate, user_id) => {
+  const query = `
+    INSERT INTO travel (location, participants, vehicle, duration, startDate, endDate, user_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  const values = [location, participants, vehicle, duration, startDate, endDate, user_id];
+
+  try {
+    const [result] = await pool.query(query, values);
+    return result.insertId; // 저장된 여행 일정 ID 반환
+  } catch (error) {
+    console.error('여행 일정 저장 중 오류 발생', error);
+    throw new Error("여행 일정 저장 실패");
+  }
+}
