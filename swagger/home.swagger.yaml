@@ -103,22 +103,36 @@ paths:
                     type: string
                     example: "잘못된 요청입니다."
   
-  /home/register-trip:
+  /home/save-trip:
     post:
       summary: "여행 일정 등록"
       tags:
         - HOME
       requestBody:
+        description: "duration 값: 1, 1-2, 2-3, 3+ 중 하나"
         required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                travelRegion:
+                location:
                   type: string
                   description: "여행 지역"
                   example: "부산"
+                participants:
+                  type: integer
+                  description: "여행 인원"
+                  example: 5
+                vehicle:
+                  type: string
+                  description: "이동 수단"
+                  example: "자가용"
+                duration:
+                  type: string
+                  description: |
+                    여행 시간 (가능한 값: '1', '1-2', '2-3', '3+')
+                  example: "2-3"
                 startDate:
                   type: string
                   format: date-time
@@ -129,14 +143,6 @@ paths:
                   format: date-time
                   description: "여행 종료 날짜"
                   example: "2025-01-08T12:00:00Z"
-                participants:
-                  type: integer
-                  description: "여행 인원"
-                  example: 5
-                transportType:
-                  type: string
-                  description: "이동 수단"
-                  example: "자가용"
       responses:
         '200':
           description: "여행 일정 등록 성공"
