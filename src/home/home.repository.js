@@ -87,3 +87,21 @@ export const saveTrip = async (location, participants, vehicle, duration, startD
     throw new Error("여행 일정 저장 실패");
   }
 }
+
+// 다가오는 여행 일정 조회
+export const getUpcomingTrips = async (user_id) => {
+  const query =`
+    SELECT id, location, startDate, endDate, participants, vehicle, duration
+    FROM travel
+    WHERE startDate >  NOW() AND user_id = ?
+    ORDER BY startDate ASC
+  `;
+
+  try {
+    const [rows] = await pool.query(query, [user_id]);
+    return rows;
+  } catch (error) {
+    console.error("다가오는 여행 조회 중 오류 발생", error);
+    throw new Error("다가오는 여행 조회 실패");
+  }
+};

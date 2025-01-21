@@ -1,10 +1,11 @@
 export const randomTripDto = (data) => {
   return {
-    tripDates: data.travelDates,
-    numberOfPeople: data.numberOfPeople,
-    depatrue: data.depature,
+    departure: data.departure,
+    participants: data.participants,
     vehicle: data.vehicle,
     duration: data.duration,
+    startDate: data.startDate,
+    endDate: data.endDate,
   };
 };
 
@@ -36,3 +37,14 @@ export const saveTripDto = (data) => {
 
   return saveTripDto;
 }
+
+// 다가오는 여행 일정 조회 (클라이언트에 반환할 데이터 정의의)
+export const upcomingTripDto = (trip) => ({
+  tripId: trip.id,
+  location: trip.location,
+  participants: trip.participants,
+  vehicle: trip.vehicle,
+  duration: trip.duration,
+  startDate: trip.startDate,
+  endDate: trip.endDate
+});

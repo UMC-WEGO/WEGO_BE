@@ -1,6 +1,6 @@
-import { getFilterdRandomTrips, saveTrip } from "./home.repository.js"
+import { getFilterdRandomTrips, getUpcomingTrips, saveTrip } from "./home.repository.js"
 import { response } from '../../config/response.js';
-import { saveTripDto } from "./home.dto.js";
+import { saveTripDto, upcomingTripDto } from "./home.dto.js";
 
 export const getRandomTrips = async (departure, vehicle, duration) => {
   try {
@@ -59,5 +59,38 @@ export const saveTripService = async (data) => {
       code: 500,
       message: '여행 일정 저장 중 오류가 발생하였습니다.',
     });
+  }
+};
+
+export const getUpcomingTripsService = async (memberId) => {
+  try {
+    const trips = await getUpcomingTrips(memberId);
+
+    if (trips.length === 0) {
+      return {
+        isSuccess: true,
+        code: 200,
+        message: "다가오는 여행이 없습니다.",
+        result: [],
+      };
+    }
+    
+    // DTO 변환
+    const result = trips.map(upcomingTripDto);
+
+    return {
+      isSuccess: true,
+      code: 200,
+      message: "다가오는 여행 조회 성공",
+      result,
+    };
+  } catch (error) {
+    console.error("다가오는 여행 조회 중 서비스 오류", error);
+
+    return {
+      isSuccess: false,
+      code: 500,
+      message: "다가오는 여행 조회 중 오류 발생",
+    };
   }
 };
