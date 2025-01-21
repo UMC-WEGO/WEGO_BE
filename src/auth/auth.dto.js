@@ -1,7 +1,5 @@
 // src/auth/auth.dto.js
 
-import { refreshTokens } from "./auth.service.js";
-
 export class SignUpDto {
     constructor(email, password, nickname, marketing_consent, info_consent) {
       this.email = email;
@@ -26,7 +24,6 @@ export const signUpResponseDTO = (message) => ({
 
 // 로그인 응답 DTO
 export const loginResponseDTO = (refreshToken) => ({
-  message : "로그인 성공",
   refreshToken
 });
 

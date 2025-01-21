@@ -46,7 +46,12 @@ export const login = async (loginDto) => {
       throw new Error('잘못된 이메일 또는 비밀번호입니다.');
     }
 
+    console.log('Input password:', password); // 사용자가 입력한 비밀번호
+    console.log('Stored hashed password:', user.password);
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    console.log('Password is valid:', isPasswordValid);
 
     if (!isPasswordValid) {
       throw new Error('잘못된 이메일 또는 비밀번호입니다.');
@@ -55,6 +60,7 @@ export const login = async (loginDto) => {
     const tokens = generateTokens(user.id);
 
     await updateUserRefreshToken(user.id, tokens.refreshToken);
+    console.log('Generated tokens:', tokens);
 
     return tokens;
   } catch (error) {
@@ -140,7 +146,7 @@ export const sendEmailVerificationCode = async (email) => {
   const verificationCode = generateVerificationCode();
 
   const expiresAt = new Date();
-  expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+  expiresAt.setMinutes(expiresAt.getMinutes() + 3);
 
   const transporter = nodemailer.createTransport({
     service: 'gmail', 
@@ -216,7 +222,7 @@ export const sendPasswordVerificationCode = async (email) => {
   const verificationCode = generateVerificationCode();
 
   const expiresAt = new Date();
-  expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+  expiresAt.setMinutes(expiresAt.getMinutes() + 3);
 
   const transporter = nodemailer.createTransport({
     service: 'gmail', 
@@ -298,5 +304,4 @@ export const changePasswordService = async (email, newPassword) => {
 
   await updateUserPassword(user.id, hashedPassword);
 
-  return { message: '비밀번호가 성공적으로 변경되었습니다.' };
 };
