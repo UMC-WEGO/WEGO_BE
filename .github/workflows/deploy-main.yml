@@ -37,6 +37,16 @@ jobs:
           ssh wego 'sudo chown ubuntu:ubuntu /opt/app'
           scp -r ./[!.]* wego:/opt/app
 
+      - name: Create .env file on EC2
+        run: |
+          ssh wego '
+            echo "PORT=3000" >> /opt/app/.env
+            echo "JWT_PRIVATE_KEY=${{ secrets.JWT_PRIVATE_KEY }}" >> /opt/app/.env
+            echo "JWT_PUBLIC_KEY=${{ secrets.JWT_PUBLIC_KEY }}" >> /opt/app/.env
+            echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> /opt/app/.env
+            echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> /opt/app/.env
+          '
+
       - name: Install dependencies
         run: |
           ssh wego 'npm install --prefix /opt/app/'
@@ -50,6 +60,7 @@ jobs:
 
             [Service]
             User=${USER}
+            EnvironmentFile=/opt/app/.env
             ExecStart=/usr/bin/npm run dev --prefix /opt/app/
             Restart=always
 
