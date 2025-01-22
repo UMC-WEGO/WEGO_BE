@@ -5,6 +5,7 @@ import { specs } from "../config/swagger.config.js";
 import SwaggerUi from "swagger-ui-express";
 import  { authRouter }  from "./auth/auth.route.js";
 import { createRandomTrip, deleteUpcomingTrip, getUpcomingTripsController, saveTripController } from "./home/home.controller.js";
+import  scheduleRouter  from "./schedule/routes/schedule.route.js"; // 추가
 
 dotenv.config();
 
@@ -18,10 +19,14 @@ app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형
 
 app.use("/api-docs", SwaggerUi.serve, SwaggerUi.setup(specs));
 app.use('/auth', authRouter);
+
 app.post('/home', createRandomTrip);
 app.post('/home/save-trip', saveTripController);
 app.get("/home/upcoming-trips", getUpcomingTripsController);
 app.delete("/home/upcoming-trips/:tripId", deleteUpcomingTrip);
+
+app.use("/schedule", scheduleRouter); // schedule 라우트 등록
+
 
 app.get("/", (req, res) => {
   res.send("Hello World!!");
