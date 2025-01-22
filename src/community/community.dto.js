@@ -36,7 +36,6 @@ export const update_post_request_dto = (data, post_id) => ({
 
 // 게시글 수정 응답 DTO
 export const update_post_response_dto = (response) => ({
-    user_id: response.result.user_id,
     post_id: response.result.id,
     category_id: response.category_id,
     local_id: response.local_id,
@@ -52,7 +51,6 @@ export const update_post_response_dto = (response) => ({
 export const delete_post_response_dto = (post_id) => ({
     message: "게시글이 성공적으로 삭제되었습니다.",
     post_id, 
-    status: "DELETED", 
 });
 
 
@@ -148,4 +146,10 @@ export const create_comment_response_dto = (response) => ({
     user_profile_image : response.user_profile_image,
     content: response.content,
     created_at: response.created_at ? new Date(response.created_at).toISOString() : null,
+});
+
+export const delete_comment_response_dto = (post_id, comment_id) => ({
+    post_id,
+    comment_id,
+    message: "댓글이 성공적으로 삭제되었습니다.",
 });
