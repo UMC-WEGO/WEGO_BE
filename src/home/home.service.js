@@ -1,4 +1,4 @@
-import { getFilterdRandomTrips, getUpcomingTrips, saveTrip } from "./home.repository.js"
+import { deleteTrip, getFilterdRandomTrips, getUpcomingTrips, saveTrip } from "./home.repository.js"
 import { response } from '../../config/response.js';
 import { saveTripDto, upcomingTripDto } from "./home.dto.js";
 
@@ -92,5 +92,33 @@ export const getUpcomingTripsService = async (memberId) => {
       code: 500,
       message: "다가오는 여행 조회 중 오류 발생",
     };
+  }
+};
+
+// 여행 일정 삭제
+export const deleteTripService = async (tripId) => {
+  try {
+    const success = await deleteTrip(tripId);
+
+    if (success) {
+      return response({
+        isSuccess: true,
+        code: 200,
+        messsage: "여행 일정이 성공적으로 삭제되었습니다.",
+      });
+    } else {
+      return response({
+        isSuccess: false,
+        code: 404,
+        messsage: "해당 여행 일정정이 존재하지 않습니다.",
+      });
+    }
+  } catch (error) {
+    console.error("여행 삭제 중 서비스 오류", error);
+    return response({
+      isSuccess: false,
+      code: 500,
+      message: "여행 일정 삭제 중 서버 오류 발생",
+    });
   }
 };

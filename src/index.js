@@ -4,7 +4,7 @@ import cors from "cors";
 import { specs } from "../config/swagger.config.js";
 import SwaggerUi from "swagger-ui-express";
 import  { authRouter }  from "./auth/auth.route.js";
-import { createRandomTrip, getUpcomingTripsController, saveTripController } from "./home/home.controller.js";
+import { createRandomTrip, deleteUpcomingTrip, getUpcomingTripsController, saveTripController } from "./home/home.controller.js";
 
 dotenv.config();
 
@@ -21,6 +21,7 @@ app.use('/auth', authRouter);
 app.post('/home', createRandomTrip);
 app.post('/home/save-trip', saveTripController);
 app.get("/home/upcoming-trips", getUpcomingTripsController);
+app.delete("/home/upcoming-trips/:tripId", deleteUpcomingTrip);
 
 app.get("/", (req, res) => {
   res.send("Hello World!!");

@@ -48,3 +48,10 @@ export const upcomingTripDto = (trip) => ({
   startDate: trip.startDate,
   endDate: trip.endDate
 });
+
+// 여행 일정 삭제
+export const deleteTripDto = (tripId) => {
+  return {
+    tripId,
+  };
+};

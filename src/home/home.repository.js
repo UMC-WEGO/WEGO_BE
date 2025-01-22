@@ -105,3 +105,24 @@ export const getUpcomingTrips = async (user_id) => {
     throw new Error("다가오는 여행 조회 실패");
   }
 };
+
+// 여행 일정 삭제
+export const deleteTrip = async (id) => {
+  try {
+    const query = `
+      DELETE FROM travel WHERE id = ?;
+    `;
+
+    const [result] = await pool.query(query, [id]);
+
+    // 삭제된 행 O -> 정상 / x -> 실패
+    if (result.affectedRows > 0) {
+      return true; // 성공
+    } else {
+      return false; // 해당 여행 존재 X -> 실패
+    }
+  } catch (error) {
+    console.error("여행 삭제 중 오류 발생", error);
+    throw new Error("여행 삭제 중 오류 발생");
+  }
+}

@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes"
-import { getRandomTrips, getUpcomingTripsService, saveTripService } from "./home.service.js";
+import { deleteTripService, getRandomTrips, getUpcomingTripsService, saveTripService } from "./home.service.js";
 import { randomTripDto } from "./home.dto.js"
+import { deleteTrip } from "./home.repository.js";
 
 // 랜덤 여행지 추출
 export const createRandomTrip = async (req, res) => {
@@ -66,3 +67,19 @@ export const getUpcomingTripsController = async (req, res) => {
     });
   }
 };
+
+// 다가오는 여행 일정 삭제
+export const deleteUpcomingTrip = async (req, res) => {
+  const { tripId } = req.params;
+
+  // 서비스 호출 -> 여행 일정 삭제
+  const result = await deleteTripService(tripId);
+
+  // 응답
+  res.status(result.code).json({
+    isSuccess: result.isSuccess,
+    code: result.code,
+    message: result.message,
+  });
+
+}
