@@ -16,7 +16,7 @@ const options = {
         description: "로컬 서버",
       },
       {
-        url: "http://43.203.244.245:3000/",
+        url: "http://13.124.213.122:3000",
         description: "개발 서버",
       },
     ],
