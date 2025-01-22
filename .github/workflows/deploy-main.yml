@@ -45,6 +45,12 @@ jobs:
             echo "JWT_PUBLIC_KEY=${{ secrets.JWT_PUBLIC_KEY }}" >> /opt/app/.env
             echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> /opt/app/.env
             echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> /opt/app/.env
+
+            echo "DB_HOST=${{ secrets.DB_HOST }}" >> /opt/app/.env
+            echo "DB_USER=${{ secrets.DB_USER }}" >> /opt/app/.env
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /opt/app/.env
+            echo "DB_NAME=${{ secrets.DB_NAME }}" >> /opt/app/.env
+            echo "DB_PORT=${{ secrets.DB_PORT }}" >> /opt/app/.env
           '
 
       - name: Install dependencies
