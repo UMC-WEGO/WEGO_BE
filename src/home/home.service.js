@@ -62,6 +62,7 @@ export const saveTripService = async (data) => {
   }
 };
 
+// 다가오는 여행 일정 조회
 export const getUpcomingTripsService = async (memberId) => {
   try {
     const trips = await getUpcomingTrips(memberId);
@@ -104,13 +105,13 @@ export const deleteTripService = async (tripId) => {
       return response({
         isSuccess: true,
         code: 200,
-        messsage: "여행 일정이 성공적으로 삭제되었습니다.",
+        message: "여행 일정이 성공적으로 삭제되었습니다.",
       });
     } else {
       return response({
         isSuccess: false,
         code: 404,
-        messsage: "해당 여행 일정정이 존재하지 않습니다.",
+        messsage: "해당 여행 일정이 존재하지 않습니다.",
       });
     }
   } catch (error) {
