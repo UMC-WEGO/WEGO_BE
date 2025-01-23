@@ -75,11 +75,14 @@ export const deleteUpcomingTrip = async (req, res) => {
   // 서비스 호출 -> 여행 일정 삭제
   const result = await deleteTripService(tripId);
 
-  // 응답
-  res.status(result.code).json({
-    isSuccess: result.isSuccess,
-    code: result.code,
-    message: result.message,
-  });
-
+  try {
+    res.status(result.code).json(result);
+  } catch (error) {
+    console.error("다가오는 여행 삭제제 중 컨트롤러 오류", error);
+    res.status(500).json({
+      isSuccess: false,
+      code: 500,
+      message: "다가오는 여행 삭제 중 서버 오류 발생"
+    });
+  }
 }
