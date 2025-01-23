@@ -20,6 +20,23 @@ export const createUser = async (signUpDto) => {
   }
 };
 
+export const verifyEmail = async (email) => {
+  const query = `
+    SELECT * 
+    FROM Auth_codes 
+    WHERE email = ? AND purpose = 'EMAIL_VERIFICATION' AND is_used = 1;
+  `;
+
+  try {
+    const [rows] = await pool.query(query, [email]);
+    return rows[0]; // 조건에 맞는 레코드가 있으면 true 반환
+  } catch (error) {
+    console.error('Error during email verification:', error.message);
+    console.error(error.stack);
+    throw new Error('이메일 인증 확인 중 오류가 발생했습니다.');
+  }
+};
+
 export const findUserByEmail = async (email) => {
   const query = `SELECT * FROM User WHERE email = ?`;
   const values = [email];
