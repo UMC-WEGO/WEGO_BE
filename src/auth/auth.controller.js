@@ -284,7 +284,7 @@ export const verifyPasswordAuthController = async (req, res) => {
 
     if (isVerified) {
       const responseResult = response(
-        { isSuccess: false, code: 200, message: '인증 코드가 유효합니다.' }
+        { isSuccess: false, code: 200, message: '인증 코드가 일치합니다.' }
       );
       return res.status(200).json(responseResult);
     } else {

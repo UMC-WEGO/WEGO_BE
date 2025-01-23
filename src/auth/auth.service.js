@@ -2,6 +2,7 @@
 
 import { 
     createUser,
+    verifyEmail,
     findUserByEmail,
     updateUserRefreshToken,
     findUserByNickname,
@@ -19,6 +20,11 @@ import nodemailer from 'nodemailer';
 
 export const signUp = async (signUpDto) => {
   const { email, password, nickname, marketing_consent, info_consent } = signUpDto;
+
+  const isVerified = await verifyEmail(email);
+  if (!isVerified) {
+    throw new Error('이메일 인증이 완료되지 않았습니다.');
+  }
 
   console.log('Password before hash: ', password); 
 
