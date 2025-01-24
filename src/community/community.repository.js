@@ -14,7 +14,7 @@ export const create_post_repository = async(data) => {
 
     const post_id = result.insertId;
     const new_query = `
-        SELECT p.id, c.name AS category_name, l.name AS local_name, p.title, p.content, p.picture_url, p.created_at
+        SELECT p.id, c.name AS category_name, l.location_name AS location_name, p.title, p.content, p.picture_url, p.created_at
         FROM post p
         JOIN category c ON c.id = p.category_id
         JOIN local l ON l.id = p.local_id
@@ -88,7 +88,7 @@ export const get_all_posts_repository = async(page,limit) => {
     const offset = (page - 1) * limit;
 
     const query = `
-        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.name AS local_name, p.created_at,
+        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
@@ -118,7 +118,7 @@ export const get_posts_by_category_repository = async(category_id,page,limit) =>
     const offset = (page- 1) * limit;
 
     const query = `
-        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.name AS local_name, p.created_at,
+        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
@@ -145,7 +145,7 @@ export const get_posts_by_category_repository = async(category_id,page,limit) =>
 // 상위 2개 게시글 조회 - 지역 
 export const get_top_post_by_local_repository = async (local_id) => {
     const query = `
-        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.name AS local_name, p.created_at,
+        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
@@ -171,7 +171,7 @@ export const get_top_post_by_local_repository = async (local_id) => {
 // 상위 2개 게시글 조회 - 전체
 export const get_posts_top_repository = async() => {
     const query = `
-        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.name AS local_name, p.created_at,
+        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
@@ -253,7 +253,7 @@ export const get_post_by_id_repository = async (post_id) => {
 // 내가 작성한 글 조회 
 export const get_my_posts_repository = async (user_id) => {
     const query = `
-        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.name AS local_name, p.created_at,
+        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
@@ -390,7 +390,7 @@ export const delete_scrap_repository = async(post_id, user_id) => {
 // 스크랩 조회
 export const get_scrap_repository = async(user_id) => {
     const query = `
-        SELECT p.id, c.name AS category_name, p.title, p.content, l.name AS local_name,p.created_at,
+        SELECT p.id, c.name AS category_name, p.title, p.content, l.location_name AS location_name,p.created_at,
             COALESCE(comment_counts.comment_count, 0) AS total_comment,
             COALESCE(like_counts.like_count, 0) AS total_like,
             COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
@@ -417,7 +417,7 @@ export const get_scrap_repository = async(user_id) => {
 // 스크랩 조회 - 카테고리별 
 export const get_scrap_by_category_repository = async(user_id, category_id) => {
     const query = `
-        SELECT p.id, c.name, p.title, p.content, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, l.name, p.created_at,
+        SELECT p.id, c.name, p.title, p.content, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, l.location_name, p.created_at,
 	        COALESCE(comment_counts.comment_count, 0) AS total_comment,
 	        COALESCE(like_counts.like_count, 0) AS total_like,
 	        COALESCE(scrap_counts.scrap_count, 0) AS total_scrap 

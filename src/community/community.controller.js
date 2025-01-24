@@ -131,7 +131,7 @@ export const get_posts_by_category_controller = async(req,res,next)=> {
         res.status(StatusCodes.OK).json(posts);
     } catch (error){
         console.error(error);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "게시판 조회중에 에러가 발생했습니다."});
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "카테고리별 게시판 조회중에 에러가 발생했습니다."});
     }
 };
 

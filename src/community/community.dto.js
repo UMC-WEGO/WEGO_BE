@@ -15,7 +15,7 @@ export const create_post_response_dto = (response) => ({
     post_id: response.id,
     user_nickname: response.user_nickname,
     category_name: response.category_name,
-    local_name: response.local_name,   
+    location_name_: response.location_name,   
     title: response.title,
     content: response.content,
     picture_url: response.picture_url ? JSON.parse(response.picture_url) : [],
