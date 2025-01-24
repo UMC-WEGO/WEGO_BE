@@ -7,6 +7,14 @@ paths:
     get:
       tags:
         - USER
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: "사용자의 ID"
+          schema:
+            type: integer
+            example: 1
       summary: 마이페이지 정보 조회
       responses:
         "200":
@@ -31,27 +39,27 @@ paths:
                       user_id:
                         type: integer
                         example: 1
+                      email:
+                        type: string
+                        example: test@example.com
                       nickname:
                         type: string
                         example: tndbsrkd
                       profile_image:
                         type: string
                         example: "https://example.com/images/profile.jpg"
-                      email:
-                        type: string
-                        example: test@example.com
                       point:
                         type: integer
                         example: 1400
-                      travel:
+                      temperature:
+                        type: integer
+                        example: 30
+                      travelCount:
                         type: integer
                         example: 1
                       completedMissions:
                         type: integer
                         example: 8
-                      temperature:
-                        type: integer
-                        example: 30
         "400":
           description: 잘못된 요청
           content:
