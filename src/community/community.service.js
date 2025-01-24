@@ -7,6 +7,9 @@ import {
     create_post_repository,
     update_post_repository,
     delete_post_repository,
+
+    get_local_search_repository,
+
     get_all_posts_repository,
     get_posts_top_repository,
     get_top_post_by_local_repository,
@@ -28,7 +31,10 @@ import {
     get_scrap_repository,
     get_scrap_by_category_repository,
 
+    get_user_profile_repository,
+
 } from "./community.repository.js"
+
 
 
 // 게시글 작성
@@ -50,7 +56,6 @@ export const create_post_service = async (data) => {
     }
 }
 
-
 // 게시물 수정
 export const update_post_service = async (post_id, data) => {
     const update_key = await update_post_repository(post_id, data);
@@ -62,7 +67,6 @@ export const update_post_service = async (post_id, data) => {
     return update_key;
 }
 
-
 //게시물 삭제
 export const delete_post_service = async (post_id) => {
     const delete_key = await delete_post_repository(post_id);
@@ -72,6 +76,20 @@ export const delete_post_service = async (post_id) => {
     }
 
     return delete_key;
+}
+
+
+
+// 최근 검색어 - 조회 
+export const get_local_search_service = async(user_id) => {
+    try {
+        const get_key = await get_local_search_repository(user_id);
+    
+        return get_key || [];
+    } catch(error){
+        console.error(error);
+        throw new Error("최근 검색어가 조회되지 않았습니다.");
+    }
 }
 
 
@@ -99,6 +117,7 @@ export const get_top_post_by_local_service = async(local_id) => {
     return top_posts_by_local;
 }
 
+
 // 상위 2개 게시판 조회 - 전체
 export const get_top_post_service = async()=> {
     const top_posts = await get_posts_top_repository();
@@ -106,7 +125,7 @@ export const get_top_post_service = async()=> {
 }
 
 
-// 인기 게시판 
+// 인기 게시판 조회 
 export const get_popular_posts_service = async() => {
     const popular_posts = await get_popular_posts_repository();
     return popular_posts;
@@ -169,6 +188,7 @@ export const delete_comment_service = async(post_id, comment_id) => {
 }
 
 
+
 // 좋아요 누르기 
 export const create_like_service = async(post_id, user_id) => {
     const like_key = await create_like_repository(post_id, user_id);
@@ -179,7 +199,6 @@ export const create_like_service = async(post_id, user_id) => {
 
     return like_key;
 }
-
 
 // 좋아요 취소하기
 export const delete_like_service = async(post_id, user_id) => {
@@ -193,6 +212,7 @@ export const delete_like_service = async(post_id, user_id) => {
 }
 
 
+
 // 스크랩 누르기 
 export const create_scrap_service = async(post_id, user_id) => {
     const scrap_key = await create_scrap_repository(post_id, user_id);
@@ -204,7 +224,6 @@ export const create_scrap_service = async(post_id, user_id) => {
     return scrap_key;
 }
 
-
 // 스크랩 취소하기 
 export const delete_scrap_service = async (post_id, user_id) => {
     const delete_scrap_key = await delete_scrap_repository(post_id, user_id);
@@ -214,7 +233,6 @@ export const delete_scrap_service = async (post_id, user_id) => {
     }
     return delete_scrap_key;
 }
-
 
 // 스크랩 조회 
 export const get_scrap_service = async(user_id) => {
@@ -226,7 +244,6 @@ export const get_scrap_service = async(user_id) => {
     return get_scrap_key;
 }
 
-
 // 스크랩 조회 - 카테고리별 
 export const get_scrap_by_category_service = async(user_id, category_id) => {
     const get_scrap_by_category_key = await get_scrap_by_category_repository(user_id, category_id);
@@ -236,4 +253,17 @@ export const get_scrap_by_category_service = async(user_id, category_id) => {
     }
 
     return get_scrap_by_category_key;
+}
+
+
+
+// 게시글 작성자 프로필 조회
+export const get_user_profile_service = async(user_id) => {
+    const get_profile = await get_user_profile_repository(user_id);
+
+    if(!get_profile) {
+        throw new Error("프로필 조회가 되지 않았습니다.");
+    }
+
+    return get_profile;
 }

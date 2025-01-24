@@ -21,6 +21,9 @@ import {
     create_post_service,
     update_post_service,
     delete_post_service,
+
+    get_local_search_service,
+
     get_all_posts_service,
     get_posts_by_category_service,
     get_top_post_service,
@@ -42,6 +45,8 @@ import {
 
     get_scrap_service,
     get_scrap_by_category_service,
+
+    get_user_profile_service,
 
 } from "./community.service.js"
 
@@ -104,6 +109,28 @@ export const delete_post_controller = async(req,res,next) => {
 };
 
 
+
+// 최근 검색어 - 조회 
+export const get_local_search_controller = async(req, res) => {
+    const user_id = parseInt(req.params.user_id);
+
+    try{
+        const get_key = await get_local_search_service(user_id);
+        
+
+        if(get_key.length > 0) {
+            res.status(StatusCodes.OK).json(get_key);
+        } else {
+            res.status(StatusCodes.NOT_FOUND).json({message: "검색어가 없습니다."});
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "최근 검색어 조회 중에 에러가 발생했습니다."});
+    }
+}
+
+
+
 // 전체 글 조회 
 export const get_all_posts_controller = async(req,res,next) => {
     const page = parseInt(req.query.page) || 1;
@@ -148,6 +175,7 @@ export const get_top_post_by_local_controller = async(req,res,next) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "게시판 상위 2개 조회(지역별) 중에 에러가 발생했습니다."});
     }
 };
+
 
 // 즉흥 게시판 상위 2개 조회 - 전체
 export const get_top_controller = async(req, res) => {
@@ -247,6 +275,7 @@ export const delete_comment_controller = async(req,res) => {
 }
 
 
+
 // 좋아요 누르기
 export const create_like_controller = async(req,res) => {
     try {
@@ -297,6 +326,7 @@ export const delete_like_controller = async(req,res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "좋아요 취소하는 중에 에러가 발생했습니다."}); 
     }
 }
+
 
 
 // 스크랩 누르기 
@@ -384,5 +414,25 @@ export const get_scrap_by_category_controller = async(req,res) => {
     } catch(error) {
         console.error(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "카테고리별 스크랩 조회 중에 에러가 발생했습니다."});
+    }
+}
+
+
+
+// 게시글 작성자 프로필 조회 
+export const get_user_profile_controller = async(req, res) => {
+    const user_id = parseInt(req.params.user_id); 
+
+    try {
+        const get_key = await get_user_profile_service(user_id);
+
+        if(get_key) {
+            res.status(StatusCodes.OK).json(get_key);
+        } else {
+            res.status(StatusCodes.NOT_FOUND).json({message: "작성자의 프로필을 찾을 수 없습니다."});
+        }
+    } catch (error){
+        console.error(error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "게시글 작성자 프로필 조회 중에 에러가 발생했습니다."});
     }
 }

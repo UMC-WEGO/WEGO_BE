@@ -315,57 +315,52 @@ paths:
                     description: 에러 메시지
                     example: "전체 글 조회 중에 에러가 발생했습니다."
 
-  /community/posts/local:
+  /community/posts/local-search/{user_id}:
     get:
       summary: "게시글 지역 선택 시 최근 출발 지역 조회(홈화면에서도 사용)"
       tags:
         - COMMUNITY
+      parameters: 
+        - name: user_id
+          in: path
+          required: true
+          description: 사용자 ID
+          schema: 
+            type: integer 
       responses:
         '200':
           description: "최근 출발 지역 조회 성공"
           content:
             application/json:
               schema:
+                type: array
+                items:
+                  type: string
+                example:
+                  - "제주도"
+                  - "부산"
+                  - "서울"
+                  - "여수"      
+        '404':
+          description: "검색어가 없습니다."
+          content: 
+            application/json:
+              schema:
                 type: object
                 properties:
-                  isSuccess:
-                    type: boolean
-                    example: true
-                  code:
-                    type: integer
-                    example: 200
                   message:
                     type: string
-                    example: "최근 출발 지역 조회 성공"
-                  result:
-                    type: object
-                    properties:
-                      userId:
-                        type: integer
-                      local:
-                        type: array
-                        items:
-                          type: string
-                        example:
-                          - 서울 강북
-                          - 부산
-                          
-        "400":
-          description: 잘못된 요청
+                    example: "검색어가 없습니다." 
+        '500':
+          description: "서버 에러"
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  isSuccess:
-                    type: boolean
-                    example: false
-                  code:
-                    type: integer
-                    example: 400
                   message:
                     type: string
-                    example: 잘못된 요청입니다.
+                    example: "최근 검색어 조회 중에 에러가 발생했습니다."
 
   /impromptu-posts/{category_id}:
     get:
@@ -627,10 +622,14 @@ paths:
                     type: string
                     description: 카테고리 이름
                     example: "미션 제안"
-                  nickname:
+                  post_author_profile:
                     type: string
-                    description: 사용자 닉네임
-                    example: "UserOne"
+                    description: 게시물 작성자 프로필 이미지 URL
+                    example: "https://example.com/uploads/profile.jpg"
+                  post_author_nickname:
+                    type: string
+                    description: 게시물 작성자 닉네임
+                    example: "UserOne" 
                   created_at:
                     type: string
                     format: date-time
@@ -648,6 +647,44 @@ paths:
                     type: string
                     description: 게시물 이미지 URL
                     example: "https://example.com/uploads/image1.jpg"
+                  comment_counts:
+                    type: integer
+                    description: 댓글 수
+                    example: 5
+                  like_counts:
+                    type: integer
+                    description: 좋아요 수
+                    example: 2
+                  scrap_counts:
+                    type: integer
+                    desription: 스크랩 수
+                    example: 3
+                comments:
+                  type: array
+                  items: 
+                    type: object
+                    properties:
+                      user_id:
+                        type: integer
+                        description: 댓글 작성자 ID
+                        example: 1
+                      comment_author_name:
+                        type: string
+                        description: 댓글 작성자 닉네임
+                        example: "기사식당"  
+                      comment_author_profile:
+                        type: string
+                        description: 댓글 작성자 프로필 이미지 URL
+                        example: "http://example.com/image1.jpg"
+                      comment_created_at:
+                        type: string
+                        format: data-time
+                        description: 댓글 작성일시
+                        example: "2025-01-24T12:38:41.000Z"
+                      comment_content:
+                        type: string
+                        description: 댓글 내용
+                        example: "갑자기 갯벌핑ㅋㅋ" 
 
         '404':
           description: "게시물을 찾을 수 없음"
@@ -1273,13 +1310,13 @@ paths:
                     type: string
                     example: "카테고리별 스크랩 조회 중에 에러가 발생했습니다."    
                             
-  /community/users/{userId}/profile:
+  /community/users/{user_id}/profile:
       get:
         summary: "게시글 작성자 프로필 조회"
         tags:
           - COMMUNITY
         parameters:
-          - name: userId
+          - name: user_id
             in: path
             required: true
             description: "조회할 사용자의 ID"
@@ -1293,108 +1330,73 @@ paths:
                 schema:
                   type: object
                   properties:
-                    isSuccess:
-                      type: boolean
-                      example: true
-                    code:
-                      type: integer
-                      example: 200
-                    message:
-                      type: string
-                      example: "게시글 작성자 프로필 조회 성공"
-                    result:
+                    user_info:
                       type: object
                       properties:
-                        userId:
-                          type: integer
-                          example: 1
                         nickname:
                           type: string
-                          example: "홍길동"
-                        profileImage:
+                          example: "위고 빅토르"
+                        profile_image:
                           type: string
-                          format: uri
-                          example: "https://example.com/profile.jpg"
-                        travelCount:
+                          example: "http://example.com/image3.jpg"
+                        temp:
+                          type: number
+                          format: float
+                          example: "36.5"
+                        travel_counts:
                           type: integer
-                          example: 12
-                        impromptuTemperature:
+                          example: 3
+                        post_counts:
                           type: integer
-                          example: 78
-                        postCount:
+                          example: 10
+                        mission_counts:
                           type: integer
-                          example: 34
-                        receivedLikes:
+                          nullable: true
+                          example: null 
+                  posts:  
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
                           type: integer
-                          example: 200
-                        missionCompleted:
-                          type: integer
-                          example: 5
-                        posts:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              postId:
-                                type: integer
-                                example: 1
-                              title:
-                                type: string
-                                example: "이런건 어떤가요 ㅋㅋ"
-                              content:
-                                type: string
-                                example: "순천 안온해변에서 어쩌고"
-                              createdAt:
-                                type: string
-                                format: date-time
-                                example: "2025-01-06T12:00:00Z"
-                              totalLikes:
-                                type: integer
-                                example: 20
-                              totalComments:
-                                type: integer
-                                example: 3
-                              totalScraps:
-                                type: integer
-                                example: 5
-                              isLiked:
-                                type: boolean
-                                example: true
-                              isScraped:
-                                type: boolean
-                                example: false
-                              hasCommented:
-                                type: boolean
-                                example: true
-          '400':
-            description: "잘못된 요청"
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    isSuccess:
-                      type: boolean
-                      example: false
-                    code:
-                      type: integer
-                      example: 400
-                    message:
-                      type: string
-                      example: "잘못된 요청입니다."
+                          example: 2
+                        picture_url:
+                          type: string
+                          example: "wmrgmd.jpg"
+                        category_name:
+                          type: string
+                          example: "즉흥 자랑" 
+                        title:
+                          type: string
+                          example: "이런 건 어떤가요 ㅋㅋ" 
+                        content:
+                          type: string
+                          example: "순천 안온해변에서 갑자기 갯벌 밟아보기 어떠신가요? ㅋㅋㅋ.."
+                        location_name:
+                          type: string
+                          example: "강남"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2025-01-24T12:32:37.000Z"  
           '404':
-            description: "사용자 없음"
+            description: 작성자의 프로필을 찾을 수 없습니다. 
             content:
               application/json:
                 schema:
                   type: object
                   properties:
-                    isSuccess:
-                      type: boolean
-                      example: false
-                    code:
-                      type: integer
-                      example: 404
+                    message: 
+                      type: string
+                      example: "작성자의 프로필을 찾을 수 없습니다." 
+          '500': 
+            description: 서버 내부 에러 
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
                     message:
                       type: string
-                      example: "사용자를 찾을 수 없습니다."
+                      example: "게시글 작성자 프로필 조회 중에 에러가 발생했습니다."

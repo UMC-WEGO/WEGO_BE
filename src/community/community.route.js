@@ -4,6 +4,9 @@ import {
     create_post_controller,
     update_post_controller,
     delete_post_controller,
+
+    get_local_search_controller,
+
     get_all_posts_controller,
     get_posts_by_category_controller,
     get_top_controller,
@@ -26,13 +29,17 @@ import {
     get_scrap_controller,
     get_scrap_by_category_controller,
 
+    get_user_profile_controller,
+
 } from './community.controller.js'
 
 const communityRouter = express.Router();
 
+
 communityRouter.get("/", (req, res) => {
     res.send("community main route");
 });
+
 
 //게시글 작성
 communityRouter.post("/posts", create_post_controller);
@@ -42,6 +49,10 @@ communityRouter.patch("/posts/modify/:post_id", update_post_controller);
 
 //게시글 삭제
 communityRouter.delete("/posts/delete/:post_id", delete_post_controller);
+
+
+// 최근 검색어 - 조회 
+communityRouter.get("/posts/local-search/:user_id", get_local_search_controller);
 
 
 //전체 게시글 조회
@@ -69,6 +80,7 @@ communityRouter.get("/posts/:post_id", get_post_by_id_controller);
 communityRouter.get("/my-posts/:user_id", get_my_posts_controller);
 
 
+
 // 댓글 작성 
 communityRouter.post("/posts/:post_id/comments", create_comment_controller);
 
@@ -76,11 +88,13 @@ communityRouter.post("/posts/:post_id/comments", create_comment_controller);
 communityRouter.delete("/posts/:post_id/comments/:comment_id", delete_comment_controller);
 
 
+
 // 좋아요 누르기
 communityRouter.post("/posts/:post_id/likes/:user_id", create_like_controller);
 
 // 좋아요 삭제 
 communityRouter.delete("/delete/:post_id/likes/:user_id", delete_like_controller);
+
 
 
 // 스크랩 누르기
@@ -94,6 +108,11 @@ communityRouter.get("/my-scraps/:user_id", get_scrap_controller);
 
 // 스크랩 조회 - 카테고리별 
 communityRouter.get("/my-scraps/:user_id/category/:category_id",get_scrap_by_category_controller);
+
+
+
+// 게시글 작성자 프로필 조회 
+communityRouter.get("/users/:user_id/profile", get_user_profile_controller);
 
 
 export default communityRouter;
