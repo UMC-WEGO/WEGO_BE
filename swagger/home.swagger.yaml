@@ -20,7 +20,7 @@ paths:
                 departure:
                   type: string
                   description: "출발지 (예: 부산)"
-                  example: "부산"
+                  example: "서울 강북"
                 participants:
                   type: integer
                   description: "여행 인원 (예: 5)"
@@ -293,12 +293,12 @@ paths:
                         type: string
                         format: date-time
                         description: "여행 시작 날짜"
-                        example: "2025-01-06T12:00:00Z"
+                        example: "2025-01-30"
                       endDate:
                         type: string
                         format: date-time
                         description: "여행 종료 날짜"
-                        example: "2025-01-08T12:00:00Z"
+                        example: "2025-01-31"
         '400':
           description: "잘못된 요청"
           content:
