@@ -41,8 +41,8 @@ jobs:
         run: |
           ssh wego '
             echo "PORT=3000" >> /opt/app/.env
-            printf "JWT_PRIVATE_KEY=${{ secrets.JWT_PRIVATE_KEY }}" >> /opt/app/.env
-            printf "JWT_PUBLIC_KEY=${{ secrets.JWT_PUBLIC_KEY }}" >> /opt/app/.env
+            echo "JWT_PRIVATE_KEY=${{ secrets.JWT_PRIVATE_KEY }}" >> /opt/app/.env
+            echo "JWT_PUBLIC_KEY=${{ secrets.JWT_PUBLIC_KEY }}" >> /opt/app/.env
             echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> /opt/app/.env
             echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> /opt/app/.env
 
