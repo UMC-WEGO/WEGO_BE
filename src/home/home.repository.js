@@ -124,6 +124,7 @@ export const getUpcomingTrips = async (user_id) => {
 
   try {
     const [rows] = await pool.query(query, [user_id]);
+    console.log("다가오는 여행 조회", rows);
     return rows;
   } catch (error) {
     console.error("다가오는 여행 조회 중 오류 발생", error);

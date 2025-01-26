@@ -146,6 +146,10 @@ paths:
                   format: date-time
                   description: "여행 종료 날짜"
                   example: "2025-01-08T12:00:00Z"
+                user_id:
+                  type: integer
+                  description: 사용자 id
+                  example: 1
       responses:
         '200':
           description: "여행 일정 등록 성공"
