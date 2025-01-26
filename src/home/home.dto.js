@@ -6,6 +6,7 @@ export const randomTripDto = (data) => {
     duration: data.duration,
     startDate: data.startDate,
     endDate: data.endDate,
+    growthRate: data.growthRate,
   };
 };
 
