@@ -15,6 +15,28 @@ const getRegionByLocation = async (locationName) => {
     }
 };
 
+// 방문 증감률 찾기
+const getGrwowthRateByLocation = async (locationName) => {
+  try {
+    const query = `
+      SELECT growth_rate
+      FROM visit_growth_rate
+      WHERE location_name = ?;
+    `;
+
+    const [rows] = await pool.query(query, [locationName]);
+
+    if (rows.length > 0) {
+      return rows[0].growth_rate;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("방문 증감률 조회 중 오류 발생", error);
+    throw new Error("방문 증감률 정보를 가져오는 중 실패");
+  }
+};
+
 export const getFilterdRandomTrips = async (departure, vehicle, duration) => {
   try {
     const query = `
@@ -44,9 +66,12 @@ export const getFilterdRandomTrips = async (departure, vehicle, duration) => {
       return Promise.all(
         randomDestinations.map(async (dest) => {
           const region = await getRegionByLocation(dest);
+          const growthRate = await getGrwowthRateByLocation(dest);
+
           return {
             location: dest,
             region: region || "지역 정보 없음",
+            growthRate: growthRate || "방문 증감률 정보 없음",
           };
         })
       );

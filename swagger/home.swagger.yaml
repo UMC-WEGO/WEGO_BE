@@ -82,10 +82,13 @@ paths:
                     example:
                       - region: "경상북도"
                         location: "대구"
+                        growthRate: -3.2
                       - region: "충청남도"
                         location: "천안"
+                        growthRate: 2.5
                       - region: "충청북도"
                         location: "충주"
+                        growthRate: -7.2
         '400':
           description: "잘못된 요청"
           content:
