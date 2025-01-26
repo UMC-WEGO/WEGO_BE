@@ -240,14 +240,14 @@ paths:
                     type: string
                     example: "잘못된 요청입니다."
 
-  /home/upcoming-trips/{userId}:
+  /home/upcoming-trips:
     get:
       summary: "다가오는 여행 조회"
       tags:
         - HOME
       parameters:
         - name: userId
-          in: path
+          in: query
           required: true
           description: "사용자의 ID"
           schema:
