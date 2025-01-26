@@ -43,7 +43,8 @@ jobs:
             echo "PORT=3000" >> /opt/app/.env
             echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> /opt/app/.env
             echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> /opt/app/.env
-
+            printf "JWT_PRIVATE_KEY=\"${{ secrets.JWT_PRIVATE_KEY }}\"\n" >> /opt/app/.env
+            printf "JWT_PUBLIC_KEY=\"${{ secrets.JWT_PUBLIC_KEY }}\"\n" >> /opt/app/.env
             echo "DB_HOST=${{ secrets.DB_HOST }}" >> /opt/app/.env
             echo "DB_USER=${{ secrets.DB_USER }}" >> /opt/app/.env
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /opt/app/.env
