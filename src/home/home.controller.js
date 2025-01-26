@@ -59,6 +59,7 @@ export const getUpcomingTripsController = async (req, res) => {
 
   try {
     const result = await getUpcomingTripsService(user_id);
+    console.log("다가오는 여행 조회 controller: ", result);
     res.status(result.code).json(result);
   } catch (error) {
     console.error("다가오는 여행 조회 중 컨트롤러 오류", error);
