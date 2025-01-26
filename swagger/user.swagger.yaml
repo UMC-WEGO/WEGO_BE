@@ -7,14 +7,6 @@ paths:
     get:
       tags:
         - USER
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          description: "사용자의 ID"
-          schema:
-            type: integer
-            example: 1
       summary: 마이페이지 정보 조회
       responses:
         "200":
@@ -154,14 +146,6 @@ paths:
     get:
       tags:
         - USER
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          description: "사용자의 ID"
-          schema:
-            type: integer
-            example: 1
       summary: 지난 여행 조회
       responses:
         "200":

@@ -29,7 +29,7 @@ export const saveTripDto = (data) => {
     duration: data.duration,
     startDate: data.startDate,
     endDate: data.endDate,
-    user_id: data.user_id,
+    // user_id: data.user_id,
   };
 
   if (isNaN(new Date(saveTripDto.startDate).getTime() || isNaN(new Date(saveTripDto.endDate).getTime()))) {
@@ -39,7 +39,7 @@ export const saveTripDto = (data) => {
   return saveTripDto;
 }
 
-// 다가오는 여행 일정 조회 (클라이언트에 반환할 데이터 정의의)
+// 다가오는 여행 일정 조회 (클라이언트에 반환할 데이터 정의)
 export const upcomingTripDto = (trip) => ({
   tripId: trip.id,
   location: trip.location,
