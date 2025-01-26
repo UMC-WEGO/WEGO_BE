@@ -12,6 +12,9 @@ if (!JWT_PRIVATE_KEY || !JWT_PUBLIC_KEY ) {
     throw new Error("환경 변수 JWT_PRIVATE_KEY 또는 JWT_PUBLIC_KEY 누락되었습니다.");
 }
 
+console.log('Private Key:', JWT_PRIVATE_KEY);
+console.log('Public Key:', JWT_PUBLIC_KEY);
+
 // 에러 메시지 상수
 const ERROR_MESSAGES = {
     MISSING_OR_INVALID_AUTH_HEADER: "Authorization 헤더가 없거나 형식이 잘못되었습니다.",
