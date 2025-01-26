@@ -33,7 +33,7 @@ export const getRandomTrips = async (departure, vehicle, duration) => {
 };
 
 // 여행지 저장
-export const saveTripService = async (data) => {
+export const saveTripService = async (data, user_id) => {
   const tripDto = saveTripDto(data);
 
   try {
@@ -45,7 +45,7 @@ export const saveTripService = async (data) => {
       tripDto.duration,
       tripDto.startDate,
       tripDto.endDate,
-      tripDto.user_id
+      user_id,
     );
 
     return response({
@@ -63,9 +63,9 @@ export const saveTripService = async (data) => {
 };
 
 // 다가오는 여행 일정 조회
-export const getUpcomingTripsService = async (memberId) => {
+export const getUpcomingTripsService = async (user_id) => {
   try {
-    const trips = await getUpcomingTrips(memberId);
+    const trips = await getUpcomingTrips(user_id);
 
     if (trips.length === 0) {
       return {

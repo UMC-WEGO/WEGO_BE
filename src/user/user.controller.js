@@ -1,9 +1,9 @@
 import { getPastTripsService, getUserPostService, getUserProfileService } from "./user.service.js";
 
 export const getUserInfoController = async (req, res) => {
-  const { userId } = req.query;
+  const user_id = req.user_id;
 
-  if (!userId) {
+  if (!user_id) {
     return res.status(400).json({
       isSuccess: false,
       code: 400,
@@ -12,7 +12,7 @@ export const getUserInfoController = async (req, res) => {
   }
 
   try {
-    const result = await getUserProfileService(userId);
+    const result = await getUserProfileService(user_id);
 
     if (result.length === 0) {
       return res.status(404).json({
@@ -41,8 +41,8 @@ export const getUserInfoController = async (req, res) => {
 // 지난 여행 조회
 export const getPastTripsController = async (req, res) => {
   try {
-    const userId = req.query.userId;
-    const result = await getPastTripsService(userId);
+    const user_id = req.user_id;
+    const result = await getPastTripsService(user_id);
 
     if (!result) {
       return res.status(404).json({
@@ -71,8 +71,8 @@ export const getPastTripsController = async (req, res) => {
 // 사용자 작성 게시글 조회
 export const getUserPostController = async (req, res) => {
   try {
-    const userId = req.query.userId;
-    const result = await getUserPostService(userId);
+    const user_id = req.user_id;
+    const result = await getUserPostService(user_id);
 
     if (!result) {
       return res.status(404).json({

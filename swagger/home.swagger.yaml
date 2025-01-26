@@ -146,10 +146,6 @@ paths:
                   format: date-time
                   description: "여행 종료 날짜"
                   example: "2025-01-08T12:00:00Z"
-                user_id:
-                  type: integer
-                  description: 사용자 id
-                  example: 1
       responses:
         '200':
           description: "여행 일정 등록 성공"
@@ -252,14 +248,6 @@ paths:
       summary: "다가오는 여행 조회"
       tags:
         - HOME
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          description: "사용자의 ID"
-          schema:
-            type: integer
-            example: 1
       responses:
         '200':
           description: "다가오는 여행 조회 성공"

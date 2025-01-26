@@ -16,7 +16,10 @@ export const createRandomTrip = async (req, res) => {
 
 // 여행 일정 저장
 export const saveTripController = async (req, res) => {
-  const { location, participants, vehicle, duration, startDate, endDate, user_id } = req.body;
+  const user_id = req.user_id;
+  const { location, participants, vehicle, duration, startDate, endDate} = req.body;
+
+  console.log("userId:", user_id);
 
   try {
     // 서비스로 데이터 전달
@@ -27,8 +30,7 @@ export const saveTripController = async (req, res) => {
       duration,
       startDate,
       endDate,
-      user_id
-    });
+    }, user_id);
 
     res.status(result.code).json(result);
   } catch (error) {
@@ -43,20 +45,20 @@ export const saveTripController = async (req, res) => {
 
 // 다가오는 여행 조회
 export const getUpcomingTripsController = async (req, res) => {
-  const { userId } = req.query;
+  const user_id = req.user_id;
 
-  console.log("userId:", userId);
+  console.log("userId:", user_id);
 
-  if (!userId) {
+  if (!user_id) {
     return res.status(400).json({
       isSuccess: false,
       code: 400,
-      message: "memberId가 필요합니다.",
+      message: "user_id가 필요합니다.",
     });
   }
 
   try {
-    const result = await getUpcomingTripsService(userId);
+    const result = await getUpcomingTripsService(user_id);
     res.status(result.code).json(result);
   } catch (error) {
     console.error("다가오는 여행 조회 중 컨트롤러 오류", error);
