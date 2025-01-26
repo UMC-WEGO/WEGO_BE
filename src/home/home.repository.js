@@ -115,6 +115,14 @@ export const saveTrip = async (location, participants, vehicle, duration, startD
 
 // 다가오는 여행 일정 조회
 export const getUpcomingTrips = async (user_id) => {
+  const Testquery = `
+    SELECT *
+    FROM travel
+    WHERE user_id = ?
+  `;
+  const [test] = await pool.query(Testquery, [user_id]);
+  console.log("다가오는 여행 조회 테스트: ", test);
+  
   const query =`
     SELECT id, location, startDate, endDate, participants, vehicle, duration
     FROM travel

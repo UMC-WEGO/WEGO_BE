@@ -1,3 +1,6 @@
+import moment from "moment-timezone";
+
+// 랜덤 여행지 추출
 export const randomTripDto = (data) => {
   return {
     departure: data.departure,
@@ -46,8 +49,8 @@ export const upcomingTripDto = (trip) => ({
   participants: trip.participants,
   vehicle: trip.vehicle,
   duration: trip.duration,
-  startDate: trip.startDate,
-  endDate: trip.endDate
+  startDate: moment.tz(trip.startDate, "Asia/Seoul").format(),
+  endDate: moment.tz(trip.endDate, "Asia/Seoul").format(),
 });
 
 // 여행 일정 삭제
