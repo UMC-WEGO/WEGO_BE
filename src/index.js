@@ -9,6 +9,8 @@ import  scheduleRouter  from "./schedule/routes/schedule.route.js"; // 추가
 import userRouter from "./user/user.route.js";
 import authenticateToken from "../config/jwt.middleware.js";
 
+import communityRouter from './community/community.route.js';
+
 dotenv.config();
 
 const app = express();
@@ -29,6 +31,9 @@ app.delete("/home/upcoming-trips/:tripId", authenticateToken, deleteUpcomingTrip
 
 app.use("/schedule", scheduleRouter); // schedule 라우트 등록
 app.use("/users", userRouter)
+
+// 라우터 설정
+app.use("/community", communityRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello World!!");
