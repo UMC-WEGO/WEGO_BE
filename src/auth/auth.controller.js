@@ -277,7 +277,10 @@ export const verifyPasswordAuthController = async (req, res) => {
     }
 
     if (!email || !code) {
-      return res.send(response(status.BAD_REQUEST))
+      const responseResult = response(
+        { isSuccess: false, code: 400, message: '잘못된 요청입니다.' }
+      );
+      return res.status(400).json(responseResult);
     }
 
     const isVerified = await verifyPasswordAuthCode(email, code);
@@ -303,7 +306,10 @@ export const verifyPasswordAuthController = async (req, res) => {
       return res.status(408).json(responseResult);
     }
 
-    return res.send(response(status.BAD_REQUEST));
+    const responseResult = response(
+      { isSuccess: false, code: 400, message: '잘못된 요청입니다.' }
+    );
+    return res.status(400).json(responseResult);
   }
 };
 
