@@ -150,3 +150,56 @@ export const getPastTripsByUserId = async (userId) => {
     }
 };
 
+
+// 특정 여행 일정 조회
+export const getTravelById = async (tripId) => {
+    const sql = `
+        SELECT 
+            t.id, 
+            t.location, 
+            t.vehicle, 
+            t.duration, 
+            t.participants, 
+            t.startDate, 
+            t.endDate
+        FROM 
+            travel t
+        WHERE 
+            t.id = ?;
+    `;
+
+    try {
+        const [result] = await pool.execute(sql, [tripId]);
+        return result[0]; // 단일 여행 정보 반환
+    } catch (error) {
+        throw new Error(`Failed to fetch trip by ID: ${error.message}`);
+    }
+};
+
+// 특정 여행 일정 날짜 수정
+export const updateTripDatesById = async (tripId, startDate, endDate) => {
+    const sql = `UPDATE travel SET startDate = ?, endDate = ?, updated_at = NOW() WHERE id = ?`;
+    
+    try {
+        const [result] = await pool.execute(sql, [startDate, endDate, tripId]);
+        return result;
+    } catch (error) {
+        throw new Error(`Failed to update trip dates: ${error.message}`);
+    }
+};
+
+// 🛠 여행 인원수 업데이트
+export const updateTripParticipants = async (tripId, adultCount, childCount) => {
+    const sql = `
+        UPDATE travel 
+        SET adult_participants = ?, child_participants = ?, updated_at = NOW()
+        WHERE id = ?;
+    `;
+
+    try {
+        const [result] = await pool.execute(sql, [adultCount, childCount, tripId]);
+        return result.affectedRows > 0; // 수정 여부 반환
+    } catch (error) {
+        throw new Error(`Failed to update trip participants: ${error.message}`);
+    }
+};
