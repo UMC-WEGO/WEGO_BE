@@ -88,3 +88,46 @@ export const getPostByUserId = async (userId) => {
   
   return rows;
 };
+
+// 저장한 미션 조회
+export const getMissionByUserId = async (userId) => {
+  const missionQuery = `
+    SELECT
+    rm.travel_id,
+    m.id AS mission_id,
+    m.imageUrl,
+    m.title,
+    m.content AS mission_content,
+    m.point
+    FROM receive_mission rm
+    JOIN mission m ON rm.mission_id = m.id
+    WHERE rm.user_id = ?;
+  `;
+
+  console.log("저장된 미션 쿼리문: ", missionQuery);
+  const [rows]  = await pool.execute(missionQuery, [userId])
+  
+  return rows;
+}
+
+// 미션 상세 조회
+export const getMissionDetailByUserId = async (userId, travelId, missionId) => {
+  const query = `
+    SELECT
+      m.id AS mission_id,
+      rm.id AS receive_mission_id,
+      rm.travel_id AS travel_id,
+      rm.content,
+      rm.picture,
+      rm.status,
+      rm.created_at,
+      rm.updated_at
+    FROM receive_mission rm
+    JOIN mission m ON rm.mission_id = m.id
+    WHERE rm.user_id = ? AND rm.travel_id = ? AND rm.mission_id = ?;
+  `;
+
+  const [rows] = await pool.execute(query, [userId, travelId, missionId]);
+  console.log("미션 상세 조회:", rows);
+  return rows;
+}

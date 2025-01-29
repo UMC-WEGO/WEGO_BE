@@ -1,6 +1,7 @@
 import express from "express";
 import authenticateToken from "../../config/jwt.middleware.js";
-import { getPastTripsController, getUserInfoController, getUserPostController } from "./user.controller.js";
+import { getMissionController, getMissionDetailController, getPastTripsController, getUserInfoController, getUserPostController } from "./user.controller.js";
+import { getMissionDetailByUserId } from "./user.repository.js";
 
 const router = express.Router();
 
@@ -12,5 +13,11 @@ router.get("/past-trips", authenticateToken, getPastTripsController);
 
 // 사용자 작성 게시글 조회
 router.get("/my-posts", authenticateToken, getUserPostController);
+
+// 저장한 미션 조회
+router.get("/my-missions", authenticateToken, getMissionController);
+
+// 미션 상세 조회
+router.get("/past-trips/:tripId/:missionId", authenticateToken, getMissionDetailController);
 
 export default router;
