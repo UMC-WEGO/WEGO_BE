@@ -64,3 +64,37 @@ export const getUserPostDto = (post, likeCount, scrapCount, commentCount) => {
     })),
   };
 };
+
+// 저장한 미션 조회
+export const getMissionDto = (receiveMission) => {
+  return {
+    missions: receiveMission.map((mission) => ({
+      tripId: mission.travel_id,
+      missionId: mission.mission_id,
+      imageUrl: mission.imageUrl,
+      title: mission.title,
+      content: mission.content,
+      point: mission.point,
+    })),
+  };
+};
+
+// 미션 상세 조회
+export const getMissionDetailDto = (receiveMission) => {
+  if (!receiveMission || receiveMission.length === 0) {
+    return null; // 미션이 없는 경우 null 반환
+  }
+
+  const mission = receiveMission[0]; // 첫 번째 요소 사용
+
+  return {
+    tripId: mission.travel_id,
+    mission_id: mission.mission_id,
+    receive_mission_id: mission.receive_mission_id,
+    content: mission.content,
+    picture: mission.picture,
+    status: Boolean(mission.status),
+    createdAt: mission.created_at,
+    updatedAt: mission.updated_at,
+  };
+};

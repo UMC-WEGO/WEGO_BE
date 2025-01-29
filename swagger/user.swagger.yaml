@@ -241,11 +241,72 @@ paths:
                     type: string
                     example: 잘못된 요청입니다.
 
-  /users/past-trips/{tripId}/missions/{missionId}:
+  /users/my-missions:
+    get:
+      tags:
+        - USER
+      summary: 저장한 미션 조회
+      responses:
+        "200":
+          description: 저장한 미션 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 저장한 미션 조회 성공
+                  missions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tripId:
+                          type: integer
+                          example: 1
+                        missionId:
+                          type: integer
+                          example: 4
+                        imageUrl:
+                          type: string
+                          example: https://example.com/images/nature-walk.jpg
+                        title:
+                          type: string
+                          example: 자연 속 산책
+                        point:
+                          type: integer
+                          example: 30
+                    example:
+                    - tripId: 12
+                      missionId: 2
+                      imageUrl: https://example.com/images/landmark-photo.jpg
+                      title: 명소 인증샷 찍기
+                      point: 100
+                    - tripId: 12
+                      missionId: 5
+                      imageUrl: https://example.com/images/souvenir.jpg
+                      title: 기념품 구입
+                      point: 70
+                    - tripId: 12
+                      missionId: 2
+                      imageUrl: https://example.com/images/landmark-photo.jpg
+                      title: 명소 인증샷 찍기
+                      point: 100
+
+
+  /users/past-trips/{tripId}/{missionId}:
     get:
       tags:
         - USER
       summary: 미션 상세 조회
+      description: "mission_id: 미션 자체의 id, receive_mission_id: 사용자가 저장한 미션 id, status: 미션 인증 여부"
       parameters:
         - name: tripId
           in: path
@@ -276,7 +337,7 @@ paths:
                   message:
                     type: string
                     example: 미션 상세 조회 성공
-                  data:
+                  result:
                     type: object
                     properties:
                       tripId:
@@ -285,15 +346,26 @@ paths:
                       missionId:
                         type: integer
                         example: 1
-                      photoUrl:
-                        format: uri
+                      receive_mission_id:
+                        type: integer
+                        example: 13
+                      content:
+                        type: string
+                        example: "명소 인증샷 미션 완료"
+                      picture:
+                        type: string
                         example: "https://example.com/images/mission1.jpg"
-                      missionTitle:
+                      status:
+                        type: boolean
+                        example: true
+                      createdAt:
                         type: string
-                        example: 골목길 미션
-                      description:
+                        format: date-time
+                        example: "2024-11-26T12:00:00Z"
+                      updatedAt:
                         type: string
-                        example: 충주 관아골 골목 다녀왔는데 벽화가 너무 예뻤다.
+                        format: date-time
+                        example: "2024-11-26T12:00:00Z"
         "400":
           description: 잘못된 요청
           content:
@@ -392,58 +464,3 @@ paths:
                   message:
                     type: string
                     example: 잘못된 요청입니다.
-  /users/my-missions:
-      get:
-        tags:
-          - USER
-        summary: 저장한 미션 조회
-        responses:
-          "200":
-            description: 저장한 미션 조회 성공
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    isSuccess:
-                      type: boolean
-                      example: true
-                    code:
-                      type: integer
-                      example: 200
-                    message:
-                      type: string
-                      example: 저장한 미션 조회 성공
-                    data:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          tripId:
-                            type: integer
-                            example: 1
-                          destination:
-                            type: string
-                            example: 충주
-                          startDate:
-                            type: string
-                            format: date-time
-                            example: "2024-11-26T12:00:00Z"
-                          endDate:
-                            type: string
-                            format: date-time
-                            example: "2024-11-27T12:00:00Z"
-                          participants:
-                            type: integer
-                            example: 7
-                          completedMissions:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                missionId:
-                                  type: integer
-                                  example: 1
-                                missionTitle:
-                                  type: string
-                                  example: 골목길 미션
