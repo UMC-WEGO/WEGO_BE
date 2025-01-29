@@ -79,6 +79,10 @@ paths:
                           type: string
                           description: "부모 지역"
                           example: "경상북도"
+                        growthRate:
+                          type: decimal
+                          description: "방문 증감율"
+                          example: "-3.2"
                     example:
                       - region: "경상북도"
                         location: "대구"
