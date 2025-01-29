@@ -303,7 +303,7 @@ export const verifyPasswordAuthController = async (req, res) => {
       return res.status(408).json(responseResult);
     }
 
-    return res.send(response(status.ㅑ));
+    return res.send(response(status.BAD_REQUEST));
   }
 };
 
