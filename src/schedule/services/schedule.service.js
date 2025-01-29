@@ -8,6 +8,59 @@ import { mapAuthenticatedMission, mapMissionAuthResult } from "../dto/auth.dto.j
 import { getSpontaneousPostsByTripAndLocal } from "../repositories/auth.repository.js"; // 새로운 레포지토리 함수 가져오기
 import { getTripSchedulesByUserId } from "../repositories/auth.repository.js";
 import { getPastTripsByUserId } from "../repositories/auth.repository.js";
+import { getTravelById } from "../repositories/auth.repository.js";
+import { pool } from "../../../config/db.config.js";
+import { updateTripParticipants } from "../repositories/auth.repository.js";
+
+// 🛠 여행 인원수 업데이트
+export const modifyTripParticipants = async (tripId, adultCount, childCount) => {
+    if (adultCount < 0 || childCount < 0) {
+        throw new Error("Invalid participant count");
+    }
+
+    try {
+        const updated = await updateTripParticipants(tripId, adultCount, childCount);
+        if (!updated) {
+            throw new Error("Trip not found");
+        }
+
+        return { isSuccess: true, message: "여행 인원수가 성공적으로 수정되었습니다." };
+    } catch (error) {
+        throw new Error(`Error modifying trip participants: ${error.message}`);
+    }
+};
+
+
+// 일정 수정 서비스
+export const updateTripDatesService = async (tripId, startDate, endDate) => {
+    const sql = `
+        UPDATE travel 
+        SET startDate = ?, endDate = ?, updated_at = NOW() 
+        WHERE id = ?;
+    `;
+
+    try {
+        const [result] = await pool.execute(sql, [startDate, endDate, tripId]);
+        return result; // affectedRows 값 포함
+    } catch (error) {
+        throw new Error(`Failed to update trip dates: ${error.message}`);
+    }
+};
+
+
+// 특정 여행 일정 조회 서비스
+export const fetchTripById = async (tripId) => {
+    try {
+        const trip = await getTravelById(tripId);
+        if (!trip) {
+            throw new Error(`No trip found with ID: ${tripId}`);
+        }
+        return trip;
+    } catch (error) {
+        throw new Error(`Error fetching trip by ID: ${error.message}`);
+    }
+};
+
 
 
 
