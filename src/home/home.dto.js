@@ -59,3 +59,23 @@ export const deleteTripDto = (tripId) => {
     tripId,
   };
 };
+
+// 인기 미션 3개 조회
+export const popularMissionDto = (missions) => {
+  if (!Array.isArray(missions)) {
+    throw new Error("Missions is not an array");
+  }
+
+  console.log("매핑할 미션: ", missions);
+  
+  return {
+    missions: missions.map((mission) => ({
+      missionId: mission.mission_id,
+      title: mission.title,
+      content: mission.content,
+      point: mission.point,
+      imageUrl: mission.imageUrl,
+      userCount: mission.user_count,
+    })),
+  };
+}
