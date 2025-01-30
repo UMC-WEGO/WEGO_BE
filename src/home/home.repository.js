@@ -159,4 +159,30 @@ export const deleteTrip = async (id) => {
     console.error("여행 삭제 중 오류 발생", error);
     throw new Error("여행 삭제 중 오류 발생");
   }
-}
+};
+
+// 인기 미션 3개 조회
+export const getTop3PopularMissions = async () => {
+  const query = `
+    SELECT
+      m.id AS mission_id,
+      m.title,
+      m.content,
+      m.point,
+      m.imageUrl,
+      COUNT(rm.user_id) AS user_count
+    FROM receive_mission rm
+    JOIN mission m ON rm.mission_id = m.id
+    GROUP BY rm.mission_id
+    ORDER BY user_count DESC
+    LIMIT 3;
+  `;
+
+  try {
+    const [rows] = await pool.execute(query);
+    console.log("인기 미션 3개 레포지토리: ", rows);
+    return rows;
+  } catch (error) {
+    throw new Error("인기 미션 3개 조회 중 레포지토리 오류");
+  }
+};

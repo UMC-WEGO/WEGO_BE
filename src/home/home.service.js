@@ -1,6 +1,6 @@
-import { deleteTrip, getFilterdRandomTrips, getUpcomingTrips, saveTrip } from "./home.repository.js"
+import { deleteTrip, getFilterdRandomTrips, getTop3PopularMissions, getUpcomingTrips, saveTrip } from "./home.repository.js"
 import { response } from '../../config/response.js';
-import { saveTripDto, upcomingTripDto } from "./home.dto.js";
+import { popularMissionDto, saveTripDto, upcomingTripDto } from "./home.dto.js";
 
 export const getRandomTrips = async (departure, vehicle, duration) => {
   try {
@@ -121,5 +121,28 @@ export const deleteTripService = async (tripId) => {
       code: 500,
       message: "여행 일정 삭제 중 서버 오류 발생",
     });
+  }
+};
+
+// 인기 미션 3개 조회
+export const getTop3PopularMissionService = async () => {
+  try {
+    const missions = await getTop3PopularMissions();
+    
+    console.log("받은 미션 데이터: ", missions);
+
+    if (!missions || missions.length === 0) {
+      throw new Error("No missions returned");
+    }
+    const result = popularMissionDto(missions);
+    console.log("dto 변환된 인기 미션 3개: ", result);
+
+    if (!result) {
+      console.error("DTO 변환 후 result가 undefined입니다.");
+    }
+    
+    return result;
+  } catch (error) {
+    throw new Error("인기 미션 3개 조회 중 서비스 오류: ", error);
   }
 };
