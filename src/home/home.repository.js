@@ -96,13 +96,13 @@ const getRandomDestinations = (destinations) => {
 };
 
 // 여행지 저장
-export const saveTrip = async (location, participants, vehicle, duration, startDate, endDate, user_id) => {
+export const saveTrip = async (location, adult_participants, child_participants, vehicle, duration, startDate, endDate, user_id) => {
   const query = `
-    INSERT INTO travel (location, participants, vehicle, duration, startDate, endDate, user_id)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO travel (location, adult_participants, child_participants, vehicle, duration, startDate, endDate, user_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  const values = [location, participants, vehicle, duration, startDate, endDate, user_id];
+  const values = [location, adult_participants, child_participants, vehicle, duration, startDate, endDate, user_id];
 
   try {
     const [result] = await pool.query(query, values);
@@ -115,16 +115,9 @@ export const saveTrip = async (location, participants, vehicle, duration, startD
 
 // 다가오는 여행 일정 조회
 export const getUpcomingTrips = async (user_id) => {
-  const Testquery = `
-    SELECT *
-    FROM travel
-    WHERE user_id = ?
-  `;
-  const [test] = await pool.query(Testquery, [user_id]);
-  console.log("다가오는 여행 조회 테스트: ", test);
   
   const query =`
-    SELECT id, location, startDate, endDate, participants, vehicle, duration
+    SELECT id, location, startDate, endDate, adult_participants, child_participants, vehicle, duration
     FROM travel
     WHERE startDate >  NOW() AND user_id = ?
     ORDER BY startDate ASC

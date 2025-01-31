@@ -1,5 +1,6 @@
 import { getMissionDetailService, getMissionService, getPastTripsService, getUserPostService, getUserProfileService } from "./user.service.js";
 
+// 사용자 프로필 조회
 export const getUserInfoController = async (req, res) => {
   const user_id = req.user_id;
 

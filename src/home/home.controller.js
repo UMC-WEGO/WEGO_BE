@@ -5,7 +5,7 @@ import { deleteTrip } from "./home.repository.js";
 
 // 랜덤 여행지 추출
 export const createRandomTrip = async (req, res) => {
-  const { startDate, endDate, participants, departure, vehicle, duration } = req.body;
+  const { startDate, endDate, adult_participants, child_participants, departure, vehicle, duration } = req.body;
 
   // 서비스 호출 -> 랜덤 여행지 3곳
   const result = await getRandomTrips(departure, vehicle, duration);
@@ -17,7 +17,7 @@ export const createRandomTrip = async (req, res) => {
 // 여행 일정 저장
 export const saveTripController = async (req, res) => {
   const user_id = req.user_id;
-  const { location, participants, vehicle, duration, startDate, endDate} = req.body;
+  const { location, adult_participants, child_participants, vehicle, duration, startDate, endDate} = req.body;
 
   console.log("userId:", user_id);
 
@@ -25,7 +25,8 @@ export const saveTripController = async (req, res) => {
     // 서비스로 데이터 전달
     const result = await saveTripService({
       location,
-      participants,
+      adult_participants,
+      child_participants,
       vehicle,
       duration,
       startDate,
