@@ -40,7 +40,8 @@ export const saveTripService = async (data, user_id) => {
     // 여행 일정 repository를 통해 저장
     const tripId = await saveTrip(
       tripDto.location,
-      tripDto.participants,
+      tripDto.adult_participants,
+      tripDto.child_participants,
       tripDto.vehicle,
       tripDto.duration,
       tripDto.startDate,

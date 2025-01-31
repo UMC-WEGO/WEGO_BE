@@ -4,7 +4,8 @@ import moment from "moment-timezone";
 export const randomTripDto = (data) => {
   return {
     departure: data.departure,
-    participants: data.participants,
+    adult_participants: data.adult_participants,
+    child_participants: data.child_participants,
     vehicle: data.vehicle,
     duration: data.duration,
     startDate: data.startDate,
@@ -16,10 +17,13 @@ export const randomTripDto = (data) => {
 // 여행 일정 등록
 export const saveTripDto = (data) => {
   console.log("요청 데이터: ", data);
-  console.log("여행 인원수: ", data.participants);
+  console.log("여행 어른 인원수: ", data.adult_participants);
+  console.log("여행 아이 인원수: ", data.child_participants);
 
   // 숫자인지 확인 -> 유효성 검사
-  const participants = Number(data.participants);
+  const adult_participants = Number(data.adult_participants);
+  const child_participants = Number(data.child_participants);
+  const participants = adult_participants + child_participants;
 
   if (isNaN(participants) || participants <= 0) {
     throw new Error('참가자 수는 1 이상의 값이여야 합니다.');
@@ -27,7 +31,8 @@ export const saveTripDto = (data) => {
 
   const saveTripDto = {
     location: data.location,
-    participants: participants,
+    adult_participants: data.adult_participants,
+    child_participants: data.child_participants,
     vehicle: data.vehicle,
     duration: data.duration,
     startDate: data.startDate,
@@ -46,7 +51,8 @@ export const saveTripDto = (data) => {
 export const upcomingTripDto = (trip) => ({
   tripId: trip.id,
   location: trip.location,
-  participants: trip.participants,
+  adult_participants: trip.adult_participants,
+  child_participants: trip.child_participants,
   vehicle: trip.vehicle,
   duration: trip.duration,
   startDate: moment.tz(trip.startDate, "Asia/Seoul").format(),

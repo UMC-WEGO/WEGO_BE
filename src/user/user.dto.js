@@ -20,7 +20,8 @@ export const PastTripsDto = (trips) => {
     pastTrips: trips.map((trip) => ({
       tripId: trip.id,
       location: trip.location,
-      participants: trip.participants,
+      adult_participants: trip.adult_participants,
+      child_participants: trip.child_participants,
       vehicle: trip.vehicle,
       startDate: moment.tz(trip.startDate, "Asia/Seoul").format(),
       endDate: moment.tz(trip.endDate, "Asia/Seoul").format(),
