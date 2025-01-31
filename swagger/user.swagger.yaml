@@ -200,6 +200,9 @@ paths:
                                   mission:
                                     type: object
                                     properties:
+                                      id:
+                                        type: integer
+                                        example: 1
                                       title:
                                         type: string
                                         example: 명소 인증샷 찍기
@@ -215,15 +218,27 @@ paths:
                                   receivedMission:
                                     type: object
                                     properties:
-                                      title:
-                                        type: string
-                                        example: 명소 인증샷 찍기
-                                      point:
+                                      id:
                                         type: integer
-                                        example: 100
+                                        example: 2
+                                      content:
+                                        type: string
+                                        example: 명소 인증샷 미션 완료
                                       status:
                                         type: boolean
-                                        example: false
+                                        example: true
+                                      createdAt:
+                                        type: string
+                                        format: date-time
+                                        example: "2024-11-26T12:00:00Z"
+                                      updatedAt:
+                                        type: string
+                                        format: date-time
+                                        example: "2024-11-26T12:00:00Z"
+                                      imgUrl:
+                                        type: string
+                                        description: 미션 인증 사진
+                                        example: https://example.com/mission_5.jpg
         "400":
           description: 잘못된 요청
           content:
@@ -401,6 +416,9 @@ paths:
                         type: string
                         format: date-time
                         example: "2024-11-26T12:00:00Z"
+                      imgUrl:
+                        type: string
+                        example: https://example.com/mission_14.jpg
         "400":
           description: 잘못된 요청
           content:
