@@ -48,18 +48,22 @@ export const getPastTripByUserId = async (userId) => {
   // 여행별 미션 정보 조회
   const missionsQuery = `
     SELECT
-    rm.id AS receiveMissionId,
-    rm.content AS receivedMissionContent,
-    rm.status AS receiveMissionStatus,
-    rm.created_at AS receiveMissionCreatedAt,
-    rm.updated_at AS receiveMissionUpdatedAt,
-    m.title AS missionTitle,
-    m.imageUrl AS missionImageUrl,
-    m.content AS missionContent,
-    m.point AS missionPoint
+      rm.id AS receiveMissionId,
+      rm.content AS receivedMissionContent,
+      rm.status AS receiveMissionStatus,
+      rm.created_at AS receiveMissionCreatedAt,
+      rm.updated_at AS receiveMissionUpdatedAt,
+      m.id,
+      m.title AS missionTitle,
+      m.imageUrl AS missionImageUrl,
+      m.content AS missionContent,
+      m.point AS missionPoint,
+      mp.imgUrl
     FROM receive_mission rm
     INNER JOIN mission m ON rm.mission_id = m.id
-    WHERE rm.travel_id = ?;
+    LEFT JOIN mission_pic mp ON rm.id = mp.receive_mission_id
+    WHERE
+      rm.travel_id = ?;
   `;
 
   for (const trip of trips) {
@@ -121,10 +125,14 @@ export const getMissionDetailByUserId = async (userId, travelId, missionId) => {
       rm.picture,
       rm.status,
       rm.created_at,
-      rm.updated_at
+      rm.updated_at,
+      mp.imgUrl
     FROM receive_mission rm
     JOIN mission m ON rm.mission_id = m.id
-    WHERE rm.user_id = ? AND rm.travel_id = ? AND rm.mission_id = ?;
+    LEFT JOIN mission_pic mp ON rm.id = mp.receive_mission_id
+    WHERE rm.user_id = ?
+      AND rm.travel_id = ?
+      AND rm.mission_id = ?;
   `;
 
   const [rows] = await pool.execute(query, [userId, travelId, missionId]);
