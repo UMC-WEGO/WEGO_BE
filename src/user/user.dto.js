@@ -26,6 +26,7 @@ export const PastTripsDto = (trips) => {
       endDate: moment.tz(trip.endDate, "Asia/Seoul").format(),
       missions: trip.missions.map((mission) => ({
         mission: {
+          id: mission.id,
           title: mission.missionTitle,
           imageUrl: mission.missionImageUrl,
           content: mission.missionContent,
@@ -33,12 +34,11 @@ export const PastTripsDto = (trips) => {
         },
         receivedMission: {
           id: mission.id,
-          title: mission.missionTitle,
-          content: mission.missionCotent,
-          point: mission.missionPoint,
-          status: Boolean(mission.status),
-          createdAt: mission.created_at,
-          updatedAt: mission.update_at,
+          content: mission.receivedMissionContent,
+          status: Boolean(mission.receiveMissionStatus),
+          createdAt: mission.receiveMissionCreatedAt,
+          updatedAt: mission.receiveMissionUpdatedAt,
+          imgUrl: mission.imgUrl,
         }
       })),
     })),
@@ -96,5 +96,6 @@ export const getMissionDetailDto = (receiveMission) => {
     status: Boolean(mission.status),
     createdAt: mission.created_at,
     updatedAt: mission.updated_at,
+    imgUrl: mission.imgUrl,
   };
 };
