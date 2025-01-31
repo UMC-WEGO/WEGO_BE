@@ -178,9 +178,14 @@ paths:
                             location:
                               type: string
                               example: 충주
-                            participants:
+                            adult_participants:
                               type: integer
-                              example: 7
+                              description: "여행 어른 인원 (예: 5)"
+                              example: 5
+                            child_participants:
+                              type: integer
+                              description: "여행 아이 인원 (예: 2)"
+                              example: 2
                             vehicle:
                               type: string
                               example: 자가용

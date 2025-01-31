@@ -21,10 +21,14 @@ paths:
                   type: string
                   description: "출발지 (예: 부산)"
                   example: "서울 강북"
-                participants:
+                adult_participants:
                   type: integer
-                  description: "여행 인원 (예: 5)"
+                  description: "여행 어른 인원 (예: 5)"
                   example: 5
+                child_participants:
+                  type: integer
+                  description: "여행 아이 인원 (예: 2)"
+                  example: 2
                 vehicle:
                   type: string
                   description: "이동 수단 (예: 자가용)"
@@ -38,17 +42,17 @@ paths:
                     - "1-2"
                     - "2-3"
                     - "3+"
-                  example: "2-3"
+                  example: "1-2"
                 startDate:
                   type: string
                   format: date-time
                   description: "여행 시작 날짜 (예: 2025-01-06T12:00:00Z)"
-                  example: "2025-01-06T12:00:00Z"
+                  example: "2025-02-04"
                 endDate:
                   type: string
                   format: date-time
                   description: "여행 종료 날짜 (예: 2025-01-08T12:00:00Z)"
-                  example: "2025-01-08T12:00:00Z"
+                  example: "2025-02-06"
       responses:
         '200':
           description: "랜덤 여행지 추천 성공"
@@ -127,10 +131,14 @@ paths:
                   type: string
                   description: "여행 지역"
                   example: "부산"
-                participants:
+                adult_participants:
                   type: integer
-                  description: "여행 인원"
+                  description: "여행 어른 인원 (예: 5)"
                   example: 5
+                child_participants:
+                  type: integer
+                  description: "여행 아이 인원 (예: 2)"
+                  example: 2
                 vehicle:
                   type: string
                   description: "이동 수단"
@@ -144,12 +152,12 @@ paths:
                   type: string
                   format: date-time
                   description: "여행 시작 날짜"
-                  example: "2025-01-06T12:00:00Z"
+                  example: "2025-02-04"
                 endDate:
                   type: string
                   format: date-time
                   description: "여행 종료 날짜"
-                  example: "2025-01-08T12:00:00Z"
+                  example: "2025-02-06"
       responses:
         '200':
           description: "여행 일정 등록 성공"
@@ -303,10 +311,14 @@ paths:
                           type: string
                           description: "여행 지역"
                           example: "부산"
-                        participants:
+                        adult_participants:
                           type: integer
-                          description: "여행 인원"
+                          description: "여행 어른 인원 (예: 5)"
                           example: 5
+                        child_participants:
+                          type: integer
+                          description: "여행 아이 인원 (예: 2)"
+                          example: 2
                         vehicle:
                           type: string
                           description: "이동 수단"
