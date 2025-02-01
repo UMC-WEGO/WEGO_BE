@@ -81,8 +81,8 @@ export const getPostByUserId = async (userId) => {
       p.*,
       (SELECT COUNT(*) FROM \`Like\` l WHERE l.post_id = p.id) AS likeCount,
       (SELECT COUNT(*) FROM scrap s WHERE s.post_id = p.id) AS scrapCount,
-      (SELECT COUNT(*) FROM comment c WHERE c.post_id = p.id) AS commentCount
-    FROM post p
+      (SELECT COUNT(*) FROM Comment c WHERE c.post_id = p.id) AS commentCount
+    FROM Post p
     WHERE p.user_id = ?;
   `;
 
