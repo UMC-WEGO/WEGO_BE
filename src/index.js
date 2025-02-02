@@ -36,6 +36,7 @@ app.get("/home/upcoming-trips", authenticateToken, getUpcomingTripsController);
 app.delete("/home/upcoming-trips/:tripId", authenticateToken, deleteUpcomingTrip);
 app.get("/home/popular-missions", authenticateToken, getPopularMissionController);
 
+
 app.use("/schedule", scheduleRouter); // schedule 라우트 등록
 app.use("/users", userRouter)
 

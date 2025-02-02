@@ -1,4 +1,4 @@
-import { getUserProfile, getTravelCountByUserId, getCompletedMissionByUserId, getPastTripByUserId, getPostByUserId, getMissionByUserId, getMissionDetailByUserId } from "./user.repository.js";
+import { getUserProfile, getTravelCountByUserId, getCompletedMissionByUserId, getPastTripByUserId, getPostByUserId, getMissionByUserId, getMissionDetailByUserId, deletePastTrip } from "./user.repository.js";
 import { getMissionDetailDto, getMissionDto, getUserPostDto, getUserProfileDto, PastTripsDto } from "./user.dto.js";
 
 //  사용자 프로필 조회
@@ -24,6 +24,13 @@ export const getPastTripsService = async (userId) => {
 
   return PastTripsDto(trips);
 };
+
+// 지난 여행 일정 삭제
+export const deletePastTripService = async (tripId) => {
+  const trips = await deletePastTrip(tripId);
+
+  return trips;
+}
 
 // 사용자 작성 게시글 조회
 export const getUserPostService = async (userId) => {

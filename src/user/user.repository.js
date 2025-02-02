@@ -74,6 +74,27 @@ export const getPastTripByUserId = async (userId) => {
   return trips;
 };
 
+// 지난 여행 삭제
+export const deletePastTrip = async (travelId) => {
+  try {
+    const query = `
+      DELETE FROM travel WHERE id = ? AND endDate < NOW();
+    `;
+
+    const [result] = await pool.execute(query, [travelId]);
+
+    // 삭제된 행 O -> 성공 / x -> 실패
+    if (result.affectedRows > 0) {
+      return true; // 성공
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.error("지난 여행 삭제 중 오류 발생", error);
+    throw new Error("지난 여행 삭제 중 오류 발생");
+  }
+};
+
 // 사용자 작성 게시글 조회
 export const getPostByUserId = async (userId) => {
   const postQuery = `

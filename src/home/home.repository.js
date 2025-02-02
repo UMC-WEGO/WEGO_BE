@@ -179,3 +179,44 @@ export const getTop3PopularMissions = async () => {
     throw new Error("인기 미션 3개 조회 중 레포지토리 오류");
   }
 };
+
+// 가장 임박한 여행 찾기
+export const findClosestTravel = async (userId) => {
+  const query = `
+    SELECT id
+    FROM travel
+    WHERE user_id = ? AND startDate >= NOW()
+    ORDER BY startDate ASC
+    LIMIT 1;
+  `;
+
+  const [rows] = await pool.execute(query, [userId]);
+  console.log ("가장 임박한 여행 id: ", rows);
+  return rows.length ? rows[0].id : null;
+};
+
+// 중복 미션 저장 확인 함수
+export const findMissionExists = async (userId, missionId, travelId) => {
+  const query = `
+    SELECT id
+    FROM receive_mission
+    WHERE user_id = ? AND mission_id = ? AND travel_id = ?
+  `;
+
+  const [rows] = await pool.execute(query, [userId, missionId, travelId]);
+  console.log("중복 저장된 미션 id: ", rows);
+  return rows.length > 0; // 중복된 미션 O -> true 반환
+}
+
+// 인기 미션 -> 내 미션 저장
+export const savePopularMission = async (missionId, userId, travelId) => {
+
+  const query = `
+    INSERT INTO receive_mission (mission_id, user_id, travel_id, status)
+    VALUES
+    (?, ?, ?, false);
+  `;
+
+  const [result] = await pool.execute(query, [missionId, userId, travelId]);
+    return result.insertId; // 저장된 여행 일정 ID 반환
+};

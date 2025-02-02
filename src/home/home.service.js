@@ -1,4 +1,4 @@
-import { deleteTrip, getFilterdRandomTrips, getTop3PopularMissions, getUpcomingTrips, saveTrip } from "./home.repository.js"
+import { deleteTrip, findClosestTravel, findMissionExists, getFilterdRandomTrips, getTop3PopularMissions, getUpcomingTrips, savePopularMission, saveTrip } from "./home.repository.js"
 import { response } from '../../config/response.js';
 import { popularMissionDto, saveTripDto, upcomingTripDto } from "./home.dto.js";
 
@@ -145,5 +145,47 @@ export const getTop3PopularMissionService = async () => {
     return result;
   } catch (error) {
     throw new Error("인기 미션 3개 조회 중 서비스 오류: ", error);
+  }
+};
+
+// 인기 미션 -> 내 미션 저장
+export const savePopularMissionService = async (userId, missionId) => {
+  
+  try {
+    // 가장 임박한 여행 찾기
+    const travelId = await findClosestTravel(userId);
+
+    if (!travelId) {
+      throw new Error("진행 예정인 여행이 없습니다.");
+    }
+
+    // 이미 저장된 미션인지 확인
+    const missionExists = await findMissionExists(userId, missionId, travelId);
+
+    if (missionExists) {
+      return response({
+        isSuccess: false,
+        code: 400,
+        message: "이미 저장된 미션입니다.",
+      });
+    };
+
+    // 인기 미션 -> 내 미션 저장
+    const result = await savePopularMission(missionId, userId, travelId);
+    console.log ("미션 저장 완료", result);
+
+    return response({
+      isSuccess: true,
+      code: 200,
+      message: "미션이 성공적으로 저장되었습니다.",
+    });
+  } catch (error) {
+    console.error("인기 미션 저장 중 서비스 오류", error);
+
+    return response({
+      isSuccess: true,
+      code: 500,
+      message: "미션 저장 중 서버 오류가 발생하였습니다.",
+    });
   }
 };
