@@ -1,4 +1,4 @@
-import { getMissionDetailService, getMissionService, getPastTripsService, getUserPostService, getUserProfileService } from "./user.service.js";
+import { deletePastTripService, getMissionDetailService, getMissionService, getPastTripsService, getUserPostService, getUserProfileService } from "./user.service.js";
 
 // 사용자 프로필 조회
 export const getUserInfoController = async (req, res) => {
@@ -68,6 +68,29 @@ export const getPastTripsController = async (req, res) => {
     });
   }
 };
+
+// 지난 여행 일정 삭제
+export const deletePastTripController = async (req, res) => {
+  const { tripId } = req.params;
+
+  // 서비스 호출 -> 여행 일정 삭제
+  const result = await deletePastTripService(tripId);
+
+  try {
+    res.status(200).json({
+      isSuccess: true,
+      code: 200,
+      message: "지난 여행 일정 삭제 성공",
+    });
+  } catch (error) {
+    console.error("지난 여행 일정 삭제 중 컨트롤러 오류", error);
+    res.status(500).json({
+      isSuccess: false,
+      code: 500,
+      message: "지난 여행 일정 삭제 중 서버 오류 발생"
+    });
+  }
+}
 
 // 사용자 작성 게시글 조회
 export const getUserPostController = async (req, res) => {

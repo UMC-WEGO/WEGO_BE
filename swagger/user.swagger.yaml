@@ -261,6 +261,69 @@ paths:
                     type: string
                     example: 잘못된 요청입니다.
 
+  /users/past-trips/{tripId}:
+    delete:
+      summary: "지난 여행 삭제"
+      tags:
+        - USER
+      parameters:
+        - name: tripId
+          in: path
+          required: true
+          description: "삭제할 지난 여행의 ID"
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: "지난 여행 일정 삭제 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "지난 여행 일정이 성공적으로 삭제되었습니다."
+        '400':
+          description: "잘못된 요청"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "잘못된 요청입니다."
+        '404':
+          description: "해당 여행을 찾을 수 없음"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: "해당 여행을 찾을 수 없습니다."
+
   /users/my-missions:
     get:
       tags:

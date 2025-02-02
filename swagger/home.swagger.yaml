@@ -417,3 +417,50 @@ paths:
                   message:
                     type: string
                     example: "해당 여행을 찾을 수 없습니다."
+
+  /home/savePopularMission/{missionId}:
+    post:
+      tags:
+        - HOME
+      summary: 인기 미션 저장
+      parameters:
+        - name: missionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: 인기 미션 저장 성공
+          content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isSuccess:
+                  type: boolean
+                  example: true
+                code:
+                  type: integer
+                  example: 200
+                message:
+                  type: string
+                  example: 인기 미션 저장 성공
+        "400":
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 이미 저장된 미션입니다.
+
