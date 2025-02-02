@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes"
-import { deleteTripService, getRandomTrips, getTop3PopularMissionService, getUpcomingTripsService, saveTripService } from "./home.service.js";
+import { deleteTripService, getRandomTrips, getTop3PopularMissionService, getUpcomingTripsService, savePopularMissionService, saveTripService } from "./home.service.js";
 import { randomTripDto } from "./home.dto.js"
 import { deleteTrip } from "./home.repository.js";
 
@@ -82,7 +82,7 @@ export const deleteUpcomingTrip = async (req, res) => {
   try {
     res.status(result.code).json(result);
   } catch (error) {
-    console.error("다가오는 여행 삭제제 중 컨트롤러 오류", error);
+    console.error("다가오는 여행 삭제 중 컨트롤러 오류", error);
     res.status(500).json({
       isSuccess: false,
       code: 500,
@@ -112,3 +112,30 @@ export const getPopularMissionController = async (req, res) => {
     });
   }
 }
+
+// 미션 저장 -> 내 미션 저장
+export const savePopularMissionController = async (req, res) => {
+  try {
+    const user_id = req.user_id;
+    const { missionId } = req.params;
+
+    if (!missionId) {
+      return res.status(400).json({
+        isSuccess: false,
+        code: 400,
+        message: "mission_id가 필요합니다.",
+      });
+    }
+
+    const result = await savePopularMissionService(user_id, missionId);
+
+    return res.status(200).json(result);
+
+  } catch (error) {
+    res.status(500).json({
+      isSuccess: false,
+      code: 500,
+      message: "인기 미션 저장 중 서버 오류 발생"
+    });
+  }
+};
