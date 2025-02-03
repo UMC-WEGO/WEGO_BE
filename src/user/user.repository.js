@@ -3,7 +3,7 @@ import { pool } from "../../config/db.config.js";
 // 사용자 프로필 조회
 export const getUserProfile = async (userId) => {
   const query = `
-    SELECT id, email, nickname, profile_image, point, temp
+    SELECT id, email, nickname, profile_image, COALESCE(point, 0) AS point, temp
     FROM User
     WHERE id = ? AND status = 'ACTIVE';
   `;
