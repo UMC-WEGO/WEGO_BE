@@ -82,29 +82,27 @@ export const delete_post_service = async (post_id) => {
 
 // 최근 검색어 - 조회 
 export const get_local_search_service = async(user_id) => {
-    try {
-        const get_key = await get_local_search_repository(user_id);
+    const get_key = await get_local_search_repository(user_id);
     
-        return get_key || [];
-    } catch(error){
-        console.error(error);
+    if(Array.isArray(get_key) && get_key.length === 0) {
         throw new Error("최근 검색어가 조회되지 않았습니다.");
     }
+    return get_key;
 }
 
 
 
 // 전체 글 조회
-export const get_all_posts_service = async(page, limit) => {
-    const all_posts = await get_all_posts_repository(page,limit);
+export const get_all_posts_service = async(cursor) => {
+    const all_posts = await get_all_posts_repository(cursor);
 
     return all_posts;
 }
 
 
 // 카테고리별 글 조회
-export const get_posts_by_category_service = async (category_id,page,limit) => {
-    const posts = await get_posts_by_category_repository(category_id,page,limit);
+export const get_posts_by_category_service = async (category_id,cursor) => {
+    const posts = await get_posts_by_category_repository(category_id,cursor);
 
     return posts;
 }
@@ -136,7 +134,7 @@ export const get_popular_posts_service = async() => {
 export const get_post_by_id_service = async(post_id) => {
     const post = await get_post_by_id_repository(post_id);
 
-    if(!post) {
+    if(!post.id || (Array.isArray(post) && post.length === 0)) {
         throw new Error("게시글을 찾을 수 없습니다.");
     }
 
@@ -149,7 +147,7 @@ export const get_my_posts_service = async(user_id) => {
     const get_posts = await get_my_posts_repository(user_id);
 
     if (get_posts.length === 0) {
-        return { message: "아직 작성한 글이 없습니다." }; 
+        throw new Error ("아직 작성한 글이 없습니다."); 
     }
 
     return get_posts;
@@ -235,20 +233,20 @@ export const delete_scrap_service = async (post_id, user_id) => {
 }
 
 // 스크랩 조회 
-export const get_scrap_service = async(user_id) => {
-    const get_scrap_key = await get_scrap_repository(user_id);
+export const get_scrap_service = async(user_id, cursor) => {
+    const get_scrap_key = await get_scrap_repository(user_id, cursor);
 
-    if(!get_scrap_key){
+    if(Array.isArray(get_scrap_key) && get_scrap_key.length ===0){
         throw new Error("스크랩 조회가 되지 않았습니다.");
     }
     return get_scrap_key;
 }
 
 // 스크랩 조회 - 카테고리별 
-export const get_scrap_by_category_service = async(user_id, category_id) => {
-    const get_scrap_by_category_key = await get_scrap_by_category_repository(user_id, category_id);
+export const get_scrap_by_category_service = async(user_id, category_id, cursor) => {
+    const get_scrap_by_category_key = await get_scrap_by_category_repository(user_id, category_id, cursor);
 
-    if(!get_scrap_by_category_key) {
+    if(Array.isArray(get_scrap_by_category_key) && get_scrap_by_category_key.length === 0) {
         throw new Error("카테고리별 스크랩 조회가 되지 않았습니다.");
     }
 

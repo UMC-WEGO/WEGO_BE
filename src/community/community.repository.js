@@ -6,7 +6,7 @@ export const create_post_repository = async(data) => {
     const { category_id, user_id, local_id, title, content, picture_url} = data;
 
     const query = `
-        INSERT INTO post (category_id, user_id, local_id, title, content, picture_url, created_at)
+        INSERT INTO Post (category_id, user_id, local_id, title, content, picture_url, created_at)
         VALUES (?,?,?,?,?,?,NOW());
     `;
 
@@ -14,9 +14,20 @@ export const create_post_repository = async(data) => {
     const [result] = await pool.execute(query, [category_id, user_id, local_id, title, content, picture_url_json]);
 
     const post_id = result.insertId;
+
+    if(picture_url && picture_url.length >0) {
+        const image_query = `
+            INSERT INTO image (post_id, imgUrl, created_at)
+            VALUES ${picture_url.map(() => "(?, ?, NOW())").join(", ")}
+        `;
+
+        const image_values = picture_url.flatMap(url => [post_id, url]);
+        await pool.execute(image_query, image_values);
+    }
+    
     const new_query = `
         SELECT p.id, c.name AS category_name, l.location_name AS location_name, p.title, p.content, p.picture_url, p.created_at
-        FROM post p
+        FROM Post p
         JOIN category c ON c.id = p.category_id
         JOIN local l ON l.id = p.local_id
         WHERE p.id = ?;
@@ -59,7 +70,7 @@ export const update_post_repository = async (post_id, data) => {
     }
     
     const query =`
-        UPDATE post 
+        UPDATE Post 
         SET ${updates.join(',')}, updated_at = NOW()
         WHERE id = ?;
     `;
@@ -67,13 +78,31 @@ export const update_post_repository = async (post_id, data) => {
     values.push(post_id);
 
     const [result] = await pool.execute(query, values);
+
+    if(result.affectedRows >0 && data.picture_url !== undefined){
+        const delete_image_query = `
+            DELETE FROM image
+            WHERE post_id = ?;
+        `;
+        await pool.execute(delete_image_query,[post_id]);
+
+        if(data.picture_url.length > 0){
+            const image_query = `
+                INSERT INTO image (post_id, imgUrl, created_at) 
+                VALUES ${data.picture_url.map(()=> "(?,?,NOW())").join(",")};
+            `;
+
+            const image_values = data.picture_url.flatMap(url => [post_id, url]);
+            await pool.execute(image_query, image_values);
+        }
+    }
     return result.affectedRows > 0;
 };
 
 // 게시글 삭제 
 export const delete_post_repository = async(post_id) => {
     const query = `
-        DELETE FROM post
+        DELETE FROM Post
         WHERE id = ?;
     `;
     const [result] = await pool.execute(query, [post_id]);
@@ -85,7 +114,7 @@ export const delete_post_repository = async(post_id) => {
 // 최근 검색어 - 조회 
 export const get_local_search_repository = async(user_id) => {
     const query = `
-        SELECT location 
+        SELECT DISTINCT location 
 	    FROM travel
 	    WHERE endDate < NOW() and user_id = ?
 	    ORDER BY endDate DESC
@@ -99,60 +128,64 @@ export const get_local_search_repository = async(user_id) => {
 
 
 // 전체 게시글 조회
-export const get_all_posts_repository = async(page,limit) => {
-    const offset = (page - 1) * limit;
+export const get_all_posts_repository = async(cursor) => {
+    const limit = 20;
 
     const query = `
-        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
+        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
 
-        FROM post p
+        FROM Post p
 
         JOIN category c ON c.id = p.category_id
         JOIN local l ON l.id = p.local_id
 
-        LEFT JOIN ( SELECT post_id, COUNT(*) AS comment_count FROM comment GROUP BY post_id) AS comment_counts ON comment_counts.post_id = p.id
-        LEFT JOIN (SELECT post_id, count(*) AS like_count FROM \`like\` GROUP BY post_id) AS like_counts ON like_counts.post_id = p.id
-        LEFT JOIN (SELECT post_id, count(*) AS scrap_count FROM scrap GROUP BY post_id) AS scrap_counts ON scrap_counts.post_id = p.id
+        LEFT JOIN (SELECT post_id, COUNT(*) AS comment_count FROM Comment GROUP BY post_id) AS comment_counts ON comment_counts.post_id = p.id
+        LEFT JOIN (SELECT post_id, COUNT(*) AS like_count FROM \`Like\` GROUP BY post_id) AS like_counts ON like_counts.post_id = p.id
+        LEFT JOIN (SELECT post_id, COUNT(*) AS scrap_count FROM scrap GROUP BY post_id) AS scrap_counts ON scrap_counts.post_id = p.id
 
-        ORDER BY created_at DESC
-        LIMIT ${limit}
-        OFFSET ${offset};
+        LEFT JOIN (SELECT post_id, imgUrl FROM image WHERE id IN (SELECT MIN(id) FROM image GROUP BY post_id)) AS i ON i.post_id = p.id
+
+        WHERE p.id < ?
+        ORDER BY p.id DESC
+        LIMIT ${limit};
 
     `;
-    const[rows] = await pool.execute(query);
+    const[rows] = await pool.execute(query,[cursor]);
 
     return rows;
 }
 
 
 // 카테고리별 조회
-export const get_posts_by_category_repository = async(category_id,page,limit) => {
-    const offset = (page- 1) * limit;
+export const get_posts_by_category_repository = async(category_id,cursor) => {
+    const limit = 20;
 
     const query = `
-        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
+        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
 
-        FROM post p
+        FROM Post p
 
         JOIN category c ON c.id = p.category_id
         JOIN local l ON l.id = p.local_id
 
-        LEFT JOIN ( SELECT post_id, COUNT(*) AS comment_count FROM comment GROUP BY post_id) AS comment_counts ON comment_counts.post_id = p.id
-        LEFT JOIN (SELECT post_id, count(*) AS like_count FROM \`like\` GROUP BY post_id) AS like_counts ON like_counts.post_id = p.id
+        LEFT JOIN ( SELECT post_id, COUNT(*) AS comment_count FROM Comment GROUP BY post_id) AS comment_counts ON comment_counts.post_id = p.id
+        LEFT JOIN (SELECT post_id, count(*) AS like_count FROM \`Like\` GROUP BY post_id) AS like_counts ON like_counts.post_id = p.id
         LEFT JOIN (SELECT post_id, count(*) AS scrap_count FROM scrap GROUP BY post_id) AS scrap_counts ON scrap_counts.post_id = p.id
 
-        WHERE category_id = ?
+        LEFT JOIN (SELECT post_id, imgUrl FROM image WHERE id IN (SELECT MIN(id) FROM image GROUP BY post_id)) AS i ON i.post_id = p.id
+
+        WHERE category_id = ? AND p.id < ?
         ORDER BY created_at DESC
-        LIMIT ${limit}
-        OFFSET ${offset};
+
+        LIMIT ${limit};
     `;
-    const [rows] = await pool.execute(query, [category_id]);
+    const [rows] = await pool.execute(query, [category_id, cursor]);
     return rows;
 }
 
@@ -160,19 +193,21 @@ export const get_posts_by_category_repository = async(category_id,page,limit) =>
 // 상위 2개 게시글 조회 - 지역 
 export const get_top_post_by_local_repository = async (local_id) => {
     const query = `
-        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
+        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
 
-        FROM post p
+        FROM Post p
 
         JOIN category c ON c.id = p.category_id
         JOIN local l ON l.id = p.local_id
 
-        LEFT JOIN ( SELECT post_id, COUNT(*) AS comment_count FROM comment GROUP BY post_id) AS comment_counts ON comment_counts.post_id = p.id
-        LEFT JOIN (SELECT post_id, count(*) AS like_count FROM \`like\` GROUP BY post_id) AS like_counts ON like_counts.post_id = p.id
+        LEFT JOIN ( SELECT post_id, COUNT(*) AS comment_count FROM Comment GROUP BY post_id) AS comment_counts ON comment_counts.post_id = p.id
+        LEFT JOIN (SELECT post_id, count(*) AS like_count FROM \`Like\` GROUP BY post_id) AS like_counts ON like_counts.post_id = p.id
         LEFT JOIN (SELECT post_id, count(*) AS scrap_count FROM scrap GROUP BY post_id) AS scrap_counts ON scrap_counts.post_id = p.id
+
+        LEFT JOIN (SELECT post_id, imgUrl FROM image WHERE id IN (SELECT MIN(id) FROM image GROUP BY post_id)) AS i ON i.post_id = p.id
 
         WHERE local_id = ?
         ORDER BY created_at DESC
@@ -187,19 +222,21 @@ export const get_top_post_by_local_repository = async (local_id) => {
 // 상위 2개 게시글 조회 - 전체
 export const get_posts_top_repository = async() => {
     const query = `
-        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
+        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
 
-        FROM post p
+        FROM Post p
 
         JOIN category c ON c.id = p.category_id
         JOIN local l ON l.id = p.local_id
         
-        LEFT JOIN ( SELECT post_id, COUNT(*) AS comment_count FROM comment GROUP BY post_id) AS comment_counts ON comment_counts.post_id = p.id
-        LEFT JOIN (SELECT post_id, count(*) AS like_count FROM \`like\` GROUP BY post_id) AS like_counts ON like_counts.post_id = p.id
+        LEFT JOIN ( SELECT post_id, COUNT(*) AS comment_count FROM Comment GROUP BY post_id) AS comment_counts ON comment_counts.post_id = p.id
+        LEFT JOIN (SELECT post_id, count(*) AS like_count FROM \`Like\` GROUP BY post_id) AS like_counts ON like_counts.post_id = p.id
         LEFT JOIN (SELECT post_id, count(*) AS scrap_count FROM scrap GROUP BY post_id) AS scrap_counts ON scrap_counts.post_id = p.id
+
+        LEFT JOIN (SELECT post_id, imgUrl FROM image WHERE id IN (SELECT MIN(id) FROM image GROUP BY post_id)) AS i ON i.post_id = p.id
 
         ORDER BY created_at DESC
         LIMIT 2;
@@ -215,7 +252,8 @@ export const get_posts_top_repository = async() => {
 export const get_popular_posts_repository = async() => {
     const query = `
         SELECT 
-            p.id, p.category_id, p.title, p.content, p.created_at, p.local_id,
+            p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, lc.location_name AS location_name, p.created_at, 
+
             COALESCE(c.comment_count, 0) AS comment_count,
             COALESCE(l.like_count, 0) AS like_count,
             COALESCE(s.scrap_count, 0) AS scrap_count,
@@ -224,19 +262,16 @@ export const get_popular_posts_repository = async() => {
             COALESCE(c.comment_count, 0) * 10 +
             COALESCE(s.scrap_count, 0) * 5 -
             (TIMESTAMPDIFF(HOUR, p.created_at, NOW()) * 0.5)) AS popularity_score
-        FROM post p
-        LEFT JOIN 
-            (SELECT post_id, COUNT(*) AS comment_count 
-            FROM comment 
-            GROUP BY post_id) c ON p.id = c.post_id
-        LEFT JOIN 
-            (SELECT post_id, COUNT(*) AS like_count 
-            FROM \`like\`
-            GROUP BY post_id) l ON p.id = l.post_id
-        LEFT JOIN 
-            (SELECT post_id, COUNT(*) AS scrap_count 
-            FROM scrap 
-            GROUP BY post_id) s ON p.id = s.post_id
+        FROM Post p
+
+        JOIN category c ON c.id = p.category_id
+        JOIN local lc ON lc.id = p.local_id
+
+        LEFT JOIN (SELECT post_id, COUNT(*) AS comment_count FROM Comment GROUP BY post_id) c ON p.id = c.post_id
+        LEFT JOIN (SELECT post_id, COUNT(*) AS like_count FROM \`Like\` GROUP BY post_id) l ON p.id = l.post_id
+        LEFT JOIN (SELECT post_id, COUNT(*) AS scrap_count FROM scrap GROUP BY post_id) s ON p.id = s.post_id
+
+        LEFT JOIN (SELECT post_id, imgUrl FROM image WHERE id IN (SELECT MIN(id) FROM image GROUP BY post_id)) AS i ON i.post_id = p.id
 
         WHERE p.created_at >= DATE_ADD(NOW(), INTERVAL -5 DAY)
         ORDER BY popularity_score DESC
@@ -252,16 +287,20 @@ export const get_popular_posts_repository = async() => {
 // 특정 게시글 조회 
 export const get_post_by_id_repository = async (post_id) => {
     const post_query = `
-        SELECT c.name AS category_name, u.profile_image AS post_author_profile, u.nickname AS post_author_nickname, p.created_at AS post_created_at, p.title, p.content, p.picture_url,
-               comment_count.comment_counts, like_count.like_counts, scrap_count.scrap_counts
-        FROM post p
+        SELECT p.id, c.name AS category_name, u.profile_image AS post_author_profile, u.nickname AS post_author_nickname, 
+            GROUP_CONCAT(i.imgUrl ORDER BY i.id ASC) AS picture_urls,
+            comment_count.comment_counts, like_count.like_counts, scrap_count.scrap_counts
+        FROM Post p
 
-        JOIN user u ON u.id = p.user_id
+        JOIN User u ON u.id = p.user_id
         JOIN category c ON c.id = p.category_id
 
-        LEFT JOIN (SELECT post_id, count(*) AS comment_counts FROM comment GROUP BY post_id) AS comment_count ON comment_count.post_id = p.id
-        LEFT JOIN (SELECT post_id, count(*) AS like_counts FROM \`like\` GROUP BY post_id) AS like_count ON like_count.post_id = p.id
+        LEFT JOIN (SELECT post_id, count(*) AS comment_counts FROM Comment GROUP BY post_id) AS comment_count ON comment_count.post_id = p.id
+        LEFT JOIN (SELECT post_id, count(*) AS like_counts FROM \`Like\` GROUP BY post_id) AS like_count ON like_count.post_id = p.id
         LEFT JOIN (SELECT post_id, count(*) AS scrap_counts FROM scrap GROUP BY post_id) AS scrap_count ON scrap_count.post_id = p.id
+        
+        LEFT JOIN image i ON i.post_id = p.id
+        
         WHERE p.id = ?;
     `;
 
@@ -271,10 +310,12 @@ export const get_post_by_id_repository = async (post_id) => {
 
     const post_info = post_result[0];
 
+    post_info.picture_urls = post_info.picture_urls ? post_info.picture_urls.split(',') : [];
+
     const comment_query = `
 	    SELECT cm.user_id, cu.nickname AS comment_author_name, cu.profile_image AS comment_author_profile, cm.created_at AS comment_created_at, cm.content AS comment_content
-	    FROM comment cm 
-	    JOIN user cu ON cu.id = cm.user_id
+	    FROM Comment cm 
+	    JOIN User cu ON cu.id = cm.user_id
 	    WHERE cm.post_id = ?;
     `;
 
@@ -290,19 +331,21 @@ export const get_post_by_id_repository = async (post_id) => {
 // 내가 작성한 글 조회 
 export const get_my_posts_repository = async (user_id) => {
     const query = `
-        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
+        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
 
-        FROM post p
+        FROM Post p
 
         JOIN category c ON c.id = p.category_id
         JOIN local l ON l.id = p.local_id
         
-        LEFT JOIN ( SELECT post_id, COUNT(*) AS comment_count FROM comment GROUP BY post_id) AS comment_counts ON comment_counts.post_id = p.id
-        LEFT JOIN (SELECT post_id, count(*) AS like_count FROM \`like\` GROUP BY post_id) AS like_counts ON like_counts.post_id = p.id
+        LEFT JOIN ( SELECT post_id, COUNT(*) AS comment_count FROM Comment GROUP BY post_id) AS comment_counts ON comment_counts.post_id = p.id
+        LEFT JOIN (SELECT post_id, count(*) AS like_count FROM \`Like\` GROUP BY post_id) AS like_counts ON like_counts.post_id = p.id
         LEFT JOIN (SELECT post_id, count(*) AS scrap_count FROM scrap GROUP BY post_id) AS scrap_counts ON scrap_counts.post_id = p.id
+
+        LEFT JOIN (SELECT post_id, imgUrl FROM image WHERE id IN (SELECT MIN(id) FROM image GROUP BY post_id)) AS i ON i.post_id = p.id
 
         WHERE p.user_id = ?;  
     `;
@@ -318,7 +361,7 @@ export const create_comment_repository = async(post_id, data) => {
     const {user_id, content} = data;
 
     const query = `
-        INSERT INTO comment (user_id, post_id, content, created_at)
+        INSERT INTO Comment (user_id, post_id, content, created_at)
         VALUES (?,?,?,NOW());
     `;
 
@@ -328,8 +371,8 @@ export const create_comment_repository = async(post_id, data) => {
 
     const new_query = `
         SELECT u.nickname AS user_nickname, u.profile_image AS user_profile_image, c.content, c.created_at
-        FROM comment c
-        JOIN user u ON u.id = c.user_id
+        FROM Comment c
+        JOIN User u ON u.id = c.user_id
         WHERE c.id = ?;
     `;
 
@@ -341,7 +384,7 @@ export const create_comment_repository = async(post_id, data) => {
 // 댓글 삭제 
 export const delete_comment_respository = async(post_id, comment_id) => {
     const query = `
-        DELETE FROM comment
+        DELETE FROM Comment
         WHERE post_id = ? AND id = ?;
     `;
 
@@ -356,7 +399,7 @@ export const delete_comment_respository = async(post_id, comment_id) => {
 export const check_like_exist_repository = async(post_id, user_id) => {
     const query = `
         SELECT count(*) AS count 
-        FROM \`like\`
+        FROM \`Like\`
         WHERE post_id = ? and user_id = ?;
     `;
 
@@ -367,7 +410,7 @@ export const check_like_exist_repository = async(post_id, user_id) => {
 // 좋아요 누르기
 export const create_like_repository = async(post_id, user_id) => {
     const query = `
-        INSERT INTO  \`like\` (post_id, user_id, created_at)
+        INSERT INTO  \`Like\` (post_id, user_id, created_at)
         VALUES (?,?,NOW());
     `;
 
@@ -379,7 +422,7 @@ export const create_like_repository = async(post_id, user_id) => {
 // 좋아요 취소하기 
 export const delete_like_repository = async(post_id, user_id) => {
     const query = `
-        DELETE FROM \`like\`
+        DELETE FROM \`Like\`
         WHERE post_id =? and user_id = ?;
     `;
 
@@ -425,52 +468,64 @@ export const delete_scrap_repository = async(post_id, user_id) => {
 }
 
 // 스크랩 조회
-export const get_scrap_repository = async(user_id) => {
+export const get_scrap_repository = async(user_id, cursor) => {
+    const limit = 20;
+
     const query = `
-        SELECT p.id, c.name AS category_name, p.title, p.content, l.location_name AS location_name,p.created_at,
+        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name,p.created_at,
             COALESCE(comment_counts.comment_count, 0) AS total_comment,
             COALESCE(like_counts.like_count, 0) AS total_like,
             COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
 
         FROM scrap s
 
-        JOIN post p ON p.id = s.post_id
+        JOIN Post p ON p.id = s.post_id
         JOIN category c ON c.id = p.category_id
         JOIN local l ON l.id = p.local_id
 
-        LEFT JOIN (SELECT post_id, COUNT(*) AS comment_count FROM comment GROUP BY post_id) AS comment_counts ON p.id = comment_counts.post_id
-        LEFT JOIN (SELECT post_id, COUNT(*) AS like_count FROM \`like\` GROUP BY post_id) AS like_counts ON p.id = like_counts.post_id
+        LEFT JOIN (SELECT post_id, COUNT(*) AS comment_count FROM Comment GROUP BY post_id) AS comment_counts ON p.id = comment_counts.post_id
+        LEFT JOIN (SELECT post_id, COUNT(*) AS like_count FROM \`Like\` GROUP BY post_id) AS like_counts ON p.id = like_counts.post_id
         LEFT JOIN (SELECT post_id, COUNT(*) AS scrap_count FROM scrap GROUP BY post_id) AS scrap_counts ON p.id = scrap_counts.post_id
 
-        WHERE s.user_id = ?;
+        LEFT JOIN (SELECT post_id, imgUrl FROM image WHERE id IN (SELECT MIN(id) FROM image GROUP BY post_id)) AS i ON i.post_id = p.id
+
+        WHERE s.user_id = ? AND p.id < ?
+        ORDER BY p.id DESC
+        LIMIT ${limit};
     `;
 
-    const[rows] = await pool.execute(query,[user_id]);
+    const[rows] = await pool.execute(query,[user_id, cursor]);
 
     return rows;
 }
 
 // 스크랩 조회 - 카테고리별 
-export const get_scrap_by_category_repository = async(user_id, category_id) => {
+export const get_scrap_by_category_repository = async(user_id, category_id, cursor) => {
+    const limit = 20;
+
     const query = `
-        SELECT p.id, c.name, p.title, p.content, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, l.location_name, p.created_at,
+        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
 	        COALESCE(comment_counts.comment_count, 0) AS total_comment,
 	        COALESCE(like_counts.like_count, 0) AS total_like,
 	        COALESCE(scrap_counts.scrap_count, 0) AS total_scrap 
 
-        FROM post p
+        FROM Post p
 
         JOIN category c ON c.id = p.category_id
         JOIN local l ON l.id = p.local_id
 
-        LEFT JOIN (SELECT post_id, COUNT(*) AS comment_count FROM comment GROUP BY post_id) AS comment_counts ON p.id = comment_counts.post_id 
-        LEFT JOIN (SELECT post_id, COUNT(*) AS like_count FROM \`like\` GROUP BY post_id) AS like_counts ON p.id = like_counts.post_id
+        LEFT JOIN (SELECT post_id, COUNT(*) AS comment_count FROM Comment GROUP BY post_id) AS comment_counts ON p.id = comment_counts.post_id 
+        LEFT JOIN (SELECT post_id, COUNT(*) AS like_count FROM \`Like\` GROUP BY post_id) AS like_counts ON p.id = like_counts.post_id
         LEFT JOIN (SELECT post_id, COUNT(*) AS scrap_count FROM scrap GROUP BY post_id) AS scrap_counts ON p.id = scrap_counts.post_id 
 
-        WHERE p.user_id = ? and p.category_id = ? ;
+        LEFT JOIN (SELECT post_id, imgUrl FROM image WHERE id IN (SELECT MIN(id) FROM image GROUP BY post_id)) AS i ON i.post_id = p.id
+
+        WHERE p.user_id = ? and p.category_id = ? and p.id < ?
+        ORDER BY p.id DESC
+        LIMIT ${limit};
     `;
 
-    const [rows] = await pool.execute(query, [user_id, category_id]);
+    const [rows] = await pool.execute(query, [user_id, category_id, cursor]);
     return rows;
 }
 
@@ -481,11 +536,11 @@ export const get_user_profile_repository = async(user_id) =>{
     const query = `
         SELECT u.nickname, u.profile_image, u.temp, impromptu_total.travel_counts, post_count.post_counts, mission_count.mission_counts
 	    
-        FROM user u
+        FROM User u
 
 	    LEFT JOIN ( SELECT user_id, COUNT(*) AS travel_counts FROM travel WHERE endDate < NOW() GROUP BY user_id) AS impromptu_total  ON impromptu_total.user_id = u.id
 
-	    LEFT JOIN (SELECT user_id, COUNT(*) AS post_counts FROM post p GROUP BY user_id) AS post_count ON post_count.user_id = u.id
+	    LEFT JOIN (SELECT user_id, COUNT(*) AS post_counts FROM Post p GROUP BY user_id) AS post_count ON post_count.user_id = u.id
 	    LEFT JOIN (SELECT user_id, COUNT(*) AS mission_counts FROM receive_mission rm Group BY user_id) AS mission_count ON mission_count.user_id = u.id
 
 	    WHERE u.id = ?;
@@ -497,12 +552,14 @@ export const get_user_profile_repository = async(user_id) =>{
     const user_info = user_result[0];
 
     const count_query = `
-        SELECT p.id, JSON_UNQUOTE(JSON_EXTRACT(p.picture_url, '$[0]')) AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at
+        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at
         
-        FROM post p 
+        FROM Post p 
 
 	    JOIN category c ON c.id = p.category_id
 	    JOIN local l ON l.id = p.local_id
+
+        LEFT JOIN (SELECT post_id, imgUrl FROM image WHERE id IN (SELECT MIN(id) FROM image GROUP BY post_id)) AS i ON i.post_id = p.id
 
 	    WHERE p.user_id = ?;
     `;
