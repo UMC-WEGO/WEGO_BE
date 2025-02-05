@@ -173,16 +173,16 @@ paths:
                   message:
                     type: string
                     example: "게시물을 찾을 수 없습니다."
-      '500':
-        description: "서버 에러"
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                message:
-                  type: string
-                  example: "게시물 수정 중에 에러가 발생했습니다."        
+        '500':
+          description: "서버 에러"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "게시물 수정 중에 에러가 발생했습니다."        
 
   /community/posts/delete/{post_id}:
     delete:
@@ -238,20 +238,14 @@ paths:
       tags:
         - COMMUNITY
       parameters:
-        - name: page
+        - name: cursor
           in: query
           required: false
-          description: "페이지 번호 (기본값: 1)"
-          schema:
+          description: "이전 요청의 마지막 게시글 ID (없으면 최신 게시글부터 조회, 기본 20개 반환)"
+          schema: 
             type: integer
-            example: 1
-        - name: limit
-          in: query
-          required: false
-          description: "한 페이지에 표시할 게시글 수 (기본값: 20)"
-          schema:
-            type: integer
-            example: 5
+            example: 100
+            default: null
       responses:
         '200':
           description: "전체 게시글 조회 성공"
@@ -269,7 +263,7 @@ paths:
                     picture_url:
                       type: string
                       description: 게시글의 대표 이미지 URL (맨 앞 1장) 
-                      example: "good.jpg"
+                      example: "https://example.com/uploads/image1.jpg"
                     category_name:
                       type: string
                       description: 게시글 카테고리
@@ -317,8 +311,8 @@ paths:
 
   /community/posts/local-search/{user_id}:
     get:
-      summary: "게시글 지역 선택 시 최근 출발 지역 조회(홈화면에서도 사용)"
-      tags:
+      summary: "게시글 지역 선택 시 최근 출발 지역 조회(홈화면에서도 사용, 최대 5개)"
+      tags: 
         - COMMUNITY
       parameters: 
         - name: user_id
@@ -342,7 +336,7 @@ paths:
                   - "서울"
                   - "여수"      
         '404':
-          description: "검색어가 없습니다."
+          description: "사용자가 없습니다."
           content: 
             application/json:
               schema:
@@ -350,7 +344,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "검색어가 없습니다." 
+                    example: "해당 사용자의 최근 출발한 지역을 찾을 수 없습니다."
         '500':
           description: "서버 에러"
           content:
@@ -548,10 +542,14 @@ paths:
                       type: integer
                       description: 게시물 ID
                       example: 24
-                    category_id:
-                      type: integer
-                      description: 카테고리 ID
-                      example: 4
+                    picture_url:
+                      type: string
+                      description: 게시글의 대표 이미지 URL (맨 앞 1장) 
+                      example: "https://example.com/uploads/image1.jpg"
+                    category_name:
+                      type: string
+                      description: 게시글 카테고리
+                      example: "일반"
                     title:
                       type: string
                       description: 게시물 제목
@@ -560,15 +558,15 @@ paths:
                       type: string
                       description: 게시물 내용
                       example: "또 와야지"
+                    location_name:
+                      type: string
+                      description: 게시글과 연관된 지역
+                      example: "인천" 
                     created_at:
                       type: string
                       format: date-time
                       description: 게시물 작성일시
                       example: "2025-01-22T20:25:10.000Z"
-                    local_id:
-                      type: integer
-                      description: 지역 ID
-                      example: 3
                     comment_count:
                       type: integer
                       description: 댓글 수
@@ -618,74 +616,81 @@ paths:
               schema:
                 type: object
                 properties:
-                  category_name:
-                    type: string
-                    description: 카테고리 이름
-                    example: "미션 제안"
-                  post_author_profile:
-                    type: string
-                    description: 게시물 작성자 프로필 이미지 URL
-                    example: "https://example.com/uploads/profile.jpg"
-                  post_author_nickname:
-                    type: string
-                    description: 게시물 작성자 닉네임
-                    example: "UserOne" 
-                  created_at:
-                    type: string
-                    format: date-time
-                    description: 게시물 작성일시
-                    example: "2025-01-17T14:55:22.000Z"
-                  title:
-                    type: string
-                    description: 게시물 제목
-                    example: "오늘은 어떤가요" 
-                  content:
-                    type: string
-                    description: 게시물 내용
-                    example: "미션 000하기 추천합니다!" 
-                  picture_url:
-                    type: string
-                    description: 게시물 이미지 URL
-                    example: "https://example.com/uploads/image1.jpg"
-                  comment_counts:
-                    type: integer
-                    description: 댓글 수
-                    example: 5
-                  like_counts:
-                    type: integer
-                    description: 좋아요 수
-                    example: 2
-                  scrap_counts:
-                    type: integer
-                    desription: 스크랩 수
-                    example: 3
-                comments:
-                  type: array
-                  items: 
+                  post_info:
                     type: object
                     properties:
-                      user_id:
+                      category_name:
+                        type: string
+                        description: 카테고리 이름
+                        example: "미션 제안"
+                      post_author_profile:
+                        type: string
+                        description: 게시물 작성자 프로필 이미지 URL
+                        example: "https://example.com/uploads/profile.jpg"
+                      post_author_nickname:
+                        type: string
+                        description: 게시물 작성자 닉네임
+                        example: "User123" 
+                      picture_urls:
+                        type: array
+                        description: 게시물 이미지 URL 리스트 
+                        items:
+                          type : string
+                        example: 
+                          - "https://example.com/uploads/image1.jpg"
+                          - "https://example.com/uploads/image2.jpg"
+                      created_at:
+                        type: string
+                        format: date-time
+                        description: 게시물 작성일시
+                        example: "2025-01-17T14:55:22.000Z"
+                      title:
+                        type: string
+                        description: 게시물 제목
+                        example: "이런 건 어떤가요ㅋㅋ"  
+                      content:
+                        type: string
+                        description: 게시물 내용
+                        example: "순천 안온해변에서 갑자기 ..."  
+                      comment_counts:
                         type: integer
-                        description: 댓글 작성자 ID
-                        example: 1
-                      comment_author_name:
-                        type: string
-                        description: 댓글 작성자 닉네임
-                        example: "기사식당"  
-                      comment_author_profile:
-                        type: string
-                        description: 댓글 작성자 프로필 이미지 URL
-                        example: "http://example.com/image1.jpg"
-                      comment_created_at:
-                        type: string
-                        format: data-time
-                        description: 댓글 작성일시
-                        example: "2025-01-24T12:38:41.000Z"
-                      comment_content:
-                        type: string
-                        description: 댓글 내용
-                        example: "갑자기 갯벌핑ㅋㅋ" 
-
+                        description: 댓글 수
+                        example: 5
+                      like_counts:
+                        type: integer
+                        description: 좋아요 수
+                        example: 2
+                      scrap_counts:
+                        type: integer
+                        desription: 스크랩 수
+                        example: 3
+                  
+                  comments:
+                    type: array
+                    description: 댓글 목록
+                    items:
+                      type: object
+                      properties:
+                        user_id:
+                          type: integer
+                          description: 댓글 작성자 ID
+                        comment_author_name:
+                          type: string
+                          description: 댓글 작성자 닉네임
+                          example: "기사식당"  
+                        comment_author_profile:
+                          type: string
+                          description: 댓글 작성자 프로필 이미지 URL
+                          example: "http://example.com/image1.jpg"
+                        comment_created_at:
+                          type: string
+                          format: data-time
+                          description: 댓글 작성일시
+                          example: "2025-01-24T12:38:41.000Z"
+                        comment_content:
+                          type: string
+                          description: 댓글 내용
+                          example: "갑자기 갯벌핑ㅋㅋ" 
         '404':
           description: "게시물을 찾을 수 없음"
           content:
@@ -696,6 +701,16 @@ paths:
                   message:
                     type: string
                     example: "게시글을 찾을 수 없습니다."
+        '500':
+          description: "특정 게시물 조회 중 에러 발생"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "특정 게시물 조회 중에 에러가 발생했습니다."
 
   /community/my-posts/{user_id}:
     get:
@@ -770,6 +785,16 @@ paths:
                   message:
                     type: string
                     example: "아직 작성한 글이 없습니다."
+        '500':
+          description: "내가 쓴 글 조회 중 에러 발생"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "내가 쓴 글 조회 중에 에러가 발생했습니다."
 
   /community/posts/{post_id}/comments:
     post:
@@ -809,11 +834,11 @@ paths:
                   user_nickname:
                     type: string
                     description: 사용자 닉네임
-                    example: "UserTwo"
+                    example: "User123"
                   user_profile_image:
                     type: string
                     description: 사용자 프로필 이미지
-                    example: "profile2.jpg"
+                    example: "https://example.com/uploads/profile.jpg"
                   content:
                     type: string
                     description: 댓글 내용
@@ -823,6 +848,16 @@ paths:
                     format: date-time
                     description: 댓글 작성일시
                     example: "2025-01-22T21:32:57.000Z"
+        '404':
+          description: "존재하지 않는 게시물"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "존재하지 않는 게시물입니다."
         '500':
           description: "댓글 작성 중 에러 발생"
           content:
@@ -1150,12 +1185,19 @@ paths:
         tags:
           - COMMUNITY
         parameters:
+          - name: cursor
+            in: query
+            required: false
+            description: "커서 기반 페이지네이션을 위한 커서 값"
+            schema: 
+              type: integer
           - name: user_id
             in: path
             required: true
             description: 사용자 ID
             schema:
               type: integer
+            
         responses:
           '200':
             description: "스크랩 조회 성공"
@@ -1170,6 +1212,12 @@ paths:
                         type: integer
                         description: 게시물 ID
                         example: 18
+                      picture_url:
+                        type: array
+                        description: 게시물 이미지 URL 리스트 
+                        example: 
+                          - "https://example.com/uploads/image1.jpg"
+                          - "https://example.com/uploads/image2.jpg"
                       category_name:
                         type: string
                         description: 카테고리 이름
@@ -1185,7 +1233,7 @@ paths:
                       location_name:
                         type: string
                         description: 지역 이름
-                        example: "Busan"
+                        example: "부산" 
                       created_at:
                         type: string
                         format: date-time
@@ -1203,6 +1251,7 @@ paths:
                         type: integer
                         description: 총 스크랩 수
                         example: 2
+                            
           '404':
             description: "스크랩이 없는 경우"
             content:
@@ -1230,6 +1279,12 @@ paths:
       tags:
         - COMMUNITY
       parameters:
+        - name: cursor
+          in: query
+          required: false
+          description: "커서 기반 페이지네이션을 위한 커서 값"
+          schema: 
+            type: integer
         - name: user_id
           in: path
           required: true
@@ -1256,10 +1311,14 @@ paths:
                       type: integer
                       description: 게시물 ID
                       example: 19
-                    name:
+                    picture_url:
                       type: string
-                      description: 지역 이름
-                      example: "Incheon"
+                      description: 게시글의 대표 이미지 URL (맨 앞 1장) 
+                      example: "https://example.com/uploads/image1.jpg"
+                    category_name:
+                      type: string
+                      description: 게시글 카테고리
+                      example: "일반"
                     title:
                       type: string
                       description: 게시물 제목
@@ -1268,10 +1327,10 @@ paths:
                       type: string
                       description: 게시물 내용
                       example: "너무 즐겁다."
-                    picture_url:
+                    location_name:
                       type: string
-                      description: 게시물 이미지 URL
-                      example: "happy.jpg"
+                      description: 지역 이름
+                      example: "인천" 
                     created_at:
                       type: string
                       format: date-time
@@ -1353,33 +1412,34 @@ paths:
                           type: integer
                           nullable: true
                           example: null 
-                  posts:  
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                          example: 2
-                        picture_url:
-                          type: string
-                          example: "wmrgmd.jpg"
-                        category_name:
-                          type: string
-                          example: "즉흥 자랑" 
-                        title:
-                          type: string
-                          example: "이런 건 어떤가요 ㅋㅋ" 
-                        content:
-                          type: string
-                          example: "순천 안온해변에서 갑자기 갯벌 밟아보기 어떠신가요? ㅋㅋㅋ.."
-                        location_name:
-                          type: string
-                          example: "강남"
-                        created_at:
-                          type: string
-                          format: date-time
-                          example: "2025-01-24T12:32:37.000Z"  
+                    posts:  
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          picture_url:
+                            type: string
+                            description: 게시글의 대표 이미지 URL (맨 앞 1장) 
+                            example: "https://example.com/uploads/image1.jpg"
+                          category_name:
+                            type: string
+                            example: "즉흥 자랑" 
+                          title:
+                            type: string
+                            example: "이런 건 어떤가요 ㅋㅋ" 
+                          content:
+                            type: string
+                            example: "순천 안온해변에서 갑자기 갯벌 밟아보기 어떠신가요? ㅋㅋㅋ.."
+                          location_name:
+                            type: string
+                            example: "강남"
+                          created_at:
+                            type: string
+                            format: date-time
+                            example: "2025-01-24T12:32:37.000Z"  
           '404':
             description: 작성자의 프로필을 찾을 수 없습니다. 
             content:
