@@ -134,7 +134,7 @@ export const get_popular_posts_service = async() => {
 export const get_post_by_id_service = async(post_id) => {
     const post = await get_post_by_id_repository(post_id);
 
-    if(!post.id || (Array.isArray(post) && post.length === 0)) {
+    if(!post || !post.post_info || !post.post_info.id) {
         throw new Error("게시글을 찾을 수 없습니다.");
     }
 
