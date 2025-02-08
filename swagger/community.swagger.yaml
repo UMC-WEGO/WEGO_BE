@@ -311,7 +311,7 @@ paths:
 
   /community/posts/local-search/{user_id}:
     get:
-      summary: "게시글 지역 선택 시 최근 출발 지역 조회(홈화면에서도 사용, 최대 5개)"
+      summary: "게시글 지역 선택 시 최근 출발 지역 조회(홈화면에서도 사용, 최대 3개)"
       tags: 
         - COMMUNITY
       parameters: 
@@ -329,12 +329,27 @@ paths:
               schema:
                 type: array
                 items:
-                  type: string
-                example:
-                  - "제주도"
-                  - "부산"
-                  - "서울"
-                  - "여수"      
+                  type: object
+                  properties:
+                    local_id:
+                      type: integer
+                      example: 1
+                    region_name:
+                      type: string
+                      example: "인천광역시"
+                    location_name:
+                      type: string
+                      example: "인천"   
+            example:
+              - local_id: 3
+                region_name: "인천광역시"
+                location_name: "인천"
+              - local_id: 25
+                region_name: "부산광역시"
+                location_name: "부산"
+              - local_id: 6
+                region_name: "경기도"
+                location_name: "용인"
         '404':
           description: "사용자가 없습니다."
           content: 
@@ -355,7 +370,7 @@ paths:
                   message:
                     type: string
                     example: "최근 검색어 조회 중에 에러가 발생했습니다."
-                    
+
   /impromptu-posts/{category_id}:
     get:
       summary: "카테고리별 게시글 조회"
@@ -619,6 +634,10 @@ paths:
                   post_info:
                     type: object
                     properties:
+                      id: 
+                        type: integer
+                        description: 게시물 ID
+                        example: 1
                       category_name:
                         type: string
                         description: 카테고리 이름
@@ -631,19 +650,6 @@ paths:
                         type: string
                         description: 게시물 작성자 닉네임
                         example: "User123" 
-                      picture_urls:
-                        type: array
-                        description: 게시물 이미지 URL 리스트 
-                        items:
-                          type : string
-                        example: 
-                          - "https://example.com/uploads/image1.jpg"
-                          - "https://example.com/uploads/image2.jpg"
-                      created_at:
-                        type: string
-                        format: date-time
-                        description: 게시물 작성일시
-                        example: "2025-01-17T14:55:22.000Z"
                       title:
                         type: string
                         description: 게시물 제목
@@ -652,6 +658,23 @@ paths:
                         type: string
                         description: 게시물 내용
                         example: "순천 안온해변에서 갑자기 ..."  
+                      created_at:
+                        type: string
+                        format: date-time
+                        description: 게시물 작성일시
+                        example: "2025-01-17T14:55:22.000Z"
+                      updated_at:
+                        type: string
+                        description: 게시물 수정일시
+                        example: "2025-01-17T14:55:22.000Z"
+                      picture_urls:
+                        type: array
+                        description: 게시물 이미지 URL 리스트 
+                        items:
+                          type : string
+                        example: 
+                          - "https://example.com/uploads/image1.jpg"
+                          - "https://example.com/uploads/image2.jpg"
                       comment_counts:
                         type: integer
                         description: 댓글 수

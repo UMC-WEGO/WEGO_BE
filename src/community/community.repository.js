@@ -1,9 +1,8 @@
-import { StatusCodes } from "http-status-codes";
 import { pool } from "../../config/db.config.js";
 
 // 게시글 작성 
-export const create_post_repository = async(data) => {
-    const { category_id, user_id, local_id, title, content, picture_url} = data;
+export const create_post_repository = async(data, user_id) => {
+    const { category_id, local_id, title, content, picture_url} = data;
 
     const query = `
         INSERT INTO Post (category_id, user_id, local_id, title, content, picture_url, created_at)
@@ -111,18 +110,19 @@ export const delete_post_repository = async(post_id) => {
 
 
 
-// 최근 검색어 - 조회 
+// 최근 검색어 - 조회 (최근 여행 출발지 최대 3개)
 export const get_local_search_repository = async(user_id) => {
     const query = `
-        SELECT DISTINCT location 
-	    FROM travel
-	    WHERE endDate < NOW() and user_id = ?
-	    ORDER BY endDate DESC
-	    LIMIT 5; 
+        SELECT  l.id AS local_id, l.region_name AS region_name, l.location_name AS location_name
+        FROM travel t
+        JOIN local l ON l.location_name = t.location
+        WHERE t.user_id = ?
+        ORDER BY updated_at desc
+        LIMIT 3;
     `;
 
     const [searches] = await pool.execute(query,[user_id]);
-    return searches.map(search => search.location);
+    return searches;
 }
 
 
@@ -287,7 +287,7 @@ export const get_popular_posts_repository = async() => {
 // 특정 게시글 조회 
 export const get_post_by_id_repository = async (post_id) => {
     const post_query = `
-        SELECT p.id, c.name AS category_name, u.profile_image AS post_author_profile, u.nickname AS post_author_nickname, 
+        SELECT p.id, c.name AS category_name, u.profile_image AS post_author_profile, u.nickname AS post_author_nickname, p.title, p.content, p.created_at, p.updated_at,
             GROUP_CONCAT(i.imgUrl ORDER BY i.id ASC) AS picture_urls,
             comment_count.comment_counts, like_count.like_counts, scrap_count.scrap_counts
         FROM Post p

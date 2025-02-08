@@ -38,9 +38,9 @@ import {
 
 
 // 게시글 작성
-export const create_post_service = async (data) => {
+export const create_post_service = async (data, user_id) => {
     try{
-        const post_key = await create_post_repository(data);
+        const post_key = await create_post_repository(data, user_id);
 
         if(!post_key) {
             throw new Error("postKey가 존재하지 않습니다.");

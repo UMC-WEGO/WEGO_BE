@@ -58,7 +58,8 @@ import {check_like_exist_repository, check_scrap_exist_repository} from "./commu
 export const create_post_controller = async(req,res,next) => {
     try {
         const post_data = create_post_dto(req.body);
-        const new_post = await create_post_service(post_data);
+        const user_id = req.user_id;
+        const new_post = await create_post_service(post_data,user_id);
 
         res.status(StatusCodes.CREATED).json(new_post);
 
