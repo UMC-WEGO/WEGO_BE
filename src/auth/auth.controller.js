@@ -335,7 +335,6 @@ export const passwordChangeController = async (req, res) => {
 
 
   } catch (error) {
-    console.error('비밀번호 변경 오류:', error.message);
     return res.status(500).json({ message: error.message || '비밀번호 변경 중 오류가 발생했습니다.' });
   }
 };
