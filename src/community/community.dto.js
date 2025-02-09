@@ -1,12 +1,10 @@
 
 // 게시글 추가 요청 작성 DTO
 export const create_post_dto = (data) => ({
-    category_id: data.category_id, 
-    user_id: data.user_id,         
+    category_id: data.category_id,      
     local_id: data.local_id,        
     title: data.title,           
     content: data.content,         
-    status: data.status || 'ACTIVE', // 상태 (기본값 'ACTIVE')
     picture_url: data.picture_url || [],  // 이미지 URL 배열, 기본값은 빈 배열
 });
 
@@ -137,7 +135,6 @@ export const get_post_by_id_response_dto = (response, post_id) => ({
 // 댓글 작성 DTO
 export const create_comment_dto = (data) => ({
     content: data.content,
-    user_id: data.user_id,
 });
 
 // 댓글 작성 응답 DTO

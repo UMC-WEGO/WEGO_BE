@@ -1,9 +1,8 @@
-import { StatusCodes } from "http-status-codes";
 import { pool } from "../../config/db.config.js";
 
 // 게시글 작성 
-export const create_post_repository = async(data) => {
-    const { category_id, user_id, local_id, title, content, picture_url} = data;
+export const create_post_repository = async(data, user_id) => {
+    const { category_id, local_id, title, content, picture_url} = data;
 
     const query = `
         INSERT INTO Post (category_id, user_id, local_id, title, content, picture_url, created_at)
@@ -26,10 +25,11 @@ export const create_post_repository = async(data) => {
     }
     
     const new_query = `
-        SELECT p.id, c.name AS category_name, l.location_name AS location_name, p.title, p.content, p.picture_url, p.created_at
+        SELECT p.id, c.name AS category_name, l.location_name AS location_name, u.nickname AS user_nickname, p.title, p.content, p.picture_url, p.created_at
         FROM Post p
         JOIN category c ON c.id = p.category_id
         JOIN local l ON l.id = p.local_id
+        JOIN User u ON u.id = p.user_id
         WHERE p.id = ?;
     `;
 
@@ -39,7 +39,7 @@ export const create_post_repository = async(data) => {
 };
 
 // 게시글 수정
-export const update_post_repository = async (post_id, data) => {
+export const update_post_repository = async (post_id, user_id, data) => {
 
     const updates = [];
     const values = [];
@@ -72,10 +72,10 @@ export const update_post_repository = async (post_id, data) => {
     const query =`
         UPDATE Post 
         SET ${updates.join(',')}, updated_at = NOW()
-        WHERE id = ?;
+        WHERE id = ? AND user_id = ?;
     `;
 
-    values.push(post_id);
+    values.push(post_id, user_id);
 
     const [result] = await pool.execute(query, values);
 
@@ -100,29 +100,30 @@ export const update_post_repository = async (post_id, data) => {
 };
 
 // 게시글 삭제 
-export const delete_post_repository = async(post_id) => {
+export const delete_post_repository = async(post_id, user_id) => {
     const query = `
         DELETE FROM Post
-        WHERE id = ?;
+        WHERE id = ? AND user_id = ?;
     `;
-    const [result] = await pool.execute(query, [post_id]);
+    const [result] = await pool.execute(query, [post_id, user_id]);
     return result.affectedRows > 0;
 }
 
 
 
-// 최근 검색어 - 조회 
+// 최근 검색어 - 조회 (최근 여행 출발지 최대 3개)
 export const get_local_search_repository = async(user_id) => {
     const query = `
-        SELECT DISTINCT location 
-	    FROM travel
-	    WHERE endDate < NOW() and user_id = ?
-	    ORDER BY endDate DESC
-	    LIMIT 5; 
+        SELECT  l.id AS local_id, l.region_name AS region_name, l.location_name AS location_name
+        FROM travel t
+        JOIN local l ON l.location_name = t.location
+        WHERE t.user_id = ?
+        ORDER BY updated_at desc
+        LIMIT 3;
     `;
 
     const [searches] = await pool.execute(query,[user_id]);
-    return searches.map(search => search.location);
+    return searches;
 }
 
 
@@ -132,7 +133,7 @@ export const get_all_posts_repository = async(cursor) => {
     const limit = 20;
 
     const query = `
-        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
+        SELECT p.id AS post_id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
@@ -164,7 +165,7 @@ export const get_posts_by_category_repository = async(category_id,cursor) => {
     const limit = 20;
 
     const query = `
-        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
+        SELECT p.id AS post_id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
@@ -181,7 +182,7 @@ export const get_posts_by_category_repository = async(category_id,cursor) => {
         LEFT JOIN (SELECT post_id, imgUrl FROM image WHERE id IN (SELECT MIN(id) FROM image GROUP BY post_id)) AS i ON i.post_id = p.id
 
         WHERE category_id = ? AND p.id < ?
-        ORDER BY created_at DESC
+        ORDER BY p.id DESC
 
         LIMIT ${limit};
     `;
@@ -193,7 +194,7 @@ export const get_posts_by_category_repository = async(category_id,cursor) => {
 // 상위 2개 게시글 조회 - 지역 
 export const get_top_post_by_local_repository = async (local_id) => {
     const query = `
-        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
+        SELECT p.id AS post_id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
@@ -209,8 +210,8 @@ export const get_top_post_by_local_repository = async (local_id) => {
 
         LEFT JOIN (SELECT post_id, imgUrl FROM image WHERE id IN (SELECT MIN(id) FROM image GROUP BY post_id)) AS i ON i.post_id = p.id
 
-        WHERE local_id = ?
-        ORDER BY created_at DESC
+        WHERE p.local_id = ?
+        ORDER BY p.id DESC
 
         LIMIT 2;
     `;
@@ -222,7 +223,7 @@ export const get_top_post_by_local_repository = async (local_id) => {
 // 상위 2개 게시글 조회 - 전체
 export const get_posts_top_repository = async() => {
     const query = `
-        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
+        SELECT p.id AS post_id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
@@ -252,7 +253,7 @@ export const get_posts_top_repository = async() => {
 export const get_popular_posts_repository = async() => {
     const query = `
         SELECT 
-            p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, lc.location_name AS location_name, p.created_at, 
+            p.id AS post_id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, lc.location_name AS location_name, p.created_at, 
 
             COALESCE(c.comment_count, 0) AS comment_count,
             COALESCE(l.like_count, 0) AS like_count,
@@ -287,7 +288,7 @@ export const get_popular_posts_repository = async() => {
 // 특정 게시글 조회 
 export const get_post_by_id_repository = async (post_id) => {
     const post_query = `
-        SELECT p.id, c.name AS category_name, u.profile_image AS post_author_profile, u.nickname AS post_author_nickname, 
+        SELECT p.id, c.name AS category_name, u.profile_image AS post_author_profile, u.nickname AS post_author_nickname, p.title, p.content, p.created_at, p.updated_at,
             GROUP_CONCAT(i.imgUrl ORDER BY i.id ASC) AS picture_urls,
             comment_count.comment_counts, like_count.like_counts, scrap_count.scrap_counts
         FROM Post p
@@ -331,7 +332,7 @@ export const get_post_by_id_repository = async (post_id) => {
 // 내가 작성한 글 조회 
 export const get_my_posts_repository = async (user_id) => {
     const query = `
-        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
+        SELECT p.id AS post_id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
         COALESCE(comment_counts.comment_count, 0) AS total_comment,
         COALESCE(like_counts.like_count, 0) AS total_like,
         COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
@@ -357,8 +358,8 @@ export const get_my_posts_repository = async (user_id) => {
 
 
 // 댓글 작성 
-export const create_comment_repository = async(post_id, data) => {
-    const {user_id, content} = data;
+export const create_comment_repository = async(post_id, user_id, data) => {
+    const {content} = data;
 
     const query = `
         INSERT INTO Comment (user_id, post_id, content, created_at)
@@ -382,18 +383,23 @@ export const create_comment_repository = async(post_id, data) => {
 }
 
 // 댓글 삭제 
-export const delete_comment_respository = async(post_id, comment_id) => {
+export const delete_comment_respository = async(post_id, comment_id, user_id) => {
     const query = `
         DELETE FROM Comment
-        WHERE post_id = ? AND id = ?;
+        WHERE post_id = ? AND id = ? AND user_id = ?;
     `;
 
-    const [result] = await pool.execute(query,[post_id, comment_id]);
+    const [result] = await pool.execute(query,[post_id, comment_id, user_id]);
 
     return result.affectedRows > 0;
 }
 
-
+// 게시글의 존재 여부 
+export const check_post_exist_repository = async(post_id) => {
+    const query = `SELECT count(*) AS count FROM Post WHERE id = ?`;
+    const [rows] = await pool.execute(query, [post_id]);
+    return rows[0].count > 0;
+}
 
 // 좋아요 눌렀는지 확인용 
 export const check_like_exist_repository = async(post_id, user_id) => {
@@ -504,28 +510,30 @@ export const get_scrap_by_category_repository = async(user_id, category_id, curs
     const limit = 20;
 
     const query = `
-        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at,
-	        COALESCE(comment_counts.comment_count, 0) AS total_comment,
-	        COALESCE(like_counts.like_count, 0) AS total_like,
-	        COALESCE(scrap_counts.scrap_count, 0) AS total_scrap 
+        SELECT p.id AS post_id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name,p.created_at,
+            COALESCE(comment_counts.comment_count, 0) AS total_comment,
+            COALESCE(like_counts.like_count, 0) AS total_like,
+            COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
 
-        FROM Post p
+        FROM scrap s
 
+        JOIN Post p ON p.id = s.post_id
         JOIN category c ON c.id = p.category_id
         JOIN local l ON l.id = p.local_id
 
-        LEFT JOIN (SELECT post_id, COUNT(*) AS comment_count FROM Comment GROUP BY post_id) AS comment_counts ON p.id = comment_counts.post_id 
+        LEFT JOIN (SELECT post_id, COUNT(*) AS comment_count FROM Comment GROUP BY post_id) AS comment_counts ON p.id = comment_counts.post_id
         LEFT JOIN (SELECT post_id, COUNT(*) AS like_count FROM \`Like\` GROUP BY post_id) AS like_counts ON p.id = like_counts.post_id
-        LEFT JOIN (SELECT post_id, COUNT(*) AS scrap_count FROM scrap GROUP BY post_id) AS scrap_counts ON p.id = scrap_counts.post_id 
+        LEFT JOIN (SELECT post_id, COUNT(*) AS scrap_count FROM scrap GROUP BY post_id) AS scrap_counts ON p.id = scrap_counts.post_id
 
         LEFT JOIN (SELECT post_id, imgUrl FROM image WHERE id IN (SELECT MIN(id) FROM image GROUP BY post_id)) AS i ON i.post_id = p.id
 
-        WHERE p.user_id = ? and p.category_id = ? and p.id < ?
+        WHERE s.user_id = ? AND p.category_id = ? AND p.id < ?
         ORDER BY p.id DESC
         LIMIT ${limit};
     `;
 
     const [rows] = await pool.execute(query, [user_id, category_id, cursor]);
+
     return rows;
 }
 
