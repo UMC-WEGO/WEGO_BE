@@ -7,6 +7,7 @@ import  { authRouter }  from "./auth/auth.route.js";
 import { createRandomTrip, deleteUpcomingTrip, getPopularMissionController, getUpcomingTripsController, savePopularMissionController, saveTripController } from "./home/home.controller.js";
 import  scheduleRouter  from "./schedule/routes/schedule.route.js"; // 추가
 import userRouter from "./user/user.route.js";
+import homeRouter from "./home/home.route.js";
 import authenticateToken from "../config/jwt.middleware.js";
 
 import communityRouter from './community/community.route.js';
@@ -29,14 +30,7 @@ app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형
 
 app.use("/api-docs", SwaggerUi.serve, SwaggerUi.setup(specs));
 app.use('/auth', authRouter);
-
-app.post('/home', authenticateToken, createRandomTrip);
-app.post('/home/save-trip', authenticateToken, saveTripController);
-app.get("/home/upcoming-trips", authenticateToken, getUpcomingTripsController);
-app.delete("/home/upcoming-trips/:tripId", authenticateToken, deleteUpcomingTrip);
-app.get("/home/popular-missions", authenticateToken, getPopularMissionController);
-app.post("/home/savePopularMission/:missionId", authenticateToken, savePopularMissionController);
-
+app.use("/home", homeRouter);
 
 app.use("/schedule", scheduleRouter); // schedule 라우트 등록
 app.use("/users", userRouter)
