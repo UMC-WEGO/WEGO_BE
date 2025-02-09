@@ -50,6 +50,12 @@ jobs:
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /opt/app/.env
             echo "DB_NAME=${{ secrets.DB_NAME }}" >> /opt/app/.env
             echo "DB_PORT=${{ secrets.DB_PORT }}" >> /opt/app/.env
+
+            echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> /opt/app/.env
+            echo "REGION=${{ secrets.REGION }}" >> /opt/app/.env
+            echo "S3_KEYID=${{ secrets.S3_KEYID }}" >> /opt/app/.env
+            echo "S3_PRIVATE_KEY=${{ secrets.S3_PRIVATE_KEY }}" >> /opt/app/.env
+            echo "AUTO_CONTENT_TYPE=${{ secrets.AUTO_CONTENT_TYPE }}" >> /opt/app/.env
           '
 
       - name: Install dependencies
