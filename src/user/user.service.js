@@ -1,4 +1,4 @@
-import { getUserProfile, getTravelCountByUserId, getCompletedMissionByUserId, getPastTripByUserId, getPostByUserId, getMissionByUserId, getMissionDetailByUserId, deletePastTrip } from "./user.repository.js";
+import { getUserProfile, getTravelCountByUserId, getCompletedMissionByUserId, getPastTripByUserId, getPostByUserId, getMissionByUserId, getMissionDetailByUserId, deletePastTrip, updateUserProfile } from "./user.repository.js";
 import { getMissionDetailDto, getMissionDto, getUserPostDto, getUserProfileDto, PastTripsDto } from "./user.dto.js";
 
 //  사용자 프로필 조회
@@ -16,6 +16,18 @@ export const getUserProfileService = async (userId) => {
 
   // DTO로 변환
   return getUserProfileDto(userProfile, travelCount, completedMission);
+};
+
+// 사용자 프로필 수정
+export const updateUserProfileService = async (userId, nickname, email, profileImage) => {
+  const affectedRows = await updateUserProfile(userId, nickname, email, profileImage);
+
+  if (affectedRows === 0) {
+    console.log("프로필 업데이트 실패");
+    throw new Error("프로필 업데이트 실패");
+  }
+
+  return profileImage;
 };
 
 // 지난 여행 조회
