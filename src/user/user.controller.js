@@ -1,4 +1,4 @@
-import { deletePastTripService, getMissionDetailService, getMissionService, getPastTripsService, getUserPostService, getUserProfileService } from "./user.service.js";
+import { deletePastTripService, getMissionDetailService, getMissionService, getPastTripsService, getUserPostService, getUserProfileService, updateUserProfileService } from "./user.service.js";
 
 // 사용자 프로필 조회
 export const getUserInfoController = async (req, res) => {
@@ -35,6 +35,29 @@ export const getUserInfoController = async (req, res) => {
       isSuccess: false,
       code: 500,
       message: "사용자 정보 조회 중 서버 오류 발생",
+    });
+  }
+};
+
+// 사용자 프로필 수정
+export const updateUserProfileController = async (req, res) => {
+  try {
+    const user_id = req.user_id;
+    const { nickname, email } = req.body;
+    const profileImage = req.file ? req.file.location : null;
+
+    const response = await updateUserProfileService(user_id, nickname, email, profileImage);
+    return res.status(200).json({
+      isSuccess: true,
+      code: 200,
+      message: "프로필 수정 성공",
+    });
+  } catch (error) {
+    console.error("프로필 수정 중 컨트롤러 오류 발생", error);
+    res.status(500).json({
+      isSuccess: false,
+      code: 500,
+      message: "프로필 수정 중 서버 오류 발생",
     });
   }
 };

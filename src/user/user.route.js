@@ -1,12 +1,15 @@
 import express from "express";
 import authenticateToken from "../../config/jwt.middleware.js";
-import { deletePastTripController, getMissionController, getMissionDetailController, getPastTripsController, getUserInfoController, getUserPostController } from "./user.controller.js";
-import { getMissionDetailByUserId } from "./user.repository.js";
+import { deletePastTripController, getMissionController, getMissionDetailController, getPastTripsController, getUserInfoController, getUserPostController, updateUserProfileController } from "./user.controller.js";
+import { upload } from "../../config/s3.js";
 
 const router = express.Router();
 
 // 사용자 프로필 조회
 router.get("/info", authenticateToken, getUserInfoController);
+
+// 사용자 프로필 수정
+router.patch("/profile", authenticateToken, upload.single("profile_image"), updateUserProfileController);
 
 // 지난 여행 조회
 router.get("/past-trips", authenticateToken, getPastTripsController);

@@ -14,6 +14,15 @@ export const getUserProfileDto = (userProfile, travelCount, completedMission) =>
   };
 };
 
+// 사용자 프로필 수정
+export const updateProfileDto = (nickname, email, profileImage) => {
+  return {
+    nickname: nickname,
+    email: email,
+    profileImage: profileImage,
+  };
+};
+
 // 지난 여행 조회
 export const PastTripsDto = (trips) => {
   return {

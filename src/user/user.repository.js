@@ -12,6 +12,39 @@ export const getUserProfile = async (userId) => {
   return rows[0];
 };
 
+// 사용자 프로필 수정
+export const updateUserProfile = async (userId, nickname, email, profileImage) => {
+  let query = `UPDATE User SET `;
+  const values = [];
+  const updates = [];
+
+  if (nickname !== undefined) {
+    updates.push(`nickname = ?`);
+    values.push(nickname);
+  }
+
+  if (email !== undefined) {
+    updates.push(`email = ?`);
+    values.push(email);
+  }
+
+  if (profileImage !== undefined) {
+    updates.push(`profile_image = ?`);
+    values.push(profileImage);
+  }
+
+  if (updates.length === 0) {
+    throw new Error("업데이트할 값이 없습니다.");
+  }
+
+  query += updates.join(", ");
+  query += ` WHERE id = ?`;
+  values.push(userId);
+
+  const [result] = await pool.execute(query, values);
+  return result.affectedRows;
+};
+
 // 지난 여행 일정 개수 조회
 export const getTravelCountByUserId = async (userId) => {
   const query =`
