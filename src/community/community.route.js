@@ -1,5 +1,6 @@
 
 import express from "express";
+import authenticateToken from "../../config/jwt.middleware.js";
 import {
     create_post_controller,
     update_post_controller,
@@ -42,17 +43,17 @@ communityRouter.get("/", (req, res) => {
 
 
 //게시글 작성
-communityRouter.post("/posts", create_post_controller);
+communityRouter.post("/posts", authenticateToken, create_post_controller);
 
 // 게시글 수정
-communityRouter.patch("/posts/modify/:post_id", update_post_controller);
+communityRouter.patch("/posts/modify/:post_id", authenticateToken, update_post_controller);
 
 //게시글 삭제
-communityRouter.delete("/posts/delete/:post_id", delete_post_controller);
+communityRouter.delete("/posts/delete/:post_id", authenticateToken, delete_post_controller);
 
 
 // 최근 검색어 - 조회 
-communityRouter.get("/posts/local-search/:user_id", get_local_search_controller);
+communityRouter.get("/posts/local-search", authenticateToken, get_local_search_controller);
 
 
 //전체 게시글 조회
@@ -77,37 +78,37 @@ communityRouter.get("/posts/:post_id", get_post_by_id_controller);
 
 
 // 내가 쓴 글 조회 
-communityRouter.get("/my-posts/:user_id", get_my_posts_controller);
+communityRouter.get("/my-posts", authenticateToken, get_my_posts_controller);
 
 
 
 // 댓글 작성 
-communityRouter.post("/posts/:post_id/comments", create_comment_controller);
+communityRouter.post("/posts/:post_id/comments", authenticateToken, create_comment_controller);
 
 // 댓글 삭제
-communityRouter.delete("/posts/:post_id/comments/:comment_id", delete_comment_controller);
+communityRouter.delete("/posts/:post_id/comments/:comment_id", authenticateToken, delete_comment_controller);
 
 
 
 // 좋아요 누르기
-communityRouter.post("/posts/:post_id/likes/:user_id", create_like_controller);
+communityRouter.post("/posts/:post_id/likes", authenticateToken, create_like_controller);
 
 // 좋아요 삭제 
-communityRouter.delete("/delete/:post_id/likes/:user_id", delete_like_controller);
+communityRouter.delete("/delete/:post_id/likes", authenticateToken, delete_like_controller);
 
 
 
 // 스크랩 누르기
-communityRouter.post("/posts/:post_id/scrap/:user_id", create_scrap_controller);
+communityRouter.post("/posts/:post_id/scrap", authenticateToken, create_scrap_controller);
 
-// 스크랩 삭제 
-communityRouter.delete("/delete/:post_id/scrap/:user_id", delete_scrap_controller);
+// 스크랩 삭제  
+communityRouter.delete("/delete/:post_id/scrap", authenticateToken, delete_scrap_controller);
 
 // 스크랩 조회
-communityRouter.get("/my-scraps/:user_id", get_scrap_controller);
+communityRouter.get("/my-scraps", authenticateToken, get_scrap_controller);
 
 // 스크랩 조회 - 카테고리별 
-communityRouter.get("/my-scraps/:user_id/category/:category_id",get_scrap_by_category_controller);
+communityRouter.get("/my-scraps/category/:category_id", authenticateToken, get_scrap_by_category_controller);
 
 
 

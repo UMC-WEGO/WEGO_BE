@@ -6,7 +6,7 @@ info:
 paths:
   /community/posts:
     post:
-      summary: "즉흥여행 글쓰기"
+      summary: "즉흥여행 게시글 작성"
       tags:
         - COMMUNITY
       requestBody:
@@ -20,10 +20,6 @@ paths:
                   type: integer
                   description: 게시글 카테고리 ID
                   example: 1
-                user_id:
-                  type: integer
-                  description: 사용자 ID
-                  example: 2
                 local_id:
                   type: integer
                   description: 지역명 ID
@@ -57,6 +53,9 @@ paths:
                     type: integer
                     description: 게시물 ID
                     example: 22
+                  user_nickname: 
+                    type: string
+                    description: 사용자 이름 
                   category_name:
                     type: string
                     description: 카테고리 이름
@@ -256,7 +255,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    post_id:
                       type: integer
                       description: 게시글 ID
                       example: 24
@@ -309,18 +308,11 @@ paths:
                     description: 에러 메시지
                     example: "전체 글 조회 중에 에러가 발생했습니다."
 
-  /community/posts/local-search/{user_id}:
+  /community/posts/local-search:
     get:
       summary: "게시글 지역 선택 시 최근 출발 지역 조회(홈화면에서도 사용, 최대 3개)"
       tags: 
         - COMMUNITY
-      parameters: 
-        - name: user_id
-          in: path
-          required: true
-          description: 사용자 ID
-          schema: 
-            type: integer 
       responses:
         '200':
           description: "최근 출발 지역 조회 성공"
@@ -371,10 +363,12 @@ paths:
                     type: string
                     example: "최근 검색어 조회 중에 에러가 발생했습니다."
 
-  /impromptu-posts/{category_id}:
+  /community/impromptu-posts/{category_id}:
     get:
       summary: "카테고리별 게시글 조회"
       description: "특정 카테고리에 속한 게시글을 페이지네이션을 통해 조회합니다."
+      tags: 
+        - COMMUNITY
       parameters:
         - name: category_id
           in: path
@@ -382,18 +376,12 @@ paths:
           schema:
             type: integer
           description: 카테고리 ID
-        - name: page
+        - name: cursor
           in: query
-          schema:
+          required: false
+          description: "커서 기반 페이지네이션을 위한 커서 값"
+          schema: 
             type: integer
-            default: 1
-          description: 페이지 번호
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 20
-          description: 페이지당 게시글 수
       responses:
         '200':
           description: "카테고리별 게시글 조회 성공" 
@@ -404,27 +392,47 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    post_id:
                       type: integer
+                      description: 게시글 ID
+                      example: 1
                     picture_url:
                       type: string
+                      description: 게시글의 대표 이미지 URL (맨 앞 1장장)
+                      example: "https://example.com/uploads/image1.jpg"
                     category_name:
                       type: string
+                      description: 게시글 카테고리
+                      example: "일반"
                     title:
                       type: string
+                      description: 게시글 제목
+                      example: "이런 거는 어떤가요ㅋㅋ" 
                     content:
                       type: string
+                      description: 게시글 내용 
+                      example: "순천 안온해변 어쩌고"
                     location_name:
                       type: string
+                      description: 게시글과 연관된 지역 
+                      example: "인천"
                     created_at:
                       type: string
                       format: date-time
+                      description: 게시글 작성일시 
+                      example: "2025-01-22T20:25:10.000Z"
                     total_comment:
                       type: integer
+                      description: 총 댓글 수 
+                      example: 5
                     total_like:
                       type: integer
+                      description: 총 좋아요 수 
+                      example: 2
                     total_scrap:
                       type: integer
+                      description: 총 스크랩 수
+                      example: 10
         '500':
           description: "서버 에러"
           content:
@@ -437,10 +445,12 @@ paths:
                     description: 에러 메시지
                     example: "카테고리별 게시판 조회중에 에러가 발생했습니다."
 
-  /impromptu-posts/top-local/{local_id}:
+  /community/impromptu-posts/top-local/{local_id}:
     get:
       summary: "지역별 상위 2개의 게시글 조회"
       description: "특정 지역에서 상위 2개의 게시글을 반환"
+      tags: 
+        - COMMUNITY
       parameters:
         - name: local_id
           in: path
@@ -458,27 +468,47 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    post_id:
                       type: integer
+                      description: 게시글 ID 
+                      example: 1
                     picture_url:
                       type: string
+                      description: 게시글의 대표 이미지 URL (맨 앞 1장) 
+                      example: "https://example.com/uploads/image1.jpg"
                     category_name:
                       type: string
+                      description: 게시글 카테고리 
+                      example: "일반" 
                     title:
                       type: string
+                      description: 게시글 제목 
+                      example: "이런 건 어떤가요 ㅋㅋ" 
                     content:
                       type: string
+                      description: 게시글 내용 
+                      example: "순천 안온해변에서 어쩌고" 
                     location_name:
                       type: string
+                      description: 게시글과 연관된 지역
+                      example: "인천" 
                     created_at:
                       type: string
                       format: date-time
+                      description: 게시글 작성일시 
+                      example: "2025-01-22T20:25:10.000Z"
                     total_comment:
                       type: integer
+                      description: 총 댓글 수 
+                      example: 11
                     total_like:
                       type: integer
+                      description: 총 좋아요 수 
+                      example: 7
                     total_scrap:
                       type: integer
+                      description: 총 스크랩 수 
+                      example: 5
         '500':
           description: "서버 에러"
           content:
@@ -491,10 +521,12 @@ paths:
                     description: 에러 메시지
                     example: "게시판 상위 2개 조회(지역별) 중에 에러가 발생했습니다."
 
-  /posts/top:
+  /community/posts/top:
     get:
       summary: "전체 상위 2개의 게시글 조회"
       description: "전체 게시글 중에서 상위 2개의 게시글을 반환"
+      tags: 
+        - COMMUNITY
       responses:
         '200':
           description: "전체 상위 2개의 게시글 조회 성공" 
@@ -505,27 +537,47 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    post_id:
                       type: integer
+                      description: 게시글 ID
+                      example: 1
                     picture_url:
                       type: string
+                      description: 게시글의 대표 이미지 URL (맨 앞 1장) 
+                      example: "https://example.com/uploads/image1.jpg"
                     category_name:
                       type: string
+                      description: 게시글 카테고리
+                      example: "일반"
                     title:
                       type: string
+                      description: 게시글 제목 
+                      example: "이런 건 어떤가요" 
                     content:
                       type: string
+                      description: 게시글 내용 
+                      example: "순천 안온 해변 어쩌고"
                     location_name:
                       type: string
+                      description: 게시글과 연관된 지역 
+                      example: "인천"
                     created_at:
                       type: string
                       format: date-time
+                      description: 게시글 작성일시 
+                      example: "2025-01-22T20:25:10.000Z"
                     total_comment:
                       type: integer
+                      description: 총 댓글 수 
+                      example: 10 
                     total_like:
                       type: integer
+                      description: 총 좋아요 수 
+                      example: 3
                     total_scrap:
                       type: integer
+                      description: 총 스크랩 수 
+                      example: 4
         '500':
           description: "서버 에러"
           content:
@@ -553,7 +605,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    post_id:
                       type: integer
                       description: 게시물 ID
                       example: 24
@@ -735,18 +787,11 @@ paths:
                     type: string
                     example: "특정 게시물 조회 중에 에러가 발생했습니다."
 
-  /community/my-posts/{user_id}:
+  /community/my-posts:
     get:
       summary: "내가 쓴 글 조회"
       tags:
         - COMMUNITY
-      parameters:
-        - name: user_id
-          in: path
-          required: true
-          description: 사용자 ID
-          schema:
-            type: integer
       responses:
         '200':
           description: "내가 쓴 글 조회 성공"
@@ -757,7 +802,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    post_id:
                       type: integer
                       description: 게시물 ID
                       example: 10
@@ -842,10 +887,6 @@ paths:
                   type: string
                   description: 댓글 내용
                   example: "나도 그렇게 생각해"
-                user_id:
-                  type: integer
-                  description: 사용자 ID
-                  example: 2
       responses:
         '201':
           description: "댓글 작성 성공"
@@ -950,7 +991,7 @@ paths:
                     type: string
                     example: "댓글 삭제 중에 에러가 발생했습니다."
 
-  /community/posts/{post_id}/likes/{user_id}:
+  /community/posts/{post_id}/likes:
     post:
       summary: "좋아요 누르기"
       tags:
@@ -960,12 +1001,6 @@ paths:
           in: path
           required: true
           description: 게시물 ID
-          schema:
-            type: integer
-        - name: user_id
-          in: path
-          required: true
-          description: 사용자 ID
           schema:
             type: integer
       responses:
@@ -1013,7 +1048,7 @@ paths:
                     type: string
                     example: "공감 중에 에러가 발생했습니다."
 
-  /community/delete/{post_id}/likes/{user_id}:
+  /community/delete/{post_id}/likes:
     delete:
       summary: "좋아요 취소"
       tags:
@@ -1023,12 +1058,6 @@ paths:
           in: path
           required: true
           description: 게시물 ID
-          schema:
-            type: integer
-        - name: user_id
-          in: path
-          required: true
-          description: 사용자 ID
           schema:
             type: integer
       responses:
@@ -1076,7 +1105,7 @@ paths:
                     type: string
                     example: "좋아요 취소하는 중에 에러가 발생했습니다."            
 
-  /community/posts/{post_id}/scrap/{user_id}:
+  /community/posts/{post_id}/scrap:
     post:
       summary: "게시물 스크랩"
       tags:
@@ -1086,12 +1115,6 @@ paths:
           in: path
           required: true
           description: 게시물 ID
-          schema:
-            type: integer
-        - name: user_id
-          in: path
-          required: true
-          description: 사용자 ID
           schema:
             type: integer
       responses:
@@ -1139,7 +1162,7 @@ paths:
                     type: string
                     example: "스크랩 하는 중에 에러가 발생했습니다."
 
-  /community/delete/{post_id}/scrap/{user_id}:
+  /community/delete/{post_id}/scrap:
     delete:
       summary: "스크랩 삭제"
       tags:
@@ -1149,12 +1172,6 @@ paths:
           in: path
           required: true
           description: 게시물 ID
-          schema:
-            type: integer
-        - name: user_id
-          in: path
-          required: true
-          description: 사용자 ID
           schema:
             type: integer
       responses:
@@ -1202,7 +1219,7 @@ paths:
                     type: string
                     example: "스크랩을 취소하는 중에 에러가 발생했습니다."
 
-  /community/my-scraps/{user_id}:
+  /community/my-scraps:
       get:
         summary: "스크랩한 글 조회"
         tags:
@@ -1214,13 +1231,6 @@ paths:
             description: "커서 기반 페이지네이션을 위한 커서 값"
             schema: 
               type: integer
-          - name: user_id
-            in: path
-            required: true
-            description: 사용자 ID
-            schema:
-              type: integer
-            
         responses:
           '200':
             description: "스크랩 조회 성공"
@@ -1296,7 +1306,7 @@ paths:
                       type: string
                       example: "스크랩 조회 중에 에러가 발생했습니다."
 
-  /community/my-scraps/{user_id}/category/{category_id}:
+  /community/my-scraps/category/{category_id}:
     get:
       summary: "카테고리별 스크랩 조회"
       tags:
@@ -1307,12 +1317,6 @@ paths:
           required: false
           description: "커서 기반 페이지네이션을 위한 커서 값"
           schema: 
-            type: integer
-        - name: user_id
-          in: path
-          required: true
-          description: 사용자 ID
-          schema:
             type: integer
         - name: category_id
           in: path

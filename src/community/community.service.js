@@ -57,19 +57,19 @@ export const create_post_service = async (data, user_id) => {
 }
 
 // 게시물 수정
-export const update_post_service = async (post_id, data) => {
-    const update_key = await update_post_repository(post_id, data);
+export const update_post_service = async (post_id, user_id, data) => {
+    const update_key = await update_post_repository(post_id, user_id, data);
 
     if(!update_key) {
-        throw new Error("updateKey가 존재하지 않습니다.");
+        throw new Error("게시물이 수정되지 않았습니다.");
     }
 
     return update_key;
 }
 
 //게시물 삭제
-export const delete_post_service = async (post_id) => {
-    const delete_key = await delete_post_repository(post_id);
+export const delete_post_service = async (post_id, user_id) => {
+    const delete_key = await delete_post_repository(post_id, user_id);
 
     if(!delete_key) {
         throw new Error("게시물이 삭제되지 않았습니다.");
@@ -156,9 +156,9 @@ export const get_my_posts_service = async(user_id) => {
 
 
 // 댓글 작성 
-export const create_comment_service = async(post_id, data) => {
+export const create_comment_service = async(post_id, user_id, data) => {
     try {
-        const post_key = await create_comment_repository(post_id, data);
+        const post_key = await create_comment_repository(post_id, user_id, data);
 
         if(!post_key) {
             throw new Error("댓글이 작성되지 않았습니다.");
@@ -175,8 +175,8 @@ export const create_comment_service = async(post_id, data) => {
 };
 
 // 댓글 삭제
-export const delete_comment_service = async(post_id, comment_id) => {
-    const delete_key = await delete_comment_respository(post_id, comment_id);
+export const delete_comment_service = async(post_id, comment_id, user_id) => {
+    const delete_key = await delete_comment_respository(post_id, comment_id, user_id);
 
     if(!delete_key){
         throw new Error("댓글이 삭제되지 않았습니다.");

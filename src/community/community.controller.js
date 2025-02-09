@@ -51,7 +51,7 @@ import {
 } from "./community.service.js"
 
 
-import {check_like_exist_repository, check_scrap_exist_repository} from "./community.repository.js"
+import {check_post_exist_repository, check_like_exist_repository, check_scrap_exist_repository} from "./community.repository.js"
 
 
 // 게시글 작성
@@ -73,17 +73,17 @@ export const create_post_controller = async(req,res,next) => {
 // 게시글 수정 
 export const update_post_controller = async(req,res,next) => {
     const post_id = parseInt(req.params.post_id);
+    const user_id = req.user_id;
     const post_data = req.body;
 
     try {
-        const updated_post = await update_post_service(post_id, post_data);
+        const updated_post = await update_post_service(post_id, user_id, post_data);
 
         if(!updated_post){
-            res.status(StatusCodes.OK).json({ message: "내용이 변경되었습니다.",updated_post});
-        } else {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "게시물 수정 중에 에러가 발생했습니다."});
-        }
-        
+        } 
+        res.status(StatusCodes.OK).json({ message: "내용이 변경되었습니다.", updated_post});
+
     } catch(error) {
         console.error(error);
         res.status(StatusCodes.NOT_FOUND).json({message : "게시물을 찾을 수 없습니다."});
@@ -95,7 +95,9 @@ export const update_post_controller = async(req,res,next) => {
 export const delete_post_controller = async(req,res,next) => {
     try {
         const post_id = parseInt(req.params.post_id);
-        const result = await delete_post_service(post_id);
+        const user_id = req.user_id;
+
+        const result = await delete_post_service(post_id, user_id);
 
         if(result){
             res.status(StatusCodes.OK).json(delete_post_response_dto(post_id));
@@ -112,7 +114,7 @@ export const delete_post_controller = async(req,res,next) => {
 
 // 최근 검색어 - 조회 
 export const get_local_search_controller = async(req, res) => {
-    const user_id = parseInt(req.params.user_id);
+    const user_id = req.user_id;
 
     try{
         const get_key = await get_local_search_service(user_id);
@@ -219,11 +221,12 @@ export const get_post_by_id_controller = async(req,res,next) => {
 
 // 내가 작성한 글 조회
 export const get_my_posts_controller = async(req,res) => {
-    const user_id = parseInt(req.params.user_id);
+    const user_id = req.user_id;
+
     try {
         const get_my_posts = await get_my_posts_service(user_id);
 
-        if (get_my_posts.message) {
+        if (get_my_posts) {
             return res.status(StatusCodes.OK).json(get_my_posts); 
         } else {
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "내가 작성한 글을 조회 중에 에러가 발생했습니다."});
@@ -238,11 +241,13 @@ export const get_my_posts_controller = async(req,res) => {
 
 // 게시물 댓글 작성
 export const create_comment_controller = async(req,res) => {
+    const user_id = req.user_id;
+
     try{
         const post_id = parseInt(req.params.post_id);
-        const post_data = create_comment_dto(req.body);
+        const post_data = req.body; 
 
-        const comment = await create_comment_service(post_id, post_data);
+        const comment = await create_comment_service(post_id, user_id, post_data);
         
         if(comment) {
             res.status(StatusCodes.CREATED).json(comment);
@@ -259,11 +264,12 @@ export const create_comment_controller = async(req,res) => {
 
 // 댓글 삭제
 export const delete_comment_controller = async(req,res) => {
+    const user_id = req.user_id;
     try{
         const post_id = parseInt(req.params.post_id);
         const comment_id = parseInt(req.params.comment_id);
 
-        const comment = await delete_comment_service(post_id, comment_id);
+        const comment = await delete_comment_service(post_id, comment_id, user_id);
 
         if(comment){
             res.status(StatusCodes.OK).json(delete_comment_response_dto(post_id, comment_id));
@@ -283,7 +289,11 @@ export const delete_comment_controller = async(req,res) => {
 export const create_like_controller = async(req,res) => {
     try {
         const post_id = parseInt(req.params.post_id);
-        const user_id = parseInt(req.params.user_id);
+        const user_id = req.user_id;
+
+        const post_exits = await check_post_exist_repository(post_id);
+        if(!post_exits) { return res.status(StatusCodes.NOT_FOUND).json({message: "해당 게시글을 찾을 수 없습니다."});} 
+
 
         const likeExists = await check_like_exist_repository(post_id, user_id);
 
@@ -301,7 +311,7 @@ export const create_like_controller = async(req,res) => {
         
     } catch(error){
         console.error(error);
-        res.status(StatusCodes.NOT_FOUND).json({message: "해당 게시글을 찾을 수 없습니다."});
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "서버에서 오류가 발생했습니다."});
     }
 }
 
@@ -309,7 +319,10 @@ export const create_like_controller = async(req,res) => {
 export const delete_like_controller = async(req,res) => {
     try {
         const post_id = parseInt(req.params.post_id);
-        const user_id = parseInt(req.params.user_id);
+        const user_id = req.user_id;
+
+        const post_exits = await check_post_exist_repository(post_id);
+        if(!post_exits) { return res.status(StatusCodes.NOT_FOUND).json({message: "해당 게시글을 찾을 수 없습니다."});} 
 
         const likeExists = await check_like_exist_repository(post_id,user_id);
 
@@ -327,7 +340,7 @@ export const delete_like_controller = async(req,res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(StatusCodes.NOT_FOUND).json({message: "해당 게시글을 찾을 수 없습니다."}); 
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "서버에서 오류가 발생했습니다."}); 
     }
 }
 
@@ -336,9 +349,12 @@ export const delete_like_controller = async(req,res) => {
 // 스크랩 누르기 
 export const create_scrap_controller = async(req, res) => {
     const post_id = parseInt(req.params.post_id);
-    const user_id = parseInt(req.params.user_id);
+    const user_id = req.user_id;
 
     try {
+        const post_exits = await check_post_exist_repository(post_id);
+        if(!post_exits) { return res.status(StatusCodes.NOT_FOUND).json({message: "해당 게시글을 찾을 수 없습니다."});} 
+
         const scrapExists = await check_scrap_exist_repository(post_id, user_id);
 
         if(scrapExists) {
@@ -353,7 +369,7 @@ export const create_scrap_controller = async(req, res) => {
         }
     } catch (error) {
         console.error(error);
-        res.status(StatusCodes.NOT_FOUND).json({message: "해당 게시글을 찾을 수 없습니다."});
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "서버에서 오류가 발생했습니다."});
     }
 }
 
@@ -362,14 +378,19 @@ export const create_scrap_controller = async(req, res) => {
 export const delete_scrap_controller = async(req,res) => {
     try {
         const post_id = parseInt(req.params.post_id);
-        const user_id = parseInt(req.params.user_id);
+        const user_id = req.user_id;
+
+        const post_exits = await check_post_exist_repository(post_id);
+        if(!post_exits) { return res.status(StatusCodes.NOT_FOUND).json({message: "해당 게시글을 찾을 수 없습니다."});} 
+
 
         const scrapExists = await check_scrap_exist_repository(post_id, user_id);
         
-        const delete_scrap_key = await delete_scrap_service(post_id,user_id);
         if(!scrapExists){
             return res.status(400).json({message: "스크랩 하지 않은 게시물 입니다."});
         } 
+
+        const delete_scrap_key = await delete_scrap_service(post_id,user_id);
 
         if(delete_scrap_key) {
             res.status(StatusCodes.OK).json({message: "스크랩이 취소되었습니다.", delete_scrap_key});
@@ -379,7 +400,7 @@ export const delete_scrap_controller = async(req,res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(StatusCodes.NOT_FOUND).json({message: "해당 게시글을 찾을 수 없습니다."}); 
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "서버에서 오류가 발생했습니다."});
     }
 }
 
@@ -387,7 +408,8 @@ export const delete_scrap_controller = async(req,res) => {
 // 스크랩 조회
 export const get_scrap_controller = async(req, res) => {
     const cursor = parseInt(req.query.cursor) || 20; 
-    const user_id = parseInt(req.params.user_id);
+    const user_id = req.user_id;
+
     try{
         const get_scrap = await get_scrap_service(user_id, cursor);
 
@@ -405,7 +427,7 @@ export const get_scrap_controller = async(req, res) => {
 
 // 스크랩 조회 - 카테고리별 
 export const get_scrap_by_category_controller = async(req,res) => {
-    const user_id = parseInt(req.params.user_id);
+    const user_id = req.user_id;
     const category_id = parseInt(req.params.category_id);
     const cursor = parseInt(req.query.cursor) || 20;
 
@@ -427,7 +449,7 @@ export const get_scrap_by_category_controller = async(req,res) => {
 
 // 게시글 작성자 프로필 조회 
 export const get_user_profile_controller = async(req, res) => {
-    const user_id = parseInt(req.params.user_id); 
+    const user_id = parseInt(req.params.user_id);
 
     try {
         const get_key = await get_user_profile_service(user_id);
