@@ -5,10 +5,10 @@ import { createRandomTrip, deleteUpcomingTrip, getPopularMissionController, getU
 const router = express.Router();
 
 router.post('', authenticateToken, createRandomTrip);
-router.post('/home/save-trip', authenticateToken, saveTripController);
-router.get("/home/upcoming-trips", authenticateToken, getUpcomingTripsController);
-router.delete("/home/upcoming-trips/:tripId", authenticateToken, deleteUpcomingTrip);
-router.get("/home/popular-missions", authenticateToken, getPopularMissionController);
-router.post("/home/savePopularMission/:missionId", authenticateToken, savePopularMissionController);
+router.post('/save-trip', authenticateToken, saveTripController);
+router.get("/upcoming-trips", authenticateToken, getUpcomingTripsController);
+router.delete("/upcoming-trips/:tripId", authenticateToken, deleteUpcomingTrip);
+router.get("/popular-missions", authenticateToken, getPopularMissionController);
+router.post("/savePopularMission/:missionId", authenticateToken, savePopularMissionController);
 
 export default router;
