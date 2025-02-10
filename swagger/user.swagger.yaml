@@ -541,12 +541,18 @@ paths:
                             categoryId:
                               type: integer
                               example: 1
+                            categoryName:
+                              type: string
+                              example: "즉흥 자랑"
                             userId:
                               type: integer
                               example: 1
                             localId:
                               type: integer
                               example: 1
+                            locationName:
+                              type: string
+                              example: "서울 강북"
                             title:
                               type: string
                               example: 현지 맛집 정보
