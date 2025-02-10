@@ -43,12 +43,12 @@ export const PastTripsDto = (trips) => {
           point: mission.missionPoint,
         },
         receivedMission: {
-          id: mission.id,
-          content: mission.receivedMissionContent,
+          id: mission.receiveMissionId,
+          content: mission.receiveMissionContent,
+          picture: mission.receiveMissionPicture,
           status: Boolean(mission.receiveMissionStatus),
           createdAt: mission.receiveMissionCreatedAt,
           updatedAt: mission.receiveMissionUpdatedAt,
-          imgUrl: mission.imgUrl,
         }
       })),
     })),

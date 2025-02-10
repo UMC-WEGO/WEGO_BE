@@ -18,17 +18,17 @@ export const updateUserProfile = async (userId, nickname, email, profileImage) =
   const values = [];
   const updates = [];
 
-  if (nickname !== undefined) {
+  if (nickname !== undefined && nickname !== null) {
     updates.push(`nickname = ?`);
     values.push(nickname);
   }
 
-  if (email !== undefined) {
+  if (email !== undefined && email !== null) {
     updates.push(`email = ?`);
     values.push(email);
   }
 
-  if (profileImage !== undefined) {
+  if (profileImage !== undefined && profileImage !== null) {
     updates.push(`profile_image = ?`);
     values.push(profileImage);
   }
@@ -82,7 +82,8 @@ export const getPastTripByUserId = async (userId) => {
   const missionsQuery = `
     SELECT
       rm.id AS receiveMissionId,
-      rm.content AS receivedMissionContent,
+      rm.content AS receiveMissionContent,
+      rm.picture AS receiveMissionPicture,
       rm.status AS receiveMissionStatus,
       rm.created_at AS receiveMissionCreatedAt,
       rm.updated_at AS receiveMissionUpdatedAt,
