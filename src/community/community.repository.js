@@ -255,9 +255,9 @@ export const get_popular_posts_repository = async() => {
         SELECT 
             p.id AS post_id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, lc.location_name AS location_name, p.created_at, 
 
-            COALESCE(c.comment_count, 0) AS comment_count,
-            COALESCE(l.like_count, 0) AS like_count,
-            COALESCE(s.scrap_count, 0) AS scrap_count,
+            COALESCE(c.comment_count, 0) AS total_comment,
+            COALESCE(l.like_count, 0) AS total_like,
+            COALESCE(s.scrap_count, 0) AS total_scrap,
 
             (COALESCE(l.like_count, 0) * 5 +
             COALESCE(c.comment_count, 0) * 10 +
@@ -288,13 +288,15 @@ export const get_popular_posts_repository = async() => {
 // 특정 게시글 조회 
 export const get_post_by_id_repository = async (post_id) => {
     const post_query = `
-        SELECT p.id, c.name AS category_name, u.profile_image AS post_author_profile, u.nickname AS post_author_nickname, p.title, p.content, p.created_at, p.updated_at,
+        SELECT p.id, c.name AS category_name, u.profile_image AS post_author_profile, u.nickname AS post_author_nickname, l.location_name AS location_name, p.title, p.content, p.created_at, p.updated_at,
             GROUP_CONCAT(i.imgUrl ORDER BY i.id ASC) AS picture_urls,
-            comment_count.comment_counts, like_count.like_counts, scrap_count.scrap_counts
+            comment_count.comment_counts AS total_comment, like_count.like_counts AS total_like, scrap_count.scrap_counts AS total_scrap
+            
         FROM Post p
 
         JOIN User u ON u.id = p.user_id
         JOIN category c ON c.id = p.category_id
+        JOIN local l ON l.id = p.local_id 
 
         LEFT JOIN (SELECT post_id, count(*) AS comment_counts FROM Comment GROUP BY post_id) AS comment_count ON comment_count.post_id = p.id
         LEFT JOIN (SELECT post_id, count(*) AS like_counts FROM \`Like\` GROUP BY post_id) AS like_count ON like_count.post_id = p.id
