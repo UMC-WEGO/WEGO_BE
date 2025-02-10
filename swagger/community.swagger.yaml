@@ -634,15 +634,15 @@ paths:
                       format: date-time
                       description: 게시물 작성일시
                       example: "2025-01-22T20:25:10.000Z"
-                    comment_count:
+                    total_comment:
                       type: integer
                       description: 댓글 수
                       example: 4
-                    like_count:
+                    total_like:
                       type: integer
                       description: 좋아요 수
                       example: 10
-                    scrap_count:
+                    total_scrap:
                       type: integer
                       description: 스크랩 수
                       example: 3
@@ -683,89 +683,102 @@ paths:
               schema:
                 type: object
                 properties:
-                  post_info:
+                  post:
                     type: object
                     properties:
-                      id: 
-                        type: integer
-                        description: 게시물 ID
-                        example: 1
-                      category_name:
-                        type: string
-                        description: 카테고리 이름
-                        example: "미션 제안"
-                      post_author_profile:
-                        type: string
-                        description: 게시물 작성자 프로필 이미지 URL
-                        example: "https://example.com/uploads/profile.jpg"
-                      post_author_nickname:
-                        type: string
-                        description: 게시물 작성자 닉네임
-                        example: "User123" 
-                      title:
-                        type: string
-                        description: 게시물 제목
-                        example: "이런 건 어떤가요ㅋㅋ"  
-                      content:
-                        type: string
-                        description: 게시물 내용
-                        example: "순천 안온해변에서 갑자기 ..."  
-                      created_at:
-                        type: string
-                        format: date-time
-                        description: 게시물 작성일시
-                        example: "2025-01-17T14:55:22.000Z"
-                      updated_at:
-                        type: string
-                        description: 게시물 수정일시
-                        example: "2025-01-17T14:55:22.000Z"
-                      picture_urls:
+                      post_info:
+                        type: object
+                        properties:
+                          id: 
+                            type: integer
+                            description: 게시물 ID
+                            example: 1
+                          category_name:
+                            type: string
+                            description: 카테고리 이름
+                            example: "미션 제안"
+                          post_author_profile:
+                            type: string
+                            description: 게시물 작성자 프로필 이미지 URL
+                            example: "https://example.com/uploads/profile.jpg"
+                          post_author_nickname:
+                            type: string
+                            description: 게시물 작성자 닉네임
+                            example: "User123" 
+                          location_name:
+                            type: string
+                            description: 게시글과 연관된 지역 
+                            example: "인천" 
+                          title:
+                            type: string
+                            description: 게시물 제목
+                            example: "이런 건 어떤가요ㅋㅋ"  
+                          content:
+                            type: string
+                            description: 게시물 내용
+                            example: "순천 안온해변에서 갑자기 ..."  
+                          created_at:
+                            type: string
+                            format: date-time
+                            description: 게시물 작성일시
+                            example: "2025-01-17T14:55:22.000Z"
+                          updated_at:
+                            type: string
+                            description: 게시물 수정일시
+                            example: "2025-01-17T14:55:22.000Z"
+                          picture_urls:
+                            type: array
+                            description: 게시물 이미지 URL 리스트 
+                            items:
+                              type : string
+                            example: 
+                              - "https://example.com/uploads/image1.jpg"
+                              - "https://example.com/uploads/image2.jpg"
+                          total_comment:
+                            type: integer
+                            description: 총 댓글 수
+                            example: 5
+                          total_like:
+                            type: integer
+                            description: 총 좋아요 수
+                            example: 2
+                          total_scrap:
+                            type: integer
+                            description: 총 스크랩 수
+                            example: 3
+                      comments:
                         type: array
-                        description: 게시물 이미지 URL 리스트 
+                        description: 댓글 목록
                         items:
-                          type : string
-                        example: 
-                          - "https://example.com/uploads/image1.jpg"
-                          - "https://example.com/uploads/image2.jpg"
-                      comment_counts:
-                        type: integer
-                        description: 댓글 수
-                        example: 5
-                      like_counts:
-                        type: integer
-                        description: 좋아요 수
-                        example: 2
-                      scrap_counts:
-                        type: integer
-                        desription: 스크랩 수
-                        example: 3
-                  
-                  comments:
-                    type: array
-                    description: 댓글 목록
-                    items:
-                      type: object
-                      properties:
-                        user_id:
-                          type: integer
-                          description: 댓글 작성자 ID
-                        comment_author_name:
-                          type: string
-                          description: 댓글 작성자 닉네임
-                          example: "기사식당"  
-                        comment_author_profile:
-                          type: string
-                          description: 댓글 작성자 프로필 이미지 URL
-                          example: "http://example.com/image1.jpg"
-                        comment_created_at:
-                          type: string
-                          format: data-time
-                          description: 댓글 작성일시
-                          example: "2025-01-24T12:38:41.000Z"
-                        comment_content:
-                          type: string
-                          description: 댓글 내용
-                          example: "갑자기 갯벌핑ㅋㅋ" 
+                          type: object
+                          properties:
+                            user_id:
+                              type: integer
+                              description: 댓글 작성자 ID
+                            comment_author_name:
+                              type: string
+                              description: 댓글 작성자 닉네임
+                              example: "기사식당"  
+                            comment_author_profile:
+                              type: string
+                              description: 댓글 작성자 프로필 이미지 URL
+                              example: "http://example.com/image1.jpg"
+                            comment_created_at:
+                              type: string
+                              format: date-time
+                              description: 댓글 작성일시
+                              example: "2025-01-24T12:38:41.000Z"
+                            comment_content:
+                              type: string
+                              description: 댓글 내용
+                              example: "갑자기 갯벌핑ㅋㅋ" 
+                  liked: 
+                    type: boolean
+                    example: false
+                  scraped:
+                    type: boolean
+                    example: true        
+
         '404':
           description: "게시물을 찾을 수 없음"
           content:

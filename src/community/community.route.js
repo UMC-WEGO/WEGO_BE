@@ -74,7 +74,7 @@ communityRouter.get("/popular-posts",get_popular_posts_controller);
 
 
 //특정 게시물 조회
-communityRouter.get("/posts/:post_id", get_post_by_id_controller);
+communityRouter.get("/posts/:post_id", authenticateToken, get_post_by_id_controller);
 
 
 // 내가 쓴 글 조회 

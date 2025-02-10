@@ -206,8 +206,17 @@ export const get_post_by_id_controller = async(req,res,next) => {
         const post_id = parseInt(req.params.post_id);
         const post = await get_post_by_id_service(post_id);
 
+        const user_id = req.user_id; 
+
+        const like_exits = await check_like_exist_repository(post_id, user_id);
+        const scrap_exists = await check_scrap_exist_repository(post_id, user_id);
+
         if(post){
-            res.status(StatusCodes.OK).json(post);
+            res.status(StatusCodes.OK).json({
+                post: post,
+                liked: like_exits,
+                scraped: scrap_exists,
+            });
         } else {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "특정 게시물 조회 중에 에러가 발생했습니다."});
         }
