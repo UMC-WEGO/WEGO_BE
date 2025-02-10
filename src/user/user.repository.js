@@ -18,12 +18,12 @@ export const updateUserProfile = async (userId, nickname, email, profileImage) =
   const values = [];
   const updates = [];
 
-  if (nickname !== undefined && nickname !== null) {
+  if (nickname !== undefined && nickname !== null && nickname !== "") {
     updates.push(`nickname = ?`);
     values.push(nickname);
   }
 
-  if (email !== undefined && email !== null) {
+  if (email !== undefined && email !== "") {
     updates.push(`email = ?`);
     values.push(email);
   }
