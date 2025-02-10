@@ -132,11 +132,23 @@ export const deletePastTrip = async (travelId) => {
 export const getPostByUserId = async (userId) => {
   const postQuery = `
     SELECT
-      p.*,
+      p.id AS postId,
+      p.category_id AS categoryId,
+      c.name AS categoryName,
+      p.user_id AS userId,
+      p.local_id AS localId,
+      l.location_name AS locationName,
+      p.title,
+      p.content,
+      p.picture_url AS pictureUrl,
+      p.created_at AS createdAt,
+      p.updated_at AS updatedAt,
       (SELECT COUNT(*) FROM \`Like\` l WHERE l.post_id = p.id) AS likeCount,
       (SELECT COUNT(*) FROM scrap s WHERE s.post_id = p.id) AS scrapCount,
       (SELECT COUNT(*) FROM Comment c WHERE c.post_id = p.id) AS commentCount
     FROM Post p
+    JOIN category c ON p.category_id = c.id
+    JOIN local l ON p.local_id = l.id
     WHERE p.user_id = ?;
   `;
 
