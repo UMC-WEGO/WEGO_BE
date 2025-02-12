@@ -119,14 +119,17 @@ export const get_local_search_controller = async(req, res) => {
     try{
         const get_key = await get_local_search_service(user_id);
 
-        if(get_key) {
+        if(get_key.length > 0) {
             res.status(StatusCodes.OK).json(get_key);
         } else {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "최근 검색어 조회 중에 에러가 발생했습니다."});
+            res.status(StatusCodes.OK).json({
+                message: "최근 검색어가 없습니다.",
+                data: []
+            });
         }
     } catch (error) {
         console.error(error);
-        res.status(StatusCodes.NOT_FOUND).json({message : "해당 사용자의 최근 출발한 지역을 찾을 수 없습니다."});
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "최근 검색어 조회 중에 에러가 발생했습니다."});
     }
 }
 
