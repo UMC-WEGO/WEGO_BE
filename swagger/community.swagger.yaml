@@ -1447,23 +1447,25 @@ paths:
                         temp:
                           type: number
                           format: float
-                          example: "36.5"
-                        travel_counts:
+                          example: 36.5
+                        sum_travels:
                           type: integer
                           example: 3
-                        post_counts:
+                        sum_posts:
                           type: integer
                           example: 10
-                        mission_counts:
+                        sum_likes:
                           type: integer
-                          nullable: true
-                          example: null 
+                          example: 10
+                        sum_missions:
+                          type: integer
+                          example: 5
                     posts:  
                       type: array
                       items:
                         type: object
                         properties:
-                          id:
+                          post_id:
                             type: integer
                             example: 2
                           picture_url:
@@ -1486,6 +1488,15 @@ paths:
                             type: string
                             format: date-time
                             example: "2025-01-24T12:32:37.000Z"  
+                          total_comment:
+                            type: integer
+                            example: 1
+                          total_like:
+                            type: integer
+                            example: 4
+                          total_scrap:
+                            type: integer
+                            example: 1
           '404':
             description: 작성자의 프로필을 찾을 수 없습니다. 
             content:
