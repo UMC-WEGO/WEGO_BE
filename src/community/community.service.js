@@ -84,9 +84,6 @@ export const delete_post_service = async (post_id, user_id) => {
 export const get_local_search_service = async(user_id) => {
     const get_key = await get_local_search_repository(user_id);
     
-    if(Array.isArray(get_key) && get_key.length === 0) {
-        throw new Error("최근 검색어가 조회되지 않았습니다.");
-    }
     return get_key;
 }
 
