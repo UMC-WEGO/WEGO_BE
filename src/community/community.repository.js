@@ -544,37 +544,55 @@ export const get_scrap_by_category_repository = async(user_id, category_id, curs
 // 게시글 작성자 프로필 조회
 export const get_user_profile_repository = async(user_id) =>{
     const query = `
-        SELECT u.nickname, u.profile_image, u.temp, impromptu_total.travel_counts, post_count.post_counts, mission_count.mission_counts
+        SELECT u.nickname, u.profile_image, CAST(u.temp AS DECIMAL(5, 1)) AS temp, 
+            IFNULL(impromptu_total.travel_counts, 0) AS sum_travels,
+            IFNULL(post_count.post_counts, 0) AS sum_posts, 
+            IFNULL(like_count.total_likes, 0) AS sum_likes, 
+            IFNULL(mission_count.mission_counts, 0) AS sum_missions
 	    
         FROM User u
 
-	    LEFT JOIN ( SELECT user_id, COUNT(*) AS travel_counts FROM travel WHERE endDate < NOW() GROUP BY user_id) AS impromptu_total  ON impromptu_total.user_id = u.id
+	    LEFT JOIN ( SELECT user_id, COUNT(*) AS travel_counts FROM travel WHERE endDate < NOW() GROUP BY user_id) AS impromptu_total ON impromptu_total.user_id = u.id
 
 	    LEFT JOIN (SELECT user_id, COUNT(*) AS post_counts FROM Post p GROUP BY user_id) AS post_count ON post_count.user_id = u.id
-	    LEFT JOIN (SELECT user_id, COUNT(*) AS mission_counts FROM receive_mission rm Group BY user_id) AS mission_count ON mission_count.user_id = u.id
+	    LEFT JOIN (SELECT user_id, COUNT(*) AS mission_counts FROM receive_mission rm WHERE rm.status = 1 Group BY user_id) AS mission_count ON mission_count.user_id = u.id
 
-	    WHERE u.id = ?;
+        LEFT JOIN (SELECT p.user_id, SUM(l.like_count) AS total_likes FROM Post p
+            JOIN (SELECT post_id, COUNT(*) AS like_count FROM \`Like\` GROUP BY post_id) l ON l.post_id = p.id WHERE p.user_id = ? GROUP BY p.user_id) AS like_count ON like_count.user_id = u.id
+	    
+        WHERE u.id = ?;
     `;
-    
-    const [user_result] = await pool.execute(query,[user_id]);
-
-    if(user_result.length === 0) { return null; }
-    const user_info = user_result[0];
 
     const count_query = `
-        SELECT p.id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at
-        
+        SELECT p.id AS post_id, i.imgUrl AS picture_url, c.name AS category_name, p.title, p.content, l.location_name AS location_name, p.created_at, 
+            COALESCE(comment_counts.comment_count, 0) AS total_comment,
+            COALESCE(like_counts.like_count, 0) AS total_like,
+            COALESCE(scrap_counts.scrap_count, 0) AS total_scrap
+
         FROM Post p 
 
 	    JOIN category c ON c.id = p.category_id
 	    JOIN local l ON l.id = p.local_id
+
+        LEFT JOIN (SELECT post_id, COUNT(*) AS comment_count FROM Comment GROUP BY post_id) AS comment_counts ON comment_counts.post_id = p.id
+        LEFT JOIN (SELECT post_id, COUNT(*) AS like_count FROM \`Like\` GROUP BY post_id) AS like_counts ON like_counts.post_id = p.id
+        LEFT JOIN (SELECT post_id, COUNT(*) AS scrap_count FROM scrap GROUP BY post_id) AS scrap_counts ON scrap_counts.post_id = p.id
 
         LEFT JOIN (SELECT post_id, imgUrl FROM image WHERE id IN (SELECT MIN(id) FROM image GROUP BY post_id)) AS i ON i.post_id = p.id
 
 	    WHERE p.user_id = ?;
     `;
 
-    const [total_posts] = await pool.execute(count_query, [user_id]);
+    const [[user_result], [total_posts]] = await Promise.all([
+        pool.execute(query,[user_id, user_id]),
+        pool.execute(count_query, [user_id]),
+    ]);
+
+    if (user_result.length === 0) return null;
+
+    const user_info = user_result[0];
+    user_info.sum_likes = Number(user_info.sum_likes);
+    user_info.temp = Number(user_info.temp);
 
     return {
         user_info, 
