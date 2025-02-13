@@ -109,6 +109,38 @@ paths:
                     example: false
                   code:
                     type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "유효하지 않은 vehicle 또는 duration 값입니다."
+        '404':
+          description: "요청값 오류"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: "조건에 맞는 여행지가 없습니다."
+        '500':
+          description: "서버 오류"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                    example: false
+                  code:
+                    type: integer
                     example: 500
                   message:
                     type: string

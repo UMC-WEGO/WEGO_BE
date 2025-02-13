@@ -57,7 +57,13 @@ export const getFilterdRandomTrips = async (departure, vehicle, duration) => {
     const destinationsWithRegions = await Promise.all(
       rows.flatMap(async (trip) => {
       // 3가지 목적지 -> 배열 변환 (, 문자열 분리)
-      const destinations = trip.destination.split(",").map((dest) => dest.trim());
+      const destinations = trip.destination
+      ? trip.destination.split(",").map((dest) => dest.trim())
+      : [];
+
+      if (destinations.length === 0) {
+        return [];
+      }
       
       // 랜덤 3개 여행지 선택
       const randomDestinations = getRandomDestinations(destinations);
