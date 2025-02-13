@@ -7,6 +7,19 @@ import { deleteTrip } from "./home.repository.js";
 export const createRandomTrip = async (req, res) => {
   const { startDate, endDate, adult_participants, child_participants, departure, vehicle, duration } = req.body;
 
+  // 요청 값 검증
+  const validVehicles = ["자가용", "버스", "기차(KTX)"];
+  const validDurations = ["1", "1-2", "2-3", "3+"];
+
+  if (!validVehicles.includes(vehicle) || !validDurations.includes(duration)) {
+    return res.status(400).json({
+      isSuccess: false,
+      code: 400,
+      message: "유효하지 않은 vehicle 또는 duration 값입니다.",
+      result: [],
+    });
+  }
+  
   // 서비스 호출 -> 랜덤 여행지 3곳
   const result = await getRandomTrips(departure, vehicle, duration);
 
