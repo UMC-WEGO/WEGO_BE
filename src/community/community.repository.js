@@ -288,7 +288,7 @@ export const get_popular_posts_repository = async() => {
 // 특정 게시글 조회 
 export const get_post_by_id_repository = async (post_id) => {
     const post_query = `
-        SELECT p.id, c.name AS category_name, u.profile_image AS post_author_profile, u.nickname AS post_author_nickname, l.location_name AS location_name, p.title, p.content, p.created_at, p.updated_at,
+        SELECT u.id AS viewer_id, p.id, c.name AS category_name, u.profile_image AS post_author_profile, u.nickname AS post_author_nickname, l.location_name AS location_name, p.title, p.content, p.created_at, p.updated_at,
             GROUP_CONCAT(i.imgUrl ORDER BY i.id ASC) AS picture_urls,
             comment_count.comment_counts AS total_comment, like_count.like_counts AS total_like, scrap_count.scrap_counts AS total_scrap
             
@@ -316,7 +316,7 @@ export const get_post_by_id_repository = async (post_id) => {
     post_info.picture_urls = post_info.picture_urls ? post_info.picture_urls.split(',') : [];
 
     const comment_query = `
-	    SELECT cm.user_id, cu.nickname AS comment_author_name, cu.profile_image AS comment_author_profile, cm.created_at AS comment_created_at, cm.content AS comment_content
+	    SELECT cm.id AS comment_id, cm.user_id, cu.nickname AS comment_author_name, cu.profile_image AS comment_author_profile, cm.created_at AS comment_created_at, cm.content AS comment_content
 	    FROM Comment cm 
 	    JOIN User cu ON cu.id = cm.user_id
 	    WHERE cm.post_id = ?;

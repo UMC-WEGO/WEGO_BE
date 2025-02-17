@@ -695,6 +695,10 @@ paths:
                       post_info:
                         type: object
                         properties:
+                          viewer_id:
+                            type: integer
+                            description: 조회한 사용자 ID
+                            example: 5
                           id: 
                             type: integer
                             description: 게시물 ID
@@ -758,6 +762,10 @@ paths:
                         items:
                           type: object
                           properties:
+                            comment_id: 
+                              type: integer
+                              description: 댓글 ID
+                              example: 35
                             user_id:
                               type: integer
                               description: 댓글 작성자 ID
