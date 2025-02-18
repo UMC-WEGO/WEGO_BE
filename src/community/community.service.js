@@ -231,8 +231,11 @@ export const create_comment_service = async(post_id, user_id, data) => {
 export const delete_comment_service = async(post_id, comment_id, user_id) => {
     const delete_key = await delete_comment_respository(post_id, comment_id, user_id);
 
-    if(!delete_key){
-        throw new Error("댓글이 삭제되지 않았습니다.");
+    if (delete_key === null) {
+        throw new Error("게시글 또는 댓글이 존재하지 않습니다.");
+    }
+    if (!delete_key) {
+        throw new Error("삭제 권한이 없습니다.");
     }
 
     return delete_key;

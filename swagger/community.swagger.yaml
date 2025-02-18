@@ -1076,7 +1076,18 @@ paths:
                     example: 8
                   message:
                     type: string
-                    example: "댓글이 성공적으로 삭제되었습니다." 
+                    example: "댓글이 성공적으로 삭제되었습니다."
+        '403':
+          description: "삭제할 권한이 없음"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "삭제할 권한이 없습니다."
+
         '404':
           description: "존재하지 않는 게시물 또는 댓글"
           content:
