@@ -427,6 +427,18 @@ export const create_comment_repository = async(post_id, user_id, data) => {
 
 // 댓글 삭제 
 export const delete_comment_respository = async(post_id, comment_id, user_id) => {
+    
+    const checkQuery = `SELECT user_id FROM Comment WHERE post_id = ? AND id = ?`;
+    const [rows] = await pool.execute(checkQuery, [post_id, comment_id]);
+
+    if (rows.length === 0) {
+        return null; 
+    }
+
+    if (rows[0].user_id !== user_id) {
+        return false;
+    }
+    
     const query = `
         DELETE FROM Comment
         WHERE post_id = ? AND id = ? AND user_id = ?;
