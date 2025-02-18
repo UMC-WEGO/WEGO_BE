@@ -7,6 +7,7 @@ import {
     create_post_repository,
     update_post_repository,
     delete_post_repository,
+    get_post_repository,
 
     get_local_search_repository,
 
@@ -35,7 +36,22 @@ import {
 
 } from "./community.repository.js"
 
+import{ delete_images } from "../../config/s3.js"
 
+
+// 사진 삭제 
+export const delete_image_service = async(picture_urls) => {
+    if (!Array.isArray(picture_urls) || picture_urls.length === 0) {
+        throw new Error("삭제할 이미지 URL 배열이 제공되지 않았습니다.");
+    }
+    try {
+        await delete_images(picture_urls); 
+        console.log("Successfully deleted images from S3");
+    } catch (error) {
+        console.error("Error deleting images from S3:", error);
+        throw new Error("Failed to delete images from S3");
+    }
+}
 
 // 게시글 작성
 export const create_post_service = async (data, user_id) => {
@@ -58,7 +74,28 @@ export const create_post_service = async (data, user_id) => {
 
 // 게시물 수정
 export const update_post_service = async (post_id, user_id, data) => {
-    const update_key = await update_post_repository(post_id, user_id, data);
+    
+    const existing_post = await get_post_repository(post_id, user_id);
+    
+    if(!existing_post){
+        throw new Error("게시글을 찾을 수 없습니다.");
+    }
+
+    let updated_picture_urls = existing_post.picture_urls;
+
+    if (data.deleted_pictures?.length) {
+        updated_picture_urls = updated_picture_urls.filter(url => !data.deleted_pictures.includes(url));
+        await delete_images(data.deleted_pictures);
+    }
+
+    if (data.updated_pictures?.length) {
+        const new_picture_urls = data.updated_pictures;
+        updated_picture_urls = [...updated_picture_urls, ...new_picture_urls];
+    }
+
+    const updated_data = { ...data, picture_url: updated_picture_urls };
+
+    const update_key = await update_post_repository(post_id, user_id, updated_data);
 
     if(!update_key) {
         throw new Error("게시물이 수정되지 않았습니다.");
@@ -69,6 +106,16 @@ export const update_post_service = async (post_id, user_id, data) => {
 
 //게시물 삭제
 export const delete_post_service = async (post_id, user_id) => {
+    const post = await get_post_repository(post_id, user_id);
+
+    if(!post){
+        throw new Error("게시물이 존재하지 않습니다.");
+    }
+
+    if (post.picture_urls.length > 0) {
+        await delete_images(post.picture_urls);
+    }
+
     const delete_key = await delete_post_repository(post_id, user_id);
 
     if(!delete_key) {
@@ -136,6 +183,15 @@ export const get_post_by_id_service = async(post_id) => {
 
     if(!post || !post.post_info || !post.post_info.id) {
         throw new Error("게시글을 찾을 수 없습니다.");
+    }
+
+    if(post.post_info.picture_url) {
+        try {
+            post.post_info.picture_url = JSON.parse(post.post_info.picture_url);
+        } catch (error) {
+            console.error("picture url parsing error: ", error);
+            post.post_info.picture_url = [];
+        }
     }
 
     return post;

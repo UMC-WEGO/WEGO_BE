@@ -5,7 +5,7 @@ export const create_post_dto = (data) => ({
     local_id: data.local_id,        
     title: data.title,           
     content: data.content,         
-    picture_url: data.picture_url || [],  // 이미지 URL 배열, 기본값은 빈 배열
+    picture_url: Array.isArray(data.picture_url) ? data.picture_url : [],  // 이미지 URL 배열, 기본값은 빈 배열
 });
 
 // 게시글 추가 응답 DTO
