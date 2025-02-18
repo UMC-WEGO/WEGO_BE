@@ -40,8 +40,8 @@ export const upload_post = multer({
       }
   })
 }).fields([
-  { name: 'picture_url', maxCount: 10 },    // 게시글 업로드 시
-  { name: 'updated_pictures', maxCount: 10 } // 게시글 수정 시
+  { name: 'picture_url', maxCount: 10 },    // 게시글 업로드
+  { name: 'updated_pictures', maxCount: 10 } // 게시글 수정
 ]);
 
 
@@ -51,8 +51,6 @@ export const delete_images = async (picture_urls) => {
     if (!picture_urls || !Array.isArray(picture_urls) || picture_urls.length === 0) {
       throw new Error("삭제할 이미지 URL 배열이 제공되지 않았습니다.");
     }
-
-    console.log("삭제할 이미지 URLs: ", picture_urls);
     
     const deleteCommands = picture_urls.map((picture_url) => {
       const url = new URL(picture_url);

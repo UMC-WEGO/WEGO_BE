@@ -65,11 +65,11 @@ export const upload_image_controller = async(req,res) => {
         }
 
         const picture_urls = pictureFiles.map(file => file.location);
-        res.status(StatusCodes.OK).json({ picture_urls });
+        return res.status(StatusCodes.OK).json({ picture_urls });
 
     } catch(error) {
         console.error("이미지 업로드 오류: ", error);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "이미지 업로드 중 오류 발생"});
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "이미지 업로드 중 오류 발생"});
     }
 };
 
@@ -87,10 +87,10 @@ export const delete_image_controller = async(req,res) => {
     try{
         await delete_image_service(picture_urls);
 
-        res.status(StatusCodes.OK).json({ message: "이미지가 성공적으로 삭제되었습니다." });
+        return res.status(StatusCodes.OK).json({ message: "이미지가 성공적으로 삭제되었습니다." });
     } catch(error) {
         console.error("이미지 삭제 오류: ", error);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "이미지 삭제 중 오류 발생"});
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "이미지 삭제 중 오류 발생"});
     }
 };
 
