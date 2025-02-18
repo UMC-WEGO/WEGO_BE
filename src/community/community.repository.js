@@ -38,32 +38,73 @@ export const create_post_repository = async(data, user_id) => {
     return new_post[0];
 };
 
+
+// 게시글 사진 정보를 가져옴  
+export const get_post_repository = async(post_id, user_id) => {
+    const query = `
+        SELECT picture_url
+        FROM Post
+        WHERE id = ? AND user_id = ?;
+    `;
+
+    const [rows] = await pool.execute(query,[post_id, user_id]);
+
+    if(rows.length ===0) {
+        return null;
+    }
+
+    const picture_urls = JSON.parse(rows[0].picture_url);
+
+    return {
+        picture_urls
+    };
+}
+
 // 게시글 수정
 export const update_post_repository = async (post_id, user_id, data) => {
 
     const updates = [];
     const values = [];
 
-    if (data.category_id !== undefined) {
-        updates.push("category_id = ?");
-        values.push(data.category_id);
+    const current_post_query = 'SELECT * FROM Post WHERE id = ? AND user_id = ?';
+    const [current_post] = await pool.execute(current_post_query, [post_id, user_id]);
+
+    if (current_post.length === 0) {
+        throw new Error("게시물을 찾을 수 없습니다.");
     }
-    if (data.local_id !== undefined) {
-        updates.push("local_id = ?");
-        values.push(data.local_id);
-    }
-    if (data.title !== undefined) {
-        updates.push("title = ?");
-        values.push(data.title);
-    }
-    if (data.content !== undefined) {
-        updates.push("content = ?");
-        values.push(data.content);
-    }
-    if (data.picture_url !== undefined) {
-        updates.push("picture_url = ?");
-        values.push(JSON.stringify(data.picture_url));
-    }
+
+    const existing_post = current_post[0];
+
+    const category_id = (data.category_id !== undefined && data.category_id !== null && data.category_id !== "") 
+        ? data.category_id 
+        : existing_post.category_id;
+    updates.push("category_id = ?");
+    values.push(category_id);
+
+    const local_id = (data.local_id !== undefined && data.local_id !== null && data.local_id !== "") 
+        ? data.local_id 
+        : existing_post.local_id;
+    updates.push("local_id = ?");
+    values.push(local_id);
+ 
+    const title = (data.title !== undefined && data.title !== null && data.title !== "") 
+        ? data.title 
+        : existing_post.title;
+    updates.push("title = ?");
+    values.push(title);
+ 
+    const content = (data.content !== undefined && data.content !== null && data.content !== "") 
+        ? data.content 
+        : existing_post.content;
+    updates.push("content = ?");
+    values.push(content);
+ 
+    const picture_url = (data.picture_url !== undefined && data.picture_url !== null && data.picture_url !== "") 
+        ? JSON.stringify(data.picture_url) 
+        : existing_post.picture_url;
+    updates.push("picture_url = ?");
+    values.push(picture_url);
+
 
     if (updates.length === 0) {
         return false; 
@@ -79,14 +120,14 @@ export const update_post_repository = async (post_id, user_id, data) => {
 
     const [result] = await pool.execute(query, values);
 
-    if(result.affectedRows >0 && data.picture_url !== undefined){
+    if(result.affectedRows >0){
         const delete_image_query = `
             DELETE FROM image
             WHERE post_id = ?;
         `;
         await pool.execute(delete_image_query,[post_id]);
 
-        if(data.picture_url.length > 0){
+        if(data.picture_url && data.picture_url.length > 0){
             const image_query = `
                 INSERT INTO image (post_id, imgUrl, created_at) 
                 VALUES ${data.picture_url.map(()=> "(?,?,NOW())").join(",")};

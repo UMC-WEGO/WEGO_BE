@@ -18,6 +18,8 @@ import {
 } from "./community.dto.js"
 
 import {
+    delete_image_service,
+
     create_post_service,
     update_post_service,
     delete_post_service,
@@ -50,8 +52,48 @@ import {
 
 } from "./community.service.js"
 
-
 import {check_post_exist_repository, check_like_exist_repository, check_scrap_exist_repository} from "./community.repository.js"
+
+
+// 이미지 업로드 - post_image
+export const upload_image_controller = async(req,res) => {
+    const pictureFiles = req.files.picture_url;
+
+    try {
+        if (!pictureFiles || pictureFiles.length === 0) {
+            return res.status(StatusCodes.BAD_REQUEST).json({ message: "이미지가 업로드되지 않았습니다." });
+        }
+
+        const picture_urls = pictureFiles.map(file => file.location);
+        res.status(StatusCodes.OK).json({ picture_urls });
+
+    } catch(error) {
+        console.error("이미지 업로드 오류: ", error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "이미지 업로드 중 오류 발생"});
+    }
+};
+
+
+// 이미지 삭제 - delete_image
+export const delete_image_controller = async(req,res) => {
+    const { picture_urls } = req.body;
+
+    console.log("Received picture_urls:", picture_urls);
+
+    if (!Array.isArray(picture_urls) || picture_urls.length === 0) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: "유효한 이미지 URL 배열을 제공해야 합니다." });
+    }
+
+    try{
+        await delete_image_service(picture_urls);
+
+        res.status(StatusCodes.OK).json({ message: "이미지가 성공적으로 삭제되었습니다." });
+    } catch(error) {
+        console.error("이미지 삭제 오류: ", error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "이미지 삭제 중 오류 발생"});
+    }
+};
+
 
 
 // 게시글 작성
@@ -59,6 +101,11 @@ export const create_post_controller = async(req,res,next) => {
     try {
         const post_data = create_post_dto(req.body);
         const user_id = req.user_id;
+
+        if (!post_data.picture_url || post_data.picture_url.length === 0) {
+            return res.status(StatusCodes.BAD_REQUEST).json({ message: "이미지 URL을 입력하세요." });
+          }
+
         const new_post = await create_post_service(post_data,user_id);
 
         res.status(StatusCodes.CREATED).json(new_post);
@@ -75,9 +122,19 @@ export const update_post_controller = async(req,res,next) => {
     const post_id = parseInt(req.params.post_id);
     const user_id = req.user_id;
     const post_data = req.body;
-
+    
     try {
-        const updated_post = await update_post_service(post_id, user_id, post_data);
+        const deleted_pictures = Array.isArray(req.body.deleted_pictures) 
+            ? req.body.deleted_pictures 
+            : req.body.deleted_pictures ? [req.body.deleted_pictures] : [];
+        const updated_pictures = req.files?.updated_pictures || [];
+        const picture_urls = updated_pictures.map(file => file.location);
+
+        const updated_post = await update_post_service(post_id, user_id, {
+            ...post_data,
+            deleted_pictures,
+            updated_pictures: picture_urls
+        });
 
         if(!updated_post){
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "게시물 수정 중에 에러가 발생했습니다."});

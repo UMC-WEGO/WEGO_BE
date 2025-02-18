@@ -2,6 +2,9 @@
 import express from "express";
 import authenticateToken from "../../config/jwt.middleware.js";
 import {
+    upload_image_controller,
+    delete_image_controller,
+
     create_post_controller,
     update_post_controller,
     delete_post_controller,
@@ -34,6 +37,8 @@ import {
 
 } from './community.controller.js'
 
+import { upload_post } from "../../config/s3.js";
+
 const communityRouter = express.Router();
 
 
@@ -42,11 +47,17 @@ communityRouter.get("/", (req, res) => {
 });
 
 
+// 이미지 업로드 
+communityRouter.post("/upload-image", upload_post, upload_image_controller);
+
+// 이미지 삭제
+communityRouter.delete("/delete-image", delete_image_controller);
+
 //게시글 작성
 communityRouter.post("/posts", authenticateToken, create_post_controller);
 
 // 게시글 수정
-communityRouter.patch("/posts/modify/:post_id", authenticateToken, update_post_controller);
+communityRouter.patch("/posts/modify/:post_id", authenticateToken, upload_post, update_post_controller);
 
 //게시글 삭제
 communityRouter.delete("/posts/delete/:post_id", authenticateToken, delete_post_controller);
