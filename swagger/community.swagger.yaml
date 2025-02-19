@@ -121,6 +121,7 @@ paths:
   /community/posts:
     post:
       summary: "즉흥여행 게시글 작성"
+      description: 게시글을 작성하고, 만약 게시글의 카테고리가 미션 제안(=2) 일 경우 미션을 생성함 
       tags:
         - COMMUNITY
       requestBody:
@@ -161,45 +162,143 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  post_id: 
-                    type: integer
-                    description: 게시물 ID
-                    example: 22
-                  user_nickname: 
-                    type: string
-                    description: 사용자 이름 
-                  category_name:
-                    type: string
-                    description: 카테고리 이름
-                    example: "현지 정보"
-                  location_name:
-                    type: string
-                    description: 지역 이름
-                    example: "제주"
-                  title:
-                    type: string
-                    description: 게시물 제목
-                    example: "이런건 어떤가요 ㅋㅋㅋ"
-                  content:
-                    type: string
-                    description: 게시물 본문
-                    example: "순천 안온해변에서 어쩌고"
-                  picture_url:
-                    type: array
-                    description: 이미지(최대 5개)
-                    example:
-                      - "https://example.com/uploads/image1.jpg"
-                      - "https://example.com/uploads/image2.jpg"
-                    items:
-                      type: string
-                      format: uri
-                  created_at:
-                    type: string
-                    format: date-time
-                    description: 생성 일시
-                    example: "2025-01-18T17:29:30.000Z"
+                oneOf:
+                  - type: object
+                    properties:
+                      post: 
+                        type: object
+                        properties:
+                          post_id: 
+                            type: integer
+                            description: 게시물 ID
+                            example: 22
+                          user_nickname: 
+                            type: string
+                            description: 사용자 이름 
+                          category_name:
+                            type: string
+                            description: 카테고리 이름
+                            example: "현지 정보"
+                          location_name:
+                            type: string
+                            description: 지역 이름
+                            example: "제주"
+                          title:
+                            type: string
+                            description: 게시물 제목
+                            example: "이런건 어떤가요 ㅋㅋㅋ"
+                          content:
+                            type: string
+                            description: 게시물 본문
+                            example: "순천 안온해변에서 어쩌고"
+                          picture_url:
+                            type: array
+                            description: 이미지(최대 5개)
+                            example:
+                              - "https://example.com/uploads/image1.jpg"
+                              - "https://example.com/uploads/image2.jpg"
+                            items:
+                              type: string
+                              format: uri
+                          created_at:
+                            type: string
+                            format: date-time
+                            description: 생성 일시
+                            example: "2025-01-18T17:29:30.000Z"
+                      mission:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            description: 미션 ID (카테고리가 미션 제안(2)일 경우에만 포함됨)
+                          title: 
+                            type: string
+                            description: 미션 제목
+                          imageUrl:
+                            type: string
+                            description: 미션 이미지 URL (맨 앞 1장) 
+                          content:
+                            type: string
+                            description: 미션 내용
+                          point:
+                            type: integer
+                            description: 미션 포인트 (기본값 = 0)
+                            default: 0
+                  - type: object
+                    properties:
+                    post: 
+                      type: object
+                      properties:
+                        post_id: 
+                          type: integer
+                          description: 게시물 ID
+                          example: 22
+                        user_nickname: 
+                          type: string
+                          description: 사용자 이름 
+                        category_name:
+                          type: string
+                          description: 카테고리 이름
+                          example: "현지 정보"
+                        location_name:
+                          type: string
+                          description: 지역 이름
+                          example: "제주"
+                        title:
+                          type: string
+                          description: 게시물 제목
+                          example: "이런건 어떤가요 ㅋㅋㅋ"
+                        content:
+                          type: string
+                          description: 게시물 본문
+                          example: "순천 안온해변에서 어쩌고"
+                        picture_url:
+                          type: array
+                          description: 이미지(최대 5개)
+                          example:
+                            - "https://example.com/uploads/image1.jpg"
+                            - "https://example.com/uploads/image2.jpg"
+                          items:
+                            type: string
+                            format: uri
+                        created_at:
+                          type: string
+                          format: date-time
+                          description: 생성 일시
+                          example: "2025-01-18T17:29:30.000Z"
+              examples:
+                missionAvailable(category_id = 2):
+                  value:  
+                    post: 
+                      post_id: 22
+                      user_nickname: "testuser"
+                      category_name: "미션 제안"
+                      location_name: "서울"
+                      title: "미션 제목"
+                      content: "미션 내용"
+                      picture_url:
+                        - "https://example.com/uploads/image1.jpg"                          
+                        - "https://example.com/uploads/image2.jpg"
+                    mission:
+                      id: 10
+                      title: "미션 제목"
+                      imageUrl: "https://example.com/uploads/mission_image.jpg"
+                      content: "미션 내용"
+                      point: 0
+                missionNotAvailable(category_id != 2):
+                  value:
+                    post: 
+                      post_id: 22
+                      user_nickname: "testuser"
+                      category_name: "즉흥 자랑"
+                      location_name: "서울"
+                      title: "게시물 제목"
+                      content: "게시물 내용"
+                      picture_url:
+                        - "https://example.com/uploads/image1.jpg"
+                        - "https://example.com/uploads/image2.jpg"
+                      created_at: "2025-01-18T17:29:30.000Z"
+                  
         "400":
           description: 잘못된 요청
           content:
