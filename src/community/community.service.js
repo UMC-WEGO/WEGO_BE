@@ -62,9 +62,7 @@ export const create_post_service = async (data, user_id) => {
             throw new Error("postKey가 존재하지 않습니다.");
         }
 
-        const response_dto = create_post_response_dto(post_key);
-
-        return response_dto;
+        return post_key;
 
     } catch(error) {
         console.error("게시글 생성 서비스 에러: ", error);

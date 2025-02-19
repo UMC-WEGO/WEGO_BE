@@ -35,7 +35,35 @@ export const create_post_repository = async(data, user_id) => {
 
     const [new_post] = await pool.execute(new_query, [post_id]);
 
-    return new_post[0];
+    const post_data = new_post[0];
+
+    if (post_data && post_data.picture_url) {
+        post_data.picture_url = JSON.parse(post_data.picture_url);
+    }
+
+    if (category_id === 2) {
+        const mission_query = `
+            INSERT INTO mission (title, imageUrl, content, point)
+            VALUES (?,?,?,0);
+        `;
+        await pool.execute(mission_query, [title, picture_url[0], content]);
+
+        const add_mission_query = `
+            SELECT * FROM mission WHERE title = ? AND content = ? ORDER BY id DESC LIMIT 1;
+        `;
+
+        const [mission] = await pool.execute(add_mission_query, [title, content]);
+        const mission_data = mission[0];
+
+        return {
+            post: post_data,
+            mission: mission_data
+        };
+    } else {
+        return {
+            post: post_data
+        };
+    }
 };
 
 
