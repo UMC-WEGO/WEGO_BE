@@ -35,6 +35,9 @@ export const upload_post = multer({
       contentType: multerS3.AUTO_CONTENT_TYPE,
       acl: 'bucket-owner-full-control',
       key: (req, file, cb) => {
+        if (!file) {
+          return cb(new Error("파일이 없습니다."));
+        }
         const filename = `post-photos/${Date.now()}_${file.originalname}`;
           cb(null, filename);
       }
