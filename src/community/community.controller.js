@@ -57,14 +57,19 @@ import {check_post_exist_repository, check_like_exist_repository, check_scrap_ex
 
 // 이미지 업로드 - post_image
 export const upload_image_controller = async(req,res) => {
-    const pictureFiles = req.files.picture_url;
 
     try {
-        if (!pictureFiles || pictureFiles.length === 0) {
+        if (!req.files || !req.files.picture_url) {
             return res.status(StatusCodes.BAD_REQUEST).json({ message: "이미지가 업로드되지 않았습니다." });
         }
 
-        const picture_urls = pictureFiles.map(file => file.location);
+        const picture_files = req.files.picture_url;
+
+        if (!picture_files || picture_files.length === 0) {
+            return res.status(StatusCodes.BAD_REQUEST).json({ message: "업로드된 이미지가 없습니다." });
+        }
+
+        const picture_urls = picture_files.map(file => file.location);
         return res.status(StatusCodes.OK).json({ picture_urls });
 
     } catch(error) {
