@@ -351,7 +351,7 @@ export const delete_comment_controller = async(req,res) => {
         if (error.message === "게시글 또는 댓글이 존재하지 않습니다.") {
             res.status(StatusCodes.NOT_FOUND).json({ message: "존재하지 않는 게시물, 댓글입니다." });
         } else if (error.message === "삭제 권한이 없습니다.") {
-            res.status(StatusCodes.FORBIDDEN).json({ message: "삭제할 권한이 없습니다." });
+            res.status(StatusCodes.ACCEPTED).json({ message: "삭제할 권한이 없습니다." });
         } else {
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "댓글 삭제 중 에러가 발생했습니다." });
         }

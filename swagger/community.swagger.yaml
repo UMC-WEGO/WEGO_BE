@@ -23,6 +23,9 @@ paths:
                     type: string
                     format: binary
                   description: 업로드할 이미지 파일 리스트
+              required:
+                - picture_url
+
       responses:
         '200':
           description: 이미지 업로드 성공
@@ -1117,7 +1120,7 @@ paths:
                   message:
                     type: string
                     example: "댓글이 성공적으로 삭제되었습니다."
-        '403':
+        '202':
           description: "삭제할 권한이 없음"
           content:
             application/json:
