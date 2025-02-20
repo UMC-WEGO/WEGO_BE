@@ -1,25 +1,27 @@
 import { pool } from "../../../config/db.config.js";
 
 // 특정 여행 ID로 저장된 미션 조회
+// 특정 여행 ID로 저장된 미션 조회 (인증 여부와 관계없이 모든 미션 조회)
 export const getAuthenticatedMissionsByTripId = async (tripId) => {
     const sql = `
-    SELECT 
-        p.id AS postId,
-        p.title,
-        p.content,
-        p.picture_url AS pictureUrl,
-        p.created_at AS createdAt,
-        c.name AS categoryName,
-        u.nickname AS author
-    FROM 
-        Post p
-    INNER JOIN category c ON p.category_id = c.id
-    INNER JOIN User u ON p.user_id = u.id
-    INNER JOIN local l ON p.local_id = l.id
-    WHERE 
-        l.location_name = ? AND p.status = 'ACTIVE';
-`;
-
+        SELECT 
+            rm.id AS mission_id,
+            rm.user_id,
+            rm.travel_id,
+            rm.content,
+            rm.picture,
+            rm.status, -- 인증 여부 포함 (TRUE / FALSE)
+            rm.created_at AS authenticated_at,
+            m.title,
+            m.content AS mission_content,
+            m.point
+        FROM 
+            receive_mission rm
+        JOIN 
+            mission m ON rm.mission_id = m.id
+        WHERE 
+            rm.travel_id = ?; -- 여행 ID 기준 조회
+    `;
 
     try {
         const [missions] = await pool.execute(sql, [tripId]);
@@ -28,6 +30,8 @@ export const getAuthenticatedMissionsByTripId = async (tripId) => {
         throw new Error(`Failed to fetch authenticated missions: ${error.message}`);
     }
 };
+
+
 
 // 미션 인증 추가
 export const insertMissionAuth = async (missionId, userId, content, picture) => {
