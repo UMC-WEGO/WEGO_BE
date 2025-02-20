@@ -98,14 +98,20 @@ export const fetchSpontaneousPosts = async (tripId, local) => {
     }
 };
 
-// 현재 여행 일정 조회 서비스
+// 현재 여행 일정 조회 서비스 
 export const fetchCurrentTripSchedule = async (tripId) => {
     try {
-        return await getTripById(tripId);
+        const travelData = await getTripById(tripId);
+        if (!travelData) {
+            throw new Error(`No travel schedule found for trip ID: ${tripId}`);
+        }
+        return travelData;
     } catch (error) {
-        throw new Error(`Error fetching trip schedule: ${error.message}`);
+        throw new Error(`Error fetching travel schedule: ${error.message}`);
     }
 };
+
+
 
 // 미션 인증 서비스
 export const authenticateMissionService = async (tripId, missionId, userId, evidence) => {
