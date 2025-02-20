@@ -102,7 +102,7 @@ export const getPastTripsController = async (req, res) => {
 
     try {
         const trips = await fetchPastTripsByUserId(userId);
-        res.status(200).json({ success: true, data: trips });
+        res.status(200).json({ success: true, data: trips, message:"지난 여행 목록이 성공적으로 조회되었습니다." });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

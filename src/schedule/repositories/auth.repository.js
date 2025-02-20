@@ -73,17 +73,66 @@ export const getCompletedMissionsByTripId = async (tripId) => {
 // 여행 ID로 여행 정보 가져오기
 export const getTripById = async (tripId) => {
     const sql = `
-        SELECT id, departure, vehicle, duration, destination
-        FROM trip
-        WHERE id = ?;
+        SELECT 
+            t.id, 
+            t.user_id, 
+            t.location, 
+            t.adult_participants,
+            t.child_participants, 
+            t.vehicle, 
+            t.duration, 
+            t.startDate, 
+            t.endDate,
+            -- 리시브 미션 테이블 정보 가져오기
+            rm.id AS mission_id,
+            rm.mission_id AS original_mission_id,
+            rm.content AS mission_content,
+            rm.picture AS mission_picture,
+            rm.status AS mission_status,
+            rm.created_at AS mission_created_at,
+            rm.updated_at AS mission_updated_at
+        FROM travel t
+        LEFT JOIN receive_mission rm ON t.id = rm.travel_id -- 여행 ID와 receive_mission의 travel_id 매칭
+        WHERE t.id = ?;
     `;
+
     try {
         const [result] = await pool.execute(sql, [tripId]);
-        return result[0];
+
+        if (result.length === 0) {
+            return null; // 여행 일정이 없을 경우
+        }
+
+        // 미션 정보를 배열로 변환
+        const tripData = {
+            id: result[0].id,
+            user_id: result[0].user_id,
+            location: result[0].location,
+            participants: result[0].participants,
+            vehicle: result[0].vehicle,
+            duration: result[0].duration,
+            startDate: result[0].startDate,
+            endDate: result[0].endDate,
+            missions: result
+                .map(row => ({
+                    mission_id: row.mission_id,
+                    original_mission_id: row.original_mission_id,
+                    content: row.mission_content,
+                    picture: row.mission_picture,
+                    status: row.mission_status,
+                    created_at: row.mission_created_at,
+                    updated_at: row.mission_updated_at
+                }))
+                .filter(mission => mission.mission_id !== null) // null 값 제거
+        };
+
+        return tripData;
     } catch (error) {
-        throw new Error(`Failed to fetch trip: ${error.message}`);
+        throw new Error(`Failed to fetch travel schedule: ${error.message}`);
     }
 };
+
+
 
 // 특정 여행 ID와 지역으로 즉흥 게시글 조회
 export const getSpontaneousPostsByTripAndLocal = async (tripId, local) => {
