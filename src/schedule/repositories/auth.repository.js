@@ -221,6 +221,8 @@ export const getTripSchedulesByUserId = async (userId) => {
     }
 };
 
+//
+//
 
 // 지난 여행 일정 목록 조회
 export const getPastTripsByUserId = async (userId) => {
