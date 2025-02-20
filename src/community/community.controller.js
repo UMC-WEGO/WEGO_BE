@@ -107,9 +107,9 @@ export const create_post_controller = async(req,res,next) => {
         const post_data = create_post_dto(req.body);
         const user_id = req.user_id;
 
-        if (!post_data.picture_url || post_data.picture_url.length === 0) {
-            return res.status(StatusCodes.BAD_REQUEST).json({ message: "이미지 URL을 입력하세요." });
-          }
+        if (!post_data.picture_url) {
+            post_data.picture_url = [];
+        }
 
         const new_post = await create_post_service(post_data,user_id);
 
