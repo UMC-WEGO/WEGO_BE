@@ -149,7 +149,7 @@ paths:
                   example: "순천 안온해변에서 어쩌고"
                 picture_url:
                   type: array
-                  description: 이미지(최대 5개)
+                  description: 이미지(최대 5개), [] 도 가능 
                   example: 
                     - "https://example.com/uploads/image1.jpg"
                     - "https://example.com/uploads/image2.jpg"
