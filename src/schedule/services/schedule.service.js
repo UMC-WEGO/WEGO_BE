@@ -137,10 +137,15 @@ export const fetchCompletedMissions = async (tripId) => {
 };
 
 
-// 저장된 미션 조회 서비스
+// 저장된 미션 조회 서비스 
 export const fetchAuthenticatedMissions = async (tripId) => {
     try {
         const missions = await getAuthenticatedMissionsByTripId(tripId);
+
+        if (missions.length === 0) {
+            throw new Error(`No missions found for trip ID: ${tripId}`);
+        }
+
         return missions.map(mapAuthenticatedMission);
     } catch (error) {
         throw new Error(`Service error: ${error.message}`);
