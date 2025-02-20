@@ -518,6 +518,14 @@ paths:
                       type: integer
                       description: 총 스크랩 수
                       example: 3 
+                    liked: 
+                      type: boolean
+                      description: viewer의 공감 여부 
+                      example: false
+                    scraped:
+                      type: boolean
+                      description: view의 스크랩 여부
+                      example: true  
         '500':
           description: "서버 에러"
           content:
