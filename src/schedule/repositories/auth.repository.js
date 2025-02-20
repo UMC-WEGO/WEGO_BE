@@ -50,25 +50,65 @@ export const insertMissionAuth = async (missionId, userId, content, picture) => 
 export const getCompletedMissionsByTripId = async (tripId) => {
     const sql = `
         SELECT 
-            m.id, 
-            m.title, 
-            m.content, 
-            m.point
+            m.id AS mission_id, 
+            m.title AS mission_title, 
+            m.content AS mission_content, 
+            m.point AS mission_point,
+            rm.status AS mission_status,
+            rm.created_at AS mission_created_at,
+            rm.updated_at AS mission_updated_at,
+            -- 여행 일정 정보 추가
+            t.id AS travel_id,
+            t.user_id AS travel_user_id,
+            t.location AS travel_location,
+            t.vehicle AS travel_vehicle,
+            t.duration AS travel_duration,
+            t.startDate AS travel_startDate,
+            t.endDate AS travel_endDate
         FROM 
             mission m
         JOIN 
             receive_mission rm ON m.id = rm.mission_id
+        JOIN
+            travel t ON rm.travel_id = t.id  -- 여행 ID와 매칭
         WHERE 
-            rm.status = TRUE AND rm.user_id = ?;
+            rm.status = TRUE AND t.id = ?;   -- 완료된 미션이면서 특정 여행(tripId)에 속한 것만 조회
     `;
 
     try {
-        const [missions] = await pool.execute(sql, [tripId]);
-        return missions;
+        const [result] = await pool.execute(sql, [tripId]);
+
+        if (result.length === 0) {
+            return null; // 여행 일정이 없을 경우
+        }
+
+        // 여행 일정 정보
+        const travelInfo = {
+            id: result[0].travel_id,
+            user_id: result[0].travel_user_id,
+            location: result[0].travel_location,
+            participants: result[0].travel_participants,
+            vehicle: result[0].travel_vehicle,
+            duration: result[0].travel_duration,
+            startDate: result[0].travel_startDate,
+            endDate: result[0].travel_endDate,
+            completed_missions: result.map(row => ({
+                mission_id: row.mission_id,
+                title: row.mission_title,
+                content: row.mission_content,
+                point: row.mission_point,
+                status: row.mission_status,
+                created_at: row.mission_created_at,
+                updated_at: row.mission_updated_at
+            }))
+        };
+
+        return travelInfo;
     } catch (error) {
-        throw new Error(`Failed to fetch completed missions: ${error.message}`);
+        throw new Error(`Failed to fetch completed missions with travel details: ${error.message}`);
     }
 };
+
 
 // 여행 ID로 여행 정보 가져오기
 export const getTripById = async (tripId) => {
