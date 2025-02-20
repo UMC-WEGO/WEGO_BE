@@ -210,7 +210,7 @@ export const getTripSchedulesByUserId = async (userId) => {
     const sql = `
         SELECT id, user_id, location, adult_participants, child_participants, vehicle, duration, startDate, endDate
         FROM travel
-          AND user_id = ?; -- 특정 userId로 필터링
+        WHERE user_id = ?; -- 특정 userId로 필터링
     `;
 
     try {
@@ -220,6 +220,9 @@ export const getTripSchedulesByUserId = async (userId) => {
         throw new Error(`Failed to fetch trip schedules: ${error.message}`);
     }
 };
+
+//
+//
 
 // 지난 여행 일정 목록 조회
 export const getPastTripsByUserId = async (userId) => {
