@@ -81,7 +81,7 @@ communityRouter.get("/posts/top", get_top_controller);
 
 
 // 인기 게시판 조회
-communityRouter.get("/popular-posts",get_popular_posts_controller);
+communityRouter.get("/popular-posts", authenticateToken ,get_popular_posts_controller);
 
 
 //특정 게시물 조회

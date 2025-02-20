@@ -263,8 +263,14 @@ export const get_top_controller = async(req, res) => {
 // 인기 게시판 조회 
 export const get_popular_posts_controller = async(req,res) => {
     try {
+        const user_id = req.user_id;
         const popular_posts = await get_popular_posts_service();
-        res.status(StatusCodes.OK).json(popular_posts);
+
+        for(const post of popular_posts) {
+            post.liked = await check_like_exist_repository(post.post_id, user_id);
+            post.scraped = await check_scrap_exist_repository(post.post_id, user_id);
+        }
+        res.status(StatusCodes.OK).json({popular_posts: popular_posts});
     } catch(error) {
         console.error(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: "인기 게시판 조회중 에러가 발생했습니다."});
