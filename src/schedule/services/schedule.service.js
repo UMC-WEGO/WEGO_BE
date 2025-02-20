@@ -126,11 +126,16 @@ export const authenticateMissionService = async (tripId, missionId, userId, evid
 // 완료된 미션 조회 서비스
 export const fetchCompletedMissions = async (tripId) => {
     try {
-        return await getCompletedMissionsByTripId(tripId);
+        const travelWithMissions = await getCompletedMissionsByTripId(tripId);
+        if (!travelWithMissions) {
+            throw new Error(`No completed missions found for trip ID: ${tripId}`);
+        }
+        return travelWithMissions;
     } catch (error) {
-        throw new Error(`Error fetching completed missions: ${error.message}`);
+        throw new Error(`Error fetching completed missions with travel details: ${error.message}`);
     }
 };
+
 
 // 저장된 미션 조회 서비스
 export const fetchAuthenticatedMissions = async (tripId) => {
