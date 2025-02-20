@@ -168,9 +168,8 @@ export const getSpontaneousPostsByTripAndLocal = async (tripId, local) => {
 // 여행 일정 목록 조회
 export const getTripSchedulesByUserId = async (userId) => {
     const sql = `
-        SELECT id, user_id, mission_id, location, participants, vehicle, duration, startDate, endDate
+        SELECT id, user_id, location, participants, vehicle, duration, startDate, endDate
         FROM travel
-        WHERE NOW() BETWEEN startDate AND endDate -- 현재 날짜에 해당하는 여행만 조회
           AND user_id = ?; -- 특정 userId로 필터링
     `;
 
