@@ -208,7 +208,7 @@ export const getSpontaneousPostsByTripAndLocal = async (tripId, local) => {
 // 여행 일정 목록 조회
 export const getTripSchedulesByUserId = async (userId) => {
     const sql = `
-        SELECT id, user_id, location, participants, vehicle, duration, startDate, endDate
+        SELECT id, user_id, location, adult_participants, child_participants, vehicle, duration, startDate, endDate
         FROM travel
           AND user_id = ?; -- 특정 userId로 필터링
     `;
@@ -224,7 +224,7 @@ export const getTripSchedulesByUserId = async (userId) => {
 // 지난 여행 일정 목록 조회
 export const getPastTripsByUserId = async (userId) => {
     const sql = `
-        SELECT id, user_id, mission_id, location, participants, vehicle, duration, startDate, endDate
+        SELECT id, user_id, location, adult_participants, child_participants, vehicle, duration, startDate, endDate
         FROM travel
         WHERE endDate < NOW() -- 종료된 여행만 조회
           AND user_id = ?; -- 특정 userId로 필터링
@@ -247,7 +247,8 @@ export const getTravelById = async (tripId) => {
             t.location, 
             t.vehicle, 
             t.duration, 
-            t.participants, 
+            t.adult_participants,
+            t.child_participants
             t.startDate, 
             t.endDate
         FROM 
