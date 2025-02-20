@@ -200,10 +200,17 @@ export const get_local_search_controller = async(req, res) => {
 // 전체 글 조회 
 export const get_all_posts_controller = async(req,res,next) => {
     const cursor = parseInt(req.query.cursor) || 20;
+    const user_id = req.user_id;
 
     try {
         const posts = await get_all_posts_service(cursor);
-        res.status(StatusCodes.OK).json(posts);
+
+        for (const post of posts) {
+            post.liked = await check_like_exist_repository(post.post_id, user_id);
+            post.scraped = await check_scrap_exist_repository(post.post_id, user_id);
+        }
+        res.status(StatusCodes.OK).json({posts: posts,});
+
     } catch(error){
         console.error(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "전체 글 조회 중에 에러가 발생했습니다. "});

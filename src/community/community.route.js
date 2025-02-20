@@ -68,7 +68,7 @@ communityRouter.get("/posts/local-search", authenticateToken, get_local_search_c
 
 
 //전체 게시글 조회
-communityRouter.get("/impromptu-posts", get_all_posts_controller);
+communityRouter.get("/impromptu-posts", authenticateToken, get_all_posts_controller);
 
 // 카테고리별 게시글 조회 
 communityRouter.get("/impromptu-posts/:category_id", get_posts_by_category_controller);
