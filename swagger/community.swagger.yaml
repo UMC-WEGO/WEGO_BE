@@ -524,7 +524,7 @@ paths:
                       example: false
                     scraped:
                       type: boolean
-                      description: view의 스크랩 여부
+                      description: viewer의 스크랩 여부
                       example: true  
         '500':
           description: "서버 에러"
@@ -886,6 +886,14 @@ paths:
                       type: string
                       description: 인기 점수
                       example: "0.0"
+                    liked: 
+                      type: boolean
+                      description: viewer의 공감 여부 
+                      example: false
+                    scraped:
+                      type: boolean
+                      description: viewer의 스크랩 여부
+                      example: true  
         '500':
           description: "서버 에러"
           content:
