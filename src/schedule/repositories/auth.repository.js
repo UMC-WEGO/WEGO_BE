@@ -251,7 +251,7 @@ export const getTravelById = async (tripId) => {
             t.vehicle, 
             t.duration, 
             t.adult_participants,
-            t.child_participants
+            t.child_participants,
             t.startDate, 
             t.endDate
         FROM 
