@@ -171,7 +171,7 @@ export const checkMission = async(user_id, mission_id) => {
   return rows[0].exists_mission;
 }
 
-// 인기 미션 3개 조회
+// 인기 미션 8개 조회
 export const getTop3PopularMissions = async () => {
   const query = `
     SELECT
@@ -185,15 +185,15 @@ export const getTop3PopularMissions = async () => {
     JOIN mission m ON rm.mission_id = m.id
     GROUP BY rm.mission_id
     ORDER BY user_count DESC
-    LIMIT 3;
+    LIMIT 8;
   `;
 
   try {
     const [rows] = await pool.execute(query);
-    console.log("인기 미션 3개 레포지토리: ", rows);
+    console.log("인기 미션 8개 레포지토리: ", rows);
     return rows;
   } catch (error) {
-    throw new Error("인기 미션 3개 조회 중 레포지토리 오류");
+    throw new Error("인기 미션 8개 조회 중 레포지토리 오류");
   }
 };
 
