@@ -272,6 +272,9 @@ paths:
                             userCount:
                               type: integer
                               description: "해당 미션 저장 사용자 수"
+                            exists_mission:
+                              type: integer
+                              description: "사용자의 미션 저장 여부(0: 존재하지 않음, 1: 존재함)"
                         example:
                           - missionId: 2
                             title: "명소 인증샷 찍기"
@@ -279,18 +282,21 @@ paths:
                             point: 100
                             imageUrl: https://example.com/images/landmark-photo.jpg
                             userCount: 4
+                            exists_mission: 0 
                           - missionId: 4
                             title: "자연 속 산책"
                             content: "근처 공원이나 자연 속을 걸으며 힐링하세요."
                             point: 30
                             imageUrl: https://example.com/images/nature-walk.jpg
                             userCount: 4
+                            exists_mission: 1
                           - missionId: 5
                             title: "기념품  구입"
                             content: "특별한 여행 기념품을 구매하고 사진으로 기록하세요."
                             point: 70
                             imageUrl: https://example.com/images/souvenir.jpg
                             userCount: 4
+                            exists_mission: 1
         '400':
           description: "잘못된 요청"
           content:

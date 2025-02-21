@@ -108,7 +108,9 @@ export const deleteUpcomingTrip = async (req, res) => {
 export const getPopularMissionController = async (req, res) => {
   
   try {
-    const result = await getTop3PopularMissionService();
+    const user_id = req.user_id;
+
+    const result = await getTop3PopularMissionService(user_id);
     console.log("서비스에서 받은 인기 미션: ", result);
     res.status(200).json({
       isSuccess: true,
