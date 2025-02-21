@@ -160,6 +160,17 @@ export const deleteTrip = async (id) => {
   }
 };
 
+
+// 저장한 미션 확인 
+export const checkMission = async(user_id, mission_id) => {
+  const query = `
+    SELECT EXISTS (SELECT 1 FROM receive_mission WHERE user_id = ? AND mission_id = ?) AS exists_mission;
+  `;
+
+  const [rows] = await pool.execute(query, [user_id, mission_id]);
+  return rows[0].exists_mission;
+}
+
 // 인기 미션 3개 조회
 export const getTop3PopularMissions = async () => {
   const query = `

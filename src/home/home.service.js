@@ -1,4 +1,4 @@
-import { deleteTrip, findClosestTravel, findMissionExists, getFilterdRandomTrips, getTop3PopularMissions, getUpcomingTrips, savePopularMission, saveTrip } from "./home.repository.js"
+import { deleteTrip, findClosestTravel, findMissionExists, getFilterdRandomTrips, checkMission, getTop3PopularMissions, getUpcomingTrips, savePopularMission, saveTrip } from "./home.repository.js"
 import { response } from '../../config/response.js';
 import { popularMissionDto, saveTripDto, upcomingTripDto } from "./home.dto.js";
 
@@ -126,7 +126,7 @@ export const deleteTripService = async (tripId) => {
 };
 
 // 인기 미션 3개 조회
-export const getTop3PopularMissionService = async () => {
+export const getTop3PopularMissionService = async (user_id) => {
   try {
     const missions = await getTop3PopularMissions();
     
@@ -135,7 +135,14 @@ export const getTop3PopularMissionService = async () => {
     if (!missions || missions.length === 0) {
       throw new Error("No missions returned");
     }
-    const result = popularMissionDto(missions);
+
+    const missionsWithCheck = await Promise.all(missions.map(async (mission) => {
+      const exists = await checkMission(user_id, mission.mission_id);
+      return { ...mission, exists_mission: exists };
+    }));
+    
+
+    const result = popularMissionDto(missionsWithCheck);
     console.log("dto 변환된 인기 미션 3개: ", result);
 
     if (!result) {

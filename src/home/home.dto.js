@@ -82,6 +82,7 @@ export const popularMissionDto = (missions) => {
       point: mission.point,
       imageUrl: mission.imageUrl,
       userCount: mission.user_count,
+      exists_mission: mission.exists_mission
     })),
   };
 }
