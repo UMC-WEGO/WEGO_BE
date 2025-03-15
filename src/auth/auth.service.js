@@ -26,8 +26,6 @@ export const signUp = async (signUpDto) => {
     throw new Error('이메일 인증이 완료되지 않았습니다.');
   }
 
-  console.log('Password before hash: ', password); 
-
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const newUser = await createUser({ 
@@ -52,12 +50,8 @@ export const login = async (loginDto) => {
       throw new Error('잘못된 이메일 또는 비밀번호입니다.');
     }
 
-    console.log('Input password:', password); // 사용자가 입력한 비밀번호
-    console.log('Stored hashed password:', user.password);
-
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    console.log('Password is valid:', isPasswordValid);
 
     if (!isPasswordValid) {
       throw new Error('잘못된 이메일 또는 비밀번호입니다.');
@@ -66,11 +60,9 @@ export const login = async (loginDto) => {
     const tokens = generateTokens(user.id);
 
     await updateUserRefreshToken(user.id, tokens.refreshToken);
-    console.log('Generated tokens:', tokens);
 
     return tokens;
   } catch (error) {
-    console.error('로그인 에러:', error.message);
     throw error;
   }
 };
@@ -116,7 +108,6 @@ export const refreshTokens = async (refreshToken) => {
 
     return tokens;
   } catch (error) {
-    console.error('토큰 재발급 에러:', error.message);
     throw new Error('리프레시 토큰 검증 중 오류가 발생했습니다.');
   }
 };
@@ -137,7 +128,6 @@ export const logout = async (user_id) => {
 
     return { message: '로그아웃 성공' };
   } catch (error) {
-    console.error('로그아웃 에러:', error.message);
     throw new Error('로그아웃 처리 중 오류가 발생했습니다.');
   }
 };
@@ -145,7 +135,6 @@ export const logout = async (user_id) => {
 export const sendEmailVerificationCode = async (email) => {
 
   const existingUser = await findUserByEmail(email);
-  console.log(existingUser)
   if (existingUser) {
     
     throw new Error('이미 사용 중인 이메일입니다.');
@@ -188,7 +177,6 @@ export const sendEmailVerificationCode = async (email) => {
   try {
 
     await transporter.sendMail(mailOptions);
-    console.log(`Verification code sent to ${email}`);
 
     await createAuthCode({
       email,
@@ -198,7 +186,6 @@ export const sendEmailVerificationCode = async (email) => {
     });
 
   } catch (error) {
-    console.error('Error sending email:', error.message);
     throw new Error('이메일 전송 중 오류가 발생했습니다.');
   }
 };
@@ -264,7 +251,6 @@ export const sendPasswordVerificationCode = async (email) => {
   try {
 
     await transporter.sendMail(mailOptions);
-    console.log(`Verification code sent to ${email}`);
 
     await createAuthCode({
       email,
@@ -274,7 +260,6 @@ export const sendPasswordVerificationCode = async (email) => {
     });
 
   } catch (error) {
-    console.error('Error sending email:', error.message);
     throw new Error('이메일 전송 중 오류가 발생했습니다.');
   }
 };
